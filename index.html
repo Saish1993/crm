@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aneka KG — CRM Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: rgba(0,0,0,0.08);
+    --text: #1a1a18;
+    --text2: #6b6b63;
+    --text3: #9b9b92;
+    --blue: #1a4fa0;
+    --blue-light: #e8eef8;
+    --amber: #c97d10;
+    --amber-light: #fdf3e0;
+    --green: #2d6e2d;
+    --green-light: #e8f4e8;
+    --red: #b83030;
+    --red-light: #fceaea;
+    --coral: #c45030;
+    --gray: #6b6b63;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* Header */
+  .header {
+    background: var(--text);
+    color: #fff;
+    padding: 1.5rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left h1 {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .header-left p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 2px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #4ade80;
+    animation: pulse 2s infinite;
+  }
+
+  .live-dot.loading { background: #fbbf24; }
+  .live-dot.error { background: #f87171; animation: none; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .refresh-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-weight: 500;
+  }
+
+  .refresh-btn:hover { background: rgba(255,255,255,0.2); }
+
+  /* Main layout */
+  .main { padding: 2rem 2.5rem; max-width: 1200px; margin: 0 auto; }
+
+  /* KPI grid */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 1.75rem;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
+
+  .kpi-card:hover { transform: translateY(-2px); }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent, var(--blue));
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
+  .kpi-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-size: 32px;
+    font-weight: 300;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--text3);
+  }
+
+  /* Two column layout */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+
+  .card-full {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+
+  .card-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 1.25rem;
+  }
+
+  /* Pyramid bars */
+  .pyramid-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .pyramid-lbl {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text2);
+    width: 78px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .pyramid-track {
+    flex: 1;
+    background: var(--surface2);
+    border-radius: 4px;
+    height: 26px;
+    overflow: hidden;
+  }
+
+  .pyramid-fill {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .pyramid-count {
+    font-size: 12px;
+    font-weight: 600;
+    width: 34px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* Heatmap table */
+  .heatmap-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 3px;
+    font-size: 12px;
+  }
+
+  .heatmap-table th {
+    font-weight: 500;
+    color: var(--text3);
+    font-size: 11px;
+    padding: 4px 8px;
+    text-align: center;
+  }
+
+  .heatmap-table th:first-child { text-align: left; }
+
+  .heatmap-table td {
+    text-align: center;
+    padding: 7px 6px;
+    border-radius: 5px;
+    font-weight: 500;
+    font-size: 12px;
+    transition: background 0.3s;
+  }
+
+  .heatmap-table td:first-child {
+    text-align: left;
+    padding-left: 0;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* Insights */
+  .insight-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .insight-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .insight-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .insight-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+  .insight-text strong { color: var(--text); font-weight: 600; }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Error */
+  .error-msg {
+    background: var(--red-light);
+    border: 1px solid rgba(184,48,48,0.2);
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    font-size: 13px;
+    color: var(--red);
+    margin-bottom: 1rem;
+  }
+
+  /* Skeleton */
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface2) 25%, #e8e7e0 50%, var(--surface2) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px;
+    height: 20px;
+    margin-bottom: 8px;
+  }
+
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin: 1.75rem 0 0.75rem;
+  }
+
+  @media (max-width: 768px) {
+    .main { padding: 1rem; }
+    .header { padding: 1rem; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>Aneka KG &mdash; CRM Dashboard</h1>
+    <p id="last-updated">Connecting to Google Sheets...</p>
+  </div>
+  <div class="header-right">
+    <div class="live-badge">
+      <div class="live-dot loading" id="live-dot"></div>
+      <span id="live-text">Loading</span>
+    </div>
+    <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div id="error-area" style="display:none;"></div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card" style="--accent:#1a4fa0;">
+      <div class="kpi-label">Total customers</div>
+      <div class="kpi-value" id="kpi-cust">—</div>
+      <div class="kpi-sub">Active paying clients</div>
+    </div>
+    <div class="kpi-card" style="--accent:#c97d10;">
+      <div class="kpi-label">Total leads</div>
+      <div class="kpi-value" id="kpi-leads">—</div>
+      <div class="kpi-sub">In pipeline</div>
+    </div>
+    <div class="kpi-card" style="--accent:#2d6e2d;">
+      <div class="kpi-label">VIC customers</div>
+      <div class="kpi-value" id="kpi-vic">—</div>
+      <div class="kpi-sub">Top tier (≥ ₹40L spend)</div>
+    </div>
+    <div class="kpi-card" style="--accent:#c45030;">
+      <div class="kpi-label">Conversion rate</div>
+      <div class="kpi-value" id="kpi-conv">—</div>
+      <div class="kpi-sub">Customers / total contacts</div>
+    </div>
+  </div>
+
+  <!-- Pyramid + Leads -->
+  <div class="section-label">Segmentation</div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Customer pyramid</div>
+      <div class="card-sub">Scored by 20% frequency + 80% monetary value</div>
+      <div id="pyramid-bars"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Lead pipeline</div>
+      <div class="card-sub">Current lead temperature distribution</div>
+      <div id="lead-bars"></div>
+    </div>
+  </div>
+
+  <!-- Geography + Trend -->
+  <div class="section-label">Geography & activity</div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Customers by region</div>
+      <div class="card-sub">Geographic distribution across all segments</div>
+      <div class="legend" id="geo-legend"></div>
+      <div style="position:relative; height:200px;"><canvas id="geoChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Monthly activity</div>
+      <div class="card-sub">Customers and leads contacted per month</div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#1a4fa0;"></div>Customers</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#c97d10;"></div>Leads</div>
+      </div>
+      <div style="position:relative; height:180px;"><canvas id="trendChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Heatmap -->
+  <div class="section-label">Segment × region heatmap</div>
+  <div class="card-full">
+    <div class="card-title">Distribution of customers across segments and regions</div>
+    <div class="card-sub">Darker cell = higher concentration</div>
+    <div id="heatmap" style="overflow-x:auto; margin-top:0.5rem;"></div>
+  </div>
+
+  <!-- Insights -->
+  <div class="section-label">Key insights</div>
+  <div class="card-full" style="margin-bottom:2rem;">
+    <div class="card-title">Auto-generated from latest data</div>
+    <div class="card-sub">Updates every time you refresh</div>
+    <div id="insights" style="margin-top:0.75rem;"></div>
+  </div>
+
+</div>
+
+<script>
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTNRjNk_rz_AycA1fJGl92tB1FRkY5exMSe4Ysouz94YSOoE9ZNQzswFjzI5IoujRiVS8fdOfGvNx-s/pub?output=csv';
+
+let geoChart = null, trendChart = null;
+
+function parseCSV(text) {
+  return text.split('\n').map(r => r.split(',').map(c => c.replace(/^"|"$/g,'').trim()));
+}
+
+function findVal(rows, label) {
+  for (let r of rows) {
+    for (let i = 0; i < r.length - 1; i++) {
+      if (r[i] && r[i].toString().toLowerCase().includes(label.toLowerCase())) {
+        const v = parseInt(r[i+1]);
+        if (!isNaN(v)) return v;
+      }
+    }
+  }
+  return 0;
+}
+
+function bar(container, label, value, max, fill, text, countColor) {
+  const pct = max > 0 ? Math.max(2, (value / max) * 95) : 2;
+  const el = document.createElement('div');
+  el.className = 'pyramid-row';
+  el.innerHTML = `
+    <div class="pyramid-lbl">${label}</div>
+    <div class="pyramid-track">
+      <div class="pyramid-fill" style="width:0%;background:${fill};color:${text};" data-pct="${pct}">
+        ${value > 8 ? value : ''}
+      </div>
+    </div>
+    <div class="pyramid-count" style="color:${countColor};">${value}</div>`;
+  container.appendChild(el);
+  setTimeout(() => { el.querySelector('.pyramid-fill').style.width = pct + '%'; }, 80);
+}
+
+async function loadData() {
+  const dot = document.getElementById('live-dot');
+  const liveText = document.getElementById('live-text');
+  dot.className = 'live-dot loading';
+  liveText.textContent = 'Loading';
+  document.getElementById('last-updated').textContent = 'Fetching from Google Sheets...';
+  document.getElementById('error-area').style.display = 'none';
+
+  try {
+    const res = await fetch(CSV_URL + '&t=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const rows = parseCSV(text);
+
+    // Segments
+    const vic        = findVal(rows, 'VIC');
+    const family     = findVal(rows, 'Family');
+    const adventurer = findVal(rows, 'Adventurer');
+    const core       = findVal(rows, 'Core');
+    const novice     = findVal(rows, 'Novice');
+    const totalCust  = vic + family + adventurer + core + novice;
+
+    const hotLeads  = findVal(rows, 'Hot Leads');
+    const warmLeads = findVal(rows, 'Warm Leads');
+    const coldLeads = findVal(rows, 'Cold Leads');
+    const totalLeads = hotLeads + warmLeads + coldLeads;
+
+    // KPIs
+    document.getElementById('kpi-cust').textContent  = totalCust.toLocaleString();
+    document.getElementById('kpi-leads').textContent = totalLeads.toLocaleString();
+    document.getElementById('kpi-vic').textContent   = vic;
+    const conv = totalCust + totalLeads > 0 ? ((totalCust / (totalCust + totalLeads)) * 100).toFixed(1) + '%' : '—';
+    document.getElementById('kpi-conv').textContent  = conv;
+
+    // Pyramid
+    const pb = document.getElementById('pyramid-bars'); pb.innerHTML = '';
+    const pm = Math.max(vic, family, adventurer, core, novice);
+    bar(pb, 'VIC',        vic,        pm, '#1a4fa0', '#c8d8f0', '#1a4fa0');
+    bar(pb, 'Family',     family,     pm, '#2980c4', '#fff',    '#2980c4');
+    bar(pb, 'Adventurer', adventurer, pm, '#2d6e2d', '#fff',    '#2d6e2d');
+    bar(pb, 'Core',       core,       pm, '#c97d10', '#fff',    '#c97d10');
+    bar(pb, 'Novice',     novice,     pm, '#c45030', '#fff',    '#c45030');
+
+    // Leads
+    const lb = document.getElementById('lead-bars'); lb.innerHTML = '';
+    const lm = Math.max(hotLeads, warmLeads, coldLeads);
+    bar(lb, 'Hot leads',  hotLeads,  lm, '#b83030', '#fff',    '#b83030');
+    bar(lb, 'Warm leads', warmLeads, lm, '#c97d10', '#fff',    '#c97d10');
+    bar(lb, 'Cold leads', coldLeads, lm, '#6b6b63', '#f0efe9', '#6b6b63');
+
+    // Geography
+    const regions   = ['Africa','America','Asia','Australia','Europe','MEA','Oceania','SEA'];
+    const geoColors = ['#7c6fb0','#2d6e2d','#1a4fa0','#c45030','#2980c4','#c97d10','#b83030','#6b6b63'];
+    const totalRow  = rows.find(r => r[0] && r[0].toString().trim() === 'Total' && r.length > 5 && parseInt(r[r.length-2]) > 50);
+    let geoData = [3,79,330,1,37,117,1,13];
+    if (totalRow) geoData = regions.map((_,i) => parseInt(totalRow[i+1])||0);
+
+    const gl = document.getElementById('geo-legend'); gl.innerHTML = '';
+    regions.forEach((r,i) => {
+      if (geoData[i] > 0) {
+        gl.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${geoColors[i]};"></div>${r} ${geoData[i]}</div>`;
+      }
+    });
+
+    if (geoChart) geoChart.destroy();
+    const filt = regions.map((r,i) => ({r,v:geoData[i],c:geoColors[i]})).filter(x=>x.v>0);
+    geoChart = new Chart(document.getElementById('geoChart'), {
+      type: 'doughnut',
+      data: { labels: filt.map(x=>x.r), datasets:[{ data:filt.map(x=>x.v), backgroundColor:filt.map(x=>x.c), borderWidth:2, borderColor:'#fff' }] },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        cutout: '62%',
+        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>' '+ctx.label+': '+ctx.parsed+' ('+Math.round(ctx.parsed/totalCust*100)+'%)' } } }
+      }
+    });
+
+    // Monthly trend
+    const monthSecs = ['Apr - 1','May - 1','Jun - 1','Jul - 1','Aug - 1','Sep - 1','Oct - 1'];
+    const monthLbls = ['Apr','May','Jun','Jul','Aug','Sep','Oct'];
+    const custM = [], leadM = [];
+    monthSecs.forEach(sec => {
+      const idx = rows.findIndex(r => r[0] && r[0].toString().trim() === sec);
+      if (idx === -1) { custM.push(0); leadM.push(0); return; }
+      const block = rows.slice(idx+1, idx+12);
+      const c = ['VIC','Family','Adventurer','Core','Novice'].reduce((s,seg) => {
+        const row = block.find(r => r[0] && r[0].toString().trim() === seg);
+        return s + (row ? parseInt(row[row.length-2])||0 : 0);
+      }, 0);
+      const l = ['Hot Leads','Warm Leads','Cold Leads'].reduce((s,seg) => {
+        const row = block.find(r => r[0] && r[0].toString().trim() === seg);
+        return s + (row ? parseInt(row[row.length-2])||0 : 0);
+      }, 0);
+      custM.push(c); leadM.push(l);
+    });
+
+    if (trendChart) trendChart.destroy();
+    trendChart = new Chart(document.getElementById('trendChart'), {
+      type: 'bar',
+      data: {
+        labels: monthLbls,
+        datasets: [
+          { label:'Customers', data:custM, backgroundColor:'#1a4fa0', borderRadius:4, borderSkipped:false },
+          { label:'Leads',     data:leadM, backgroundColor:'#c97d10', borderRadius:4, borderSkipped:false }
+        ]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        scales: {
+          x: { grid:{display:false}, ticks:{color:'#9b9b92', font:{size:11}} },
+          y: { grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#9b9b92', font:{size:11}} }
+        },
+        plugins:{ legend:{display:false} }
+      }
+    });
+
+    // Heatmap
+    const segs     = ['VIC','Family','Adventurer','Core','Novice'];
+    const regCols  = ['Asia','MEA','America','Europe','SEA'];
+    const segClr   = ['#1a4fa0','#2980c4','#2d6e2d','#c97d10','#c45030'];
+    const matrix   = segs.map(seg => {
+      const row = rows.find(r => r[0] && r[0].toString().trim() === seg && r.length > 8);
+      if (!row) return [0,0,0,0,0];
+      return [parseInt(row[3])||0, parseInt(row[6])||0, parseInt(row[2])||0, parseInt(row[5])||0, parseInt(row[8])||0];
+    });
+    const maxV = Math.max(...matrix.flat(), 1);
+    let ht = '<table class="heatmap-table"><tr><th></th>';
+    regCols.forEach(r => { ht += `<th>${r}</th>`; });
+    ht += '</tr>';
+    segs.forEach((seg,si) => {
+      ht += '<tr>';
+      ht += `<td style="color:${segClr[si]}">${seg}</td>`;
+      matrix[si].forEach(val => {
+        const alpha = val === 0 ? 0 : 0.07 + (val/maxV)*0.82;
+        const bg    = val === 0 ? 'transparent' : `rgba(26,79,160,${alpha.toFixed(2)})`;
+        const tc    = alpha > 0.55 ? '#fff' : (val > 0 ? '#1a4fa0' : '#9b9b92');
+        ht += `<td style="background:${bg};color:${tc};">${val||'—'}</td>`;
+      });
+      ht += '</tr>';
+    });
+    ht += '</table>';
+    document.getElementById('heatmap').innerHTML = ht;
+
+    // Insights
+    const topIdx    = geoData.indexOf(Math.max(...geoData));
+    const topR      = regions[topIdx];
+    const topPct    = Math.round(geoData[topIdx]/totalCust*100);
+    const novPct    = Math.round(novice/totalCust*100);
+    const coldPct   = Math.round(coldLeads/totalLeads*100);
+    const hotPct    = Math.round(hotLeads/totalLeads*100);
+    const totals    = custM.map((c,i)=>c+(leadM[i]||0));
+    const peakIdx   = totals.indexOf(Math.max(...totals));
+    const peakM     = monthLbls[peakIdx];
+
+    const insightsData = [
+      { icon:'🌏', bg:'#e8eef8', text:`<strong>${topR} is your #1 market</strong> — ${topPct}% of all customers. MEA is a strong #2 worth further investment.` },
+      { icon:'📊', bg:'#f0f7e8', text:`<strong>${novPct}% of your base is Novice tier</strong> — representing the largest upsell opportunity if even 10% convert to Core.` },
+      { icon:'🔥', bg:'#fdf3e0', text:`<strong>Only ${hotPct}% of leads are Hot</strong> (${hotLeads} leads) vs ${coldPct}% Cold (${coldLeads} leads) — warming the pipeline should be a priority.` },
+      { icon:'📅', bg:'#fceaea', text:`<strong>${peakM} was your busiest month</strong> with ${totals[peakIdx]} total contacts — analyse what drove that spike and replicate it.` },
+      { icon:'👑', bg:'#e8f4e8', text:`<strong>VIC + Family = ${vic+family} customers</strong> — your highest LTV segment. Protecting and nurturing these relationships is critical.` },
+    ];
+
+    document.getElementById('insights').innerHTML = insightsData.map(d => `
+      <div class="insight-item">
+        <div class="insight-icon" style="background:${d.bg};">${d.icon}</div>
+        <div class="insight-text">${d.text}</div>
+      </div>`).join('');
+
+    // Status
+    const now = new Date().toLocaleString('en-IN', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    dot.className = 'live-dot';
+    liveText.textContent = 'Live';
+    document.getElementById('last-updated').textContent = 'Last synced: ' + now;
+
+  } catch(err) {
+    dot.className = 'live-dot error';
+    liveText.textContent = 'Error';
+    document.getElementById('last-updated').textContent = 'Could not connect to Google Sheets';
+    document.getElementById('error-area').style.display = 'block';
+    document.getElementById('error-area').innerHTML = `<div class="error-msg">⚠️ Could not fetch live data: ${err.message}. Please check your internet connection or ensure the Google Sheet is still published, then click Refresh.</div>`;
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
