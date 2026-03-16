@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -478,7 +479,7 @@
 </div>
 
 <script>
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTNRjNk_rz_AycA1fJGl92tB1FRkY5exMSe4Ysouz94YSOoE9ZNQzswFjzI5IoujRiVS8fdOfGvNx-s/pub?output=csv';
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTNRjNk_rz_AycA1fJGl92tB1FRkY5exMSe4Ysouz94YSOoE9ZNQzswFjzI5IoujRiVS8fdOfGvNx-s/pub?output=csv&t=' + Date.now();
 
 let geoChart = null, trendChart = null;
 
@@ -568,8 +569,7 @@ async function loadData() {
     const regions   = ['Africa','America','Asia','Australia','Europe','MEA','Oceania','SEA'];
     const geoColors = ['#7c6fb0','#2d6e2d','#1a4fa0','#c45030','#2980c4','#c97d10','#b83030','#6b6b63'];
     const totalRow  = rows.find(r => r[0] && r[0].toString().trim() === 'Total' && r.length > 5 && parseInt(r[r.length-2]) > 50);
-    let geoData = [3,79,330,1,37,117,1,13];
-    if (totalRow) geoData = regions.map((_,i) => parseInt(totalRow[i+1])||0);
+    let geoData = regions.map((_,i) => parseInt(totalRow ? totalRow[i+1] : 0)||0);
 
     const gl = document.getElementById('geo-legend'); gl.innerHTML = '';
     regions.forEach((r,i) => {
