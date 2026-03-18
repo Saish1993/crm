@@ -479,7 +479,7 @@
 </div>
 
 <script>
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTNRjNk_rz_AycA1fJGl92tB1FRkY5exMSe4Ysouz94YSOoE9ZNQzswFjzI5IoujRiVS8fdOfGvNx-s/pub?output=csv&t=' + Date.now();
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSVCz0euggxnmSJCXl3FmSqKPB8lxd6cfw9joEb-wyuLC7OsgPbAHiHeND34y2hFoZ7r794YHy81k9N/pub?gid=2056313168&single=true&output=csv&t=' + Date.now();
 
 let geoChart = null, trendChart = null;
 
@@ -529,17 +529,26 @@ async function loadData() {
     const text = await res.text();
     const rows = parseCSV(text);
 
-    // Segments
-    const vic        = findVal(rows, 'VIC');
-    const family     = findVal(rows, 'Family');
-    const adventurer = findVal(rows, 'Adventurer');
-    const core       = findVal(rows, 'Core');
-    const novice     = findVal(rows, 'Novice');
+    // Find summary block specifically — "Segmentation (0.2x0.8)" header
+    const summaryIdx = rows.findIndex(r => r[0] && r[0].toString().includes('Segmentation'));
+    const summaryBlock = summaryIdx >= 0 ? rows.slice(summaryIdx, summaryIdx + 10) : rows.slice(0, 25);
+
+    function segVal(label) {
+      const row = summaryBlock.find(r => r[0] && r[0].toString().trim() === label);
+      if (row) return parseInt(row[1]) || 0;
+      return 0;
+    }
+
+    const vic        = segVal('VIC');
+    const family     = segVal('Family');
+    const adventurer = segVal('Adventurer');
+    const core       = segVal('Core');
+    const novice     = segVal('Novice');
     const totalCust  = vic + family + adventurer + core + novice;
 
-    const hotLeads  = findVal(rows, 'Hot Leads');
-    const warmLeads = findVal(rows, 'Warm Leads');
-    const coldLeads = findVal(rows, 'Cold Leads');
+    const hotLeads  = segVal('Hot Leads');
+    const warmLeads = segVal('Warm Leads');
+    const coldLeads = segVal('Cold Leads');
     const totalLeads = hotLeads + warmLeads + coldLeads;
 
     // KPIs
