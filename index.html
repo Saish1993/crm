@@ -582,10 +582,11 @@ async function loadData() {
     bar(lb, 'Warm leads', warmLeads, lm, '#c97d10', '#fff',    '#c97d10');
     bar(lb, 'Cold leads', coldLeads, lm, '#6b6b63', '#f0efe9', '#6b6b63');
 
-    // Geography - use the same geoHeaderIdx to find Total row right after segments
+    // Geography - find "Categories" header row with Africa in col 1
     // Row format: Total,3,79,330,1,37,117,1,13,0,581
     const regions   = ['Africa','America','Asia','Australia','Europe','MEA','Oceania','SEA'];
     const geoColors = ['#7c6fb0','#2d6e2d','#1a4fa0','#c45030','#2980c4','#c97d10','#b83030','#6b6b63'];
+    const geoHeaderIdx = rows.findIndex(r => r[0] && r[0].toString().trim() === 'Categories' && r[1] && r[1].toString().trim() === 'Africa');
     const geoTotalRow = geoHeaderIdx >= 0
       ? rows.slice(geoHeaderIdx+1, geoHeaderIdx+8).find(r => r[0] && r[0].toString().trim() === 'Total')
       : null;
@@ -666,8 +667,7 @@ async function loadData() {
     const regCols  = ['Asia','MEA','America','Europe','SEA'];
     const segClr   = ['#1a4fa0','#2980c4','#2d6e2d','#c97d10','#c45030'];
 
-    // Find the "Categories" header row that has "Africa" in col 1
-    const geoHeaderIdx = rows.findIndex(r => r[0] && r[0].toString().trim() === 'Categories' && r[1] && r[1].toString().trim() === 'Africa');
+    // Use geoHeaderIdx already declared above to get the geo block
     const geoBlock = geoHeaderIdx >= 0 ? rows.slice(geoHeaderIdx + 1, geoHeaderIdx + 7) : [];
 
     const matrix = segs.map(seg => {
