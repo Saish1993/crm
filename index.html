@@ -582,16 +582,13 @@ async function loadData() {
     bar(lb, 'Warm leads', warmLeads, lm, '#c97d10', '#fff',    '#c97d10');
     bar(lb, 'Cold leads', coldLeads, lm, '#6b6b63', '#f0efe9', '#6b6b63');
 
-    // Geography - find the customers Total row (col A=Total, cols B-I = Africa..SEA counts)
-    // Sheet row 27: Total,3,79,330,1,37,117,1,13,0,581
+    // Geography - use the same geoHeaderIdx to find Total row right after segments
+    // Row format: Total,3,79,330,1,37,117,1,13,0,581
     const regions   = ['Africa','America','Asia','Australia','Europe','MEA','Oceania','SEA'];
     const geoColors = ['#7c6fb0','#2d6e2d','#1a4fa0','#c45030','#2980c4','#c97d10','#b83030','#6b6b63'];
-    // Find the geography total row - it's the Total row where last numeric value matches totalCust
-    const geoTotalRow = rows.find(r => {
-      if (!r[0] || r[0].toString().trim() !== 'Total') return false;
-      const last = parseInt(r[10]) || parseInt(r[r.length-1]);
-      return last >= 100; // total customers > 100
-    });
+    const geoTotalRow = geoHeaderIdx >= 0
+      ? rows.slice(geoHeaderIdx+1, geoHeaderIdx+8).find(r => r[0] && r[0].toString().trim() === 'Total')
+      : null;
     let geoData = regions.map((_,i) => parseInt(geoTotalRow ? geoTotalRow[i+1] : 0)||0);
 
     const gl = document.getElementById('geo-legend'); gl.innerHTML = '';
@@ -662,24 +659,21 @@ async function loadData() {
       }
     });
 
-    // Heatmap - find each segment row in the geography section
-    // Row format: VIC,0(Africa),1(America),5(Asia),0(Aus),0(Europe),2(MEA),0(Oceania),0(SEA),0(Unclass),8(Total)
-    // We want Asia(col3), MEA(col6), America(col2), Europe(col5), SEA(col8)
+    // Heatmap - geography section starts after "Categories,Africa,America,Asia..." header row
+    // Cols: A=segment, B=Africa(1), C=America(2), D=Asia(3), E=Australia(4), F=Europe(5), G=MEA(6), H=Oceania(7), I=SEA(8)
+    // Display order: Asia(3), MEA(6), America(2), Europe(5), SEA(8)
     const segs     = ['VIC','Family','Adventurer','Core','Novice'];
     const regCols  = ['Asia','MEA','America','Europe','SEA'];
     const segClr   = ['#1a4fa0','#2980c4','#2d6e2d','#c97d10','#c45030'];
-    // Find the geo section rows - look for rows where col0 matches segment AND col10 has the total
-    const geoRows = segs.map(seg => {
-      // Find ALL rows matching this segment label, pick the one with col 10 matching known totals
-      const matches = rows.filter(r => r[0] && r[0].toString().trim() === seg && r.length >= 10);
-      // Pick row where sum of cols 1-9 > 0 (geography row, not monthly row)
-      return matches.find(r => {
-        const sum = [1,2,3,4,5,6,7,8].reduce((s,i) => s + (parseInt(r[i])||0), 0);
-        return sum > 0;
-      }) || matches[0];
-    });
-    const matrix = geoRows.map(row => {
+
+    // Find the "Categories" header row that has "Africa" in col 1
+    const geoHeaderIdx = rows.findIndex(r => r[0] && r[0].toString().trim() === 'Categories' && r[1] && r[1].toString().trim() === 'Africa');
+    const geoBlock = geoHeaderIdx >= 0 ? rows.slice(geoHeaderIdx + 1, geoHeaderIdx + 7) : [];
+
+    const matrix = segs.map(seg => {
+      const row = geoBlock.find(r => r[0] && r[0].toString().trim() === seg);
       if (!row) return [0,0,0,0,0];
+      // Asia=col3, MEA=col6, America=col2, Europe=col5, SEA=col8
       return [parseInt(row[3])||0, parseInt(row[6])||0, parseInt(row[2])||0, parseInt(row[5])||0, parseInt(row[8])||0];
     });
     const maxV = Math.max(...matrix.flat(), 1);
