@@ -546,9 +546,17 @@ async function loadData() {
     const novice     = segVal('Novice');
     const totalCust  = vic + family + adventurer + core + novice;
 
-    const hotLeads  = segVal('Hot Leads');
-    const warmLeads = segVal('Warm Leads');
-    const coldLeads = segVal('Cold Leads');
+    // Leads sit in columns 3-4 (right side of summary block)
+    function leadVal(label) {
+      const row = summaryBlock.find(r => r[3] && r[3].toString().trim() === label);
+      if (row) return parseInt(row[4]) || 0;
+      const row2 = summaryBlock.find(r => r[0] && r[0].toString().trim() === label);
+      if (row2) return parseInt(row2[1]) || 0;
+      return 0;
+    }
+    const hotLeads  = leadVal('Hot Leads');
+    const warmLeads = leadVal('Warm Leads');
+    const coldLeads = leadVal('Cold Leads');
     const totalLeads = hotLeads + warmLeads + coldLeads;
 
     // KPIs
@@ -574,11 +582,17 @@ async function loadData() {
     bar(lb, 'Warm leads', warmLeads, lm, '#c97d10', '#fff',    '#c97d10');
     bar(lb, 'Cold leads', coldLeads, lm, '#6b6b63', '#f0efe9', '#6b6b63');
 
-    // Geography
+    // Geography - find the customers Total row (col A=Total, cols B-I = Africa..SEA counts)
+    // Sheet row 27: Total,3,79,330,1,37,117,1,13,0,581
     const regions   = ['Africa','America','Asia','Australia','Europe','MEA','Oceania','SEA'];
     const geoColors = ['#7c6fb0','#2d6e2d','#1a4fa0','#c45030','#2980c4','#c97d10','#b83030','#6b6b63'];
-    const totalRow  = rows.find(r => r[0] && r[0].toString().trim() === 'Total' && r.length > 5 && parseInt(r[r.length-2]) > 50);
-    let geoData = regions.map((_,i) => parseInt(totalRow ? totalRow[i+1] : 0)||0);
+    // Find the geography total row - it's the Total row where last numeric value matches totalCust
+    const geoTotalRow = rows.find(r => {
+      if (!r[0] || r[0].toString().trim() !== 'Total') return false;
+      const last = parseInt(r[10]) || parseInt(r[r.length-1]);
+      return last >= 100; // total customers > 100
+    });
+    let geoData = regions.map((_,i) => parseInt(geoTotalRow ? geoTotalRow[i+1] : 0)||0);
 
     const gl = document.getElementById('geo-legend'); gl.innerHTML = '';
     regions.forEach((r,i) => {
@@ -599,21 +613,31 @@ async function loadData() {
       }
     });
 
-    // Monthly trend
+    // Monthly trend - find each month block and read Total row
+    // Block header e.g. "Oct - 1", followed by Categories row, then segment rows
+    // Total row: col A=Total, then weekly cols, then grand total in last non-empty col
     const monthSecs = ['Apr - 1','May - 1','Jun - 1','Jul - 1','Aug - 1','Sep - 1','Oct - 1'];
     const monthLbls = ['Apr','May','Jun','Jul','Aug','Sep','Oct'];
     const custM = [], leadM = [];
     monthSecs.forEach(sec => {
       const idx = rows.findIndex(r => r[0] && r[0].toString().trim() === sec);
       if (idx === -1) { custM.push(0); leadM.push(0); return; }
-      const block = rows.slice(idx+1, idx+12);
+      const block = rows.slice(idx+1, idx+14);
+      // Get total from each segment row: find last non-empty numeric value in the row
+      function rowTotal(row) {
+        for (let i = row.length-1; i >= 1; i--) {
+          const v = parseInt(row[i]);
+          if (!isNaN(v) && row[i].toString().trim() !== '') return v;
+        }
+        return 0;
+      }
       const c = ['VIC','Family','Adventurer','Core','Novice'].reduce((s,seg) => {
         const row = block.find(r => r[0] && r[0].toString().trim() === seg);
-        return s + (row ? parseInt(row[row.length-2])||0 : 0);
+        return s + (row ? rowTotal(row) : 0);
       }, 0);
       const l = ['Hot Leads','Warm Leads','Cold Leads'].reduce((s,seg) => {
         const row = block.find(r => r[0] && r[0].toString().trim() === seg);
-        return s + (row ? parseInt(row[row.length-2])||0 : 0);
+        return s + (row ? rowTotal(row) : 0);
       }, 0);
       custM.push(c); leadM.push(l);
     });
@@ -638,12 +662,23 @@ async function loadData() {
       }
     });
 
-    // Heatmap
+    // Heatmap - find each segment row in the geography section
+    // Row format: VIC,0(Africa),1(America),5(Asia),0(Aus),0(Europe),2(MEA),0(Oceania),0(SEA),0(Unclass),8(Total)
+    // We want Asia(col3), MEA(col6), America(col2), Europe(col5), SEA(col8)
     const segs     = ['VIC','Family','Adventurer','Core','Novice'];
     const regCols  = ['Asia','MEA','America','Europe','SEA'];
     const segClr   = ['#1a4fa0','#2980c4','#2d6e2d','#c97d10','#c45030'];
-    const matrix   = segs.map(seg => {
-      const row = rows.find(r => r[0] && r[0].toString().trim() === seg && r.length > 8);
+    // Find the geo section rows - look for rows where col0 matches segment AND col10 has the total
+    const geoRows = segs.map(seg => {
+      // Find ALL rows matching this segment label, pick the one with col 10 matching known totals
+      const matches = rows.filter(r => r[0] && r[0].toString().trim() === seg && r.length >= 10);
+      // Pick row where sum of cols 1-9 > 0 (geography row, not monthly row)
+      return matches.find(r => {
+        const sum = [1,2,3,4,5,6,7,8].reduce((s,i) => s + (parseInt(r[i])||0), 0);
+        return sum > 0;
+      }) || matches[0];
+    });
+    const matrix = geoRows.map(row => {
       if (!row) return [0,0,0,0,0];
       return [parseInt(row[3])||0, parseInt(row[6])||0, parseInt(row[2])||0, parseInt(row[5])||0, parseInt(row[8])||0];
     });
