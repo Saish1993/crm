@@ -214,13 +214,41 @@ let C={};
 function parseCSV(txt){
   const lines=txt.split('\n');
   if(!lines.length) return [];
-  const hdrs=splitCSVLine(lines[0]);
+
+  // Find the real header row — it should contain 'Financial Year' or 'Month'
+  let hdrIdx=0;
+  for(let i=0;i<Math.min(5,lines.length);i++){
+    const l=lines[i].toLowerCase();
+    if(l.includes('financial year')||l.includes('salutation')||l.includes('sr. no')||l.includes('sr no')){
+      hdrIdx=i;break;
+    }
+  }
+
+  // Merge multi-line headers: if next line looks like continuation (not data), merge it
+  let hdrLine=lines[hdrIdx];
+  if(hdrIdx+1<lines.length){
+    const nextLine=lines[hdrIdx+1];
+    const nextVals=splitCSVLine(nextLine);
+    // If next line has mostly empty cells with a few values, it's a header continuation
+    const nonEmpty=nextVals.filter(v=>v.trim()).length;
+    if(nonEmpty>0&&nonEmpty<10&&!nextVals[0].trim().match(/^FY|^\d/)){
+      // Merge: fill in the continuation values
+      const hdrVals=splitCSVLine(hdrLine);
+      nextVals.forEach((v,i)=>{if(v.trim()&&hdrVals[i]){hdrVals[i]=hdrVals[i].trim()+' '+v.trim();}else if(v.trim()){hdrVals[i]=v.trim();}});
+      hdrLine=hdrVals.join(',');
+      hdrIdx++;
+    }
+  }
+
+  const hdrs=splitCSVLine(hdrLine).map(h=>h.replace(/\n/g,' ').replace(/\r/g,'').trim());
   const rows=[];
-  for(let i=1;i<lines.length;i++){
+  for(let i=hdrIdx+1;i<lines.length;i++){
     const line=lines[i].trim();
     if(!line) continue;
     const vals=splitCSVLine(line);
     if(!vals[0]&&!vals[1]) continue;
+    // Skip rows that look like header continuations
+    if(vals[0]&&vals[0].toLowerCase().includes('new/ repeat')) continue;
     const obj={};
     hdrs.forEach((h,j)=>obj[h]=(vals[j]||'').trim());
     rows.push(obj);
@@ -486,14 +514,16 @@ async function init(){
     raw.ld=parseCSV(ldTx);
 
     // Populate dropdowns
-    fillSelect('ss-yr',raw.ss.map(r=>r['Financial Year']),'All Years');
-    fillSelect('ss-country',raw.ss.map(r=>r['Country']),'All Countries');
-    fillSelect('ss-source',raw.ss.filter(r=>(r['Primary Source']||'')!=='External Event').map(r=>r['Primary Source']),'All Sources');
-    fillSelect('ts-yr',raw.ts.map(r=>r['Financial Year']),'All Years');
-    fillSelect('ts-country',raw.ts.map(r=>r['Country']),'All Countries');
-    fillSelect('ts-source',raw.ts.filter(r=>(r['Primary Source']||'')!=='External Event').map(r=>r['Primary Source']),'All Sources');
-    fillSelect('ld-yr',raw.ld.map(r=>r['Financial Year']),'All Years');
-    fillSelect('ld-country',raw.ld.map(r=>r['Country']),'All Countries');
+    // Only include valid FY values (must start with FY)
+    const validFY = v => v && v.toString().trim().toUpperCase().startsWith('FY');
+    fillSelect('ss-yr',raw.ss.map(r=>r['Financial Year']).filter(validFY),'All Years');
+    fillSelect('ss-country',raw.ss.map(r=>r['Country']).filter(v=>v&&v.length>1&&!v.includes(',')),'All Countries');
+    fillSelect('ss-source',raw.ss.filter(r=>(r['Primary Source']||'')!=='External Event').map(r=>r['Primary Source']).filter(v=>v&&v.length>1),'All Sources');
+    fillSelect('ts-yr',raw.ts.map(r=>r['Financial Year']).filter(validFY),'All Years');
+    fillSelect('ts-country',raw.ts.map(r=>r['Country']).filter(v=>v&&v.length>1&&!v.includes(',')),'All Countries');
+    fillSelect('ts-source',raw.ts.filter(r=>(r['Primary Source']||'')!=='External Event').map(r=>r['Primary Source']).filter(v=>v&&v.length>1),'All Sources');
+    fillSelect('ld-yr',raw.ld.map(r=>r['Financial Year']).filter(validFY),'All Years');
+    fillSelect('ld-country',raw.ld.map(r=>r['Country']).filter(v=>v&&v.length>1&&!v.includes(',')),'All Countries');
 
     renderCust('ss');
     renderCust('ts');
