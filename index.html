@@ -312,7 +312,7 @@ function applyFilters(rows,pfx,nrKey,yrKey,countryKey,sourceKey){
   const country=document.getElementById(`${pfx}-country`)?.value||'';
   const source=sourceKey?document.getElementById(`${pfx}-source`)?.value||'':'';
   return rows.filter(r=>{
-    if(f!=='all'){const nr=(r[nrKey]||'').toLowerCase();if(f==='New'&&!nr.includes('new'))return false;if(f==='Repeat'&&!nr.includes('repeat'))return false;}
+    if(f!=='all'){const nr=(r[nrKey]||'').toLowerCase();if(f==='New'&&(!nr.includes('new')||nr.includes('repeat')))return false;if(f==='Repeat'&&!nr.includes('repeat'))return false;}
     if(yr&&(r[yrKey]||'').trim()!==yr)return false;
     if(country&&(r[countryKey]||'').trim()!==country)return false;
     if(source&&(r[sourceKey]||'').trim()!==source)return false;
@@ -420,7 +420,8 @@ function renderCust(pfx){
 // ── Leads ─────────────────────────────────────────────────────────────────────
 function renderLeads(){
   const rows=raw.ld;if(!rows.length)return;
-  const nrKey='Lead Status (New/ Repeat)';
+  // Lead Status column may have line break in header — find it dynamically
+  const nrKey=Object.keys(rows[0]||{}).find(k=>k.toLowerCase().includes('lead status')||k.toLowerCase().includes('new/ repeat'))||'Lead Status (New/ Repeat)';
   const nameKey='Name';
   const yrKey='Financial Year';
   const countryKey='Country';
@@ -433,6 +434,7 @@ function renderLeads(){
   f=f.filter(r=>(r[nameKey]||'').trim());
 
   const tc=f.length;
+  // Values are "New Lead" and "Repeat Lead"
   const nw=f.filter(r=>(r[nrKey]||'').toLowerCase().includes('new')).length;
   const rp=f.filter(r=>(r[nrKey]||'').toLowerCase().includes('repeat')).length;
 
