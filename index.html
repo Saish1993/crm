@@ -4,737 +4,508 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aneka KG — CRM Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Aneka KG — CRM Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-  :root {
-    --bg: #f5f4f0;
-    --surface: #ffffff;
-    --surface2: #f0efe9;
-    --border: rgba(0,0,0,0.08);
-    --text: #1a1a18;
-    --text2: #6b6b63;
-    --text3: #9b9b92;
-    --blue: #1a4fa0;
-    --blue-light: #e8eef8;
-    --amber: #c97d10;
-    --amber-light: #fdf3e0;
-    --green: #2d6e2d;
-    --green-light: #e8f4e8;
-    --red: #b83030;
-    --red-light: #fceaea;
-    --coral: #c45030;
-    --gray: #6b6b63;
-    --radius: 12px;
-    --radius-sm: 8px;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding: 0;
-  }
-
-  /* Header */
-  .header {
-    background: var(--text);
-    color: #fff;
-    padding: 1.5rem 2.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  .header-left h1 {
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-
-  .header-left p {
-    font-size: 12px;
-    color: rgba(255,255,255,0.5);
-    margin-top: 2px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .live-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 12px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  .live-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #4ade80;
-    animation: pulse 2s infinite;
-  }
-
-  .live-dot.loading { background: #fbbf24; }
-  .live-dot.error { background: #f87171; animation: none; }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.85); }
-  }
-
-  .refresh-btn {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: #fff;
-    padding: 7px 16px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-weight: 500;
-  }
-
-  .refresh-btn:hover { background: rgba(255,255,255,0.2); }
-
-  /* Main layout */
-  .main { padding: 2rem 2.5rem; max-width: 1200px; margin: 0 auto; }
-
-  /* KPI grid */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
-    margin-bottom: 1.75rem;
-  }
-
-  .kpi-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem 1.5rem;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s;
-  }
-
-  .kpi-card:hover { transform: translateY(-2px); }
-
-  .kpi-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--accent, var(--blue));
-    border-radius: var(--radius) var(--radius) 0 0;
-  }
-
-  .kpi-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 8px;
-  }
-
-  .kpi-value {
-    font-size: 32px;
-    font-weight: 300;
-    letter-spacing: -0.03em;
-    color: var(--text);
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-
-  .kpi-sub {
-    font-size: 11px;
-    color: var(--text3);
-  }
-
-  /* Two column layout */
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 14px;
-  }
-
-  .three-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 14px;
-  }
-
-  /* Cards */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-  }
-
-  .card-full {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.5rem;
-    margin-bottom: 14px;
-  }
-
-  .card-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
-    letter-spacing: -0.01em;
-  }
-
-  .card-sub {
-    font-size: 11px;
-    color: var(--text3);
-    margin-bottom: 1.25rem;
-  }
-
-  /* Pyramid bars */
-  .pyramid-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-
-  .pyramid-lbl {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text2);
-    width: 78px;
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  .pyramid-track {
-    flex: 1;
-    background: var(--surface2);
-    border-radius: 4px;
-    height: 26px;
-    overflow: hidden;
-  }
-
-  .pyramid-fill {
-    height: 100%;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    padding-left: 10px;
-    font-size: 11px;
-    font-weight: 500;
-    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .pyramid-count {
-    font-size: 12px;
-    font-weight: 600;
-    width: 34px;
-    text-align: right;
-    flex-shrink: 0;
-  }
-
-  /* Heatmap table */
-  .heatmap-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 3px;
-    font-size: 12px;
-  }
-
-  .heatmap-table th {
-    font-weight: 500;
-    color: var(--text3);
-    font-size: 11px;
-    padding: 4px 8px;
-    text-align: center;
-  }
-
-  .heatmap-table th:first-child { text-align: left; }
-
-  .heatmap-table td {
-    text-align: center;
-    padding: 7px 6px;
-    border-radius: 5px;
-    font-weight: 500;
-    font-size: 12px;
-    transition: background 0.3s;
-  }
-
-  .heatmap-table td:first-child {
-    text-align: left;
-    padding-left: 0;
-    font-size: 11px;
-    font-weight: 600;
-  }
-
-  /* Insights */
-  .insight-item {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .insight-item:last-child { border-bottom: none; padding-bottom: 0; }
-
-  .insight-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    flex-shrink: 0;
-  }
-
-  .insight-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
-  .insight-text strong { color: var(--text); font-weight: 600; }
-
-  /* Legend */
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    color: var(--text2);
-  }
-
-  .legend-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 2px;
-    flex-shrink: 0;
-  }
-
-  /* Error */
-  .error-msg {
-    background: var(--red-light);
-    border: 1px solid rgba(184,48,48,0.2);
-    border-radius: var(--radius-sm);
-    padding: 1rem 1.25rem;
-    font-size: 13px;
-    color: var(--red);
-    margin-bottom: 1rem;
-  }
-
-  /* Skeleton */
-  .skeleton {
-    background: linear-gradient(90deg, var(--surface2) 25%, #e8e7e0 50%, var(--surface2) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 6px;
-    height: 20px;
-    margin-bottom: 8px;
-  }
-
-  @keyframes shimmer { to { background-position: -200% 0; } }
-
-  .section-label {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text3);
-    margin: 1.75rem 0 0.75rem;
-  }
-
-  @media (max-width: 768px) {
-    .main { padding: 1rem; }
-    .header { padding: 1rem; }
-    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    .two-col, .three-col { grid-template-columns: 1fr; }
-  }
+:root{--bg:#0f0e0c;--bg2:#1a1915;--bg3:#222018;--surface:#2a2820;--surface2:#333028;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);--text:#f0ece0;--text2:#9a9680;--text3:#5a5848;--gold:#c9a84c;--gold2:#e8c97a;--gold3:#f5e4b0;--gold-dim:rgba(201,168,76,0.12);--teal:#4a9d8f;--coral:#c97060;--blue:#5a7fb0;--green:#6a9d6a;--purple:#8a70c0;--radius:14px;--radius-sm:8px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.header{background:var(--bg2);border-bottom:1px solid var(--border2);padding:1.25rem 2.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-mark{width:34px;height:34px;background:var(--gold-dim);border:1px solid rgba(201,168,76,0.4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.brand-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500;color:var(--gold3);}
+.brand-sub{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px;}
+.header-right{display:flex;align-items:center;gap:10px;}
+.live-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.03);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-size:11px;font-family:'DM Mono',monospace;color:var(--text2);}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite;}
+.live-dot.ok{background:var(--green);}
+.live-dot.loading{background:var(--coral);animation:none;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.refresh-btn{background:var(--gold-dim);border:1px solid rgba(201,168,76,0.25);color:var(--gold2);padding:6px 14px;border-radius:20px;font-size:11px;cursor:pointer;transition:all 0.2s;}
+.refresh-btn:hover{background:rgba(201,168,76,0.2);}
+.nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 2.5rem;display:flex;overflow-x:auto;}
+.nav-tab{padding:11px 18px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.nav-tab:hover{color:var(--text2);}
+.nav-tab.active{color:var(--gold2);border-bottom-color:var(--gold);}
+.main{padding:2rem 2.5rem;max-width:1300px;margin:0 auto;}
+.section{display:none;}
+.section.active{display:block;}
+.sec-header{margin-bottom:1.5rem;}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:var(--gold3);}
+.sec-sub{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:3px;}
+.filters{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;}
+.filter-label{font-size:11px;color:var(--text3);}
+select.flt{background:var(--surface);border:1px solid var(--border2);color:var(--text2);padding:6px 10px;border-radius:var(--radius-sm);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;outline:none;}
+select.flt:focus{border-color:var(--gold);}
+.flt-btn{background:var(--surface);border:1px solid var(--border2);color:var(--text2);padding:6px 12px;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;transition:all 0.15s;}
+.flt-btn.on{background:var(--gold-dim);border-color:rgba(201,168,76,0.35);color:var(--gold2);}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.25rem;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.25rem;position:relative;overflow:hidden;}
+.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--acc,var(--gold));opacity:0.45;}
+.kpi-lbl{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.kpi-val{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--text);letter-spacing:-0.02em;line-height:1;margin-bottom:5px;}
+.kpi-sub{font-size:10px;color:var(--text3);}
+.cards-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.cards-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;}
+.card-full{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:10px;}
+.card-title{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:3px;}
+.card-sub{font-size:10px;color:var(--text3);margin-bottom:1rem;}
+.leg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.bar-lbl{font-size:11px;color:var(--text2);width:100px;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bar-track{flex:1;background:var(--bg3);border-radius:3px;height:20px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:7px;font-size:10px;font-weight:500;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);}
+.bar-num{font-size:10px;color:var(--text2);width:36px;text-align:right;flex-shrink:0;}
+.err{background:rgba(201,112,96,0.1);border:1px solid rgba(201,112,96,0.3);border-radius:var(--radius-sm);padding:1rem;font-size:12px;color:var(--coral);margin-bottom:1rem;}
+@media(max-width:768px){.main{padding:1rem;}.header{padding:1rem;}.kpi-grid{grid-template-columns:1fr 1fr;}.cards-2,.cards-3{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-
 <div class="header">
-  <div class="header-left">
-    <h1>Aneka KG &mdash; CRM Dashboard</h1>
-    <p id="last-updated">Connecting to Google Sheets...</p>
+  <div class="brand">
+    <div class="brand-mark">💎</div>
+    <div>
+      <div class="brand-title">Aneka KG — CRM Analytics</div>
+      <div class="brand-sub" id="last-sync">Initialising...</div>
+    </div>
   </div>
   <div class="header-right">
-    <div class="live-badge">
-      <div class="live-dot loading" id="live-dot"></div>
-      <span id="live-text">Loading</span>
-    </div>
-    <button class="refresh-btn" onclick="loadData()">↻ Refresh</button>
+    <div class="live-badge"><div class="live-dot loading" id="live-dot"></div><span id="live-txt">Loading</span></div>
+    <button class="refresh-btn" onclick="init()">↻ Refresh</button>
   </div>
 </div>
-
+<div class="nav">
+  <div class="nav-tab active" onclick="showTab('segments')">Segments 25-26</div>
+  <div class="nav-tab" onclick="showTab('ss')">Customers: SS</div>
+  <div class="nav-tab" onclick="showTab('ts')">Customers: TS/PS/O</div>
+  <div class="nav-tab" onclick="showTab('leads')">Leads: SF</div>
+</div>
 <div class="main">
+  <div id="err-area"></div>
 
-  <div id="error-area" style="display:none;"></div>
-
-  <!-- KPIs -->
-  <div class="kpi-grid">
-    <div class="kpi-card" style="--accent:#1a4fa0;">
-      <div class="kpi-label">Total customers</div>
-      <div class="kpi-value" id="kpi-cust">—</div>
-      <div class="kpi-sub">Active paying clients</div>
+  <!-- SEGMENTS -->
+  <div class="section active" id="tab-segments">
+    <div class="sec-header"><div class="sec-title">Segments: 25–26</div><div class="sec-sub">Customer pyramid & lead pipeline overview</div></div>
+    <div class="kpi-grid">
+      <div class="kpi" style="--acc:var(--gold)"><div class="kpi-lbl">Total Customers</div><div class="kpi-val" id="s-tc">—</div><div class="kpi-sub">Active paying clients</div></div>
+      <div class="kpi" style="--acc:var(--coral)"><div class="kpi-lbl">Total Leads</div><div class="kpi-val" id="s-tl">—</div><div class="kpi-sub">In pipeline</div></div>
+      <div class="kpi" style="--acc:var(--teal)"><div class="kpi-lbl">VIC Customers</div><div class="kpi-val" id="s-vic">—</div><div class="kpi-sub">Top tier ≥ ₹40L</div></div>
+      <div class="kpi" style="--acc:var(--green)"><div class="kpi-lbl">Conversion Rate</div><div class="kpi-val" id="s-conv">—</div><div class="kpi-sub">Customers / total</div></div>
     </div>
-    <div class="kpi-card" style="--accent:#c97d10;">
-      <div class="kpi-label">Total leads</div>
-      <div class="kpi-value" id="kpi-leads">—</div>
-      <div class="kpi-sub">In pipeline</div>
+    <div class="cards-2">
+      <div class="card"><div class="card-title">Customer pyramid</div><div class="card-sub">20% frequency + 80% monetary</div><div id="s-pyr"></div></div>
+      <div class="card"><div class="card-title">Lead pipeline</div><div class="card-sub">Lead temperature distribution</div><div id="s-ld"></div></div>
     </div>
-    <div class="kpi-card" style="--accent:#2d6e2d;">
-      <div class="kpi-label">VIC customers</div>
-      <div class="kpi-value" id="kpi-vic">—</div>
-      <div class="kpi-sub">Top tier (≥ ₹40L spend)</div>
-    </div>
-    <div class="kpi-card" style="--accent:#c45030;">
-      <div class="kpi-label">Conversion rate</div>
-      <div class="kpi-value" id="kpi-conv">—</div>
-      <div class="kpi-sub">Customers / total contacts</div>
+    <div class="cards-2">
+      <div class="card"><div class="card-title">Customers by region</div><div class="card-sub">Geographic distribution</div><div class="leg" id="s-geo-leg"></div><div style="position:relative;height:190px;"><canvas id="s-geo"></canvas></div></div>
+      <div class="card"><div class="card-title">Monthly activity</div><div class="card-sub">Customers and leads per month</div><div class="leg"><div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div>Customers</div><div class="leg-item"><div class="leg-dot" style="background:var(--coral)"></div>Leads</div></div><div style="position:relative;height:170px;"><canvas id="s-trend"></canvas></div></div>
     </div>
   </div>
 
-  <!-- Pyramid + Leads -->
-  <div class="section-label">Segmentation</div>
-  <div class="two-col">
-    <div class="card">
-      <div class="card-title">Customer pyramid</div>
-      <div class="card-sub">Scored by 20% frequency + 80% monetary value</div>
-      <div id="pyramid-bars"></div>
+  <!-- SS -->
+  <div class="section" id="tab-ss">
+    <div class="sec-header"><div class="sec-title">Customers: SS</div><div class="sec-sub">Single sale customer analytics</div></div>
+    <div class="filters">
+      <span class="filter-label">Filter:</span>
+      <button class="flt-btn on" id="ss-f-all" onclick="setFilter('ss','all')">All</button>
+      <button class="flt-btn" id="ss-f-New" onclick="setFilter('ss','New')">New</button>
+      <button class="flt-btn" id="ss-f-Repeat" onclick="setFilter('ss','Repeat')">Repeat</button>
+      <select class="flt" id="ss-yr" onchange="renderCust('ss')"><option value="">All Years</option></select>
+      <select class="flt" id="ss-country" onchange="renderCust('ss')"><option value="">All Countries</option></select>
+      <select class="flt" id="ss-source" onchange="renderCust('ss')"><option value="">All Sources</option></select>
     </div>
-    <div class="card">
-      <div class="card-title">Lead pipeline</div>
-      <div class="card-sub">Current lead temperature distribution</div>
-      <div id="lead-bars"></div>
+    <div class="kpi-grid">
+      <div class="kpi" style="--acc:var(--gold)"><div class="kpi-lbl">Total Customers</div><div class="kpi-val" id="ss-tc">—</div><div class="kpi-sub">Filtered count</div></div>
+      <div class="kpi" style="--acc:var(--teal)"><div class="kpi-lbl">Total Revenue</div><div class="kpi-val" id="ss-rev">—</div><div class="kpi-sub">Sum of total spend</div></div>
+      <div class="kpi" style="--acc:var(--green)"><div class="kpi-lbl">New Customers</div><div class="kpi-val" id="ss-new">—</div><div class="kpi-sub">First time buyers</div></div>
+      <div class="kpi" style="--acc:var(--coral)"><div class="kpi-lbl">Repeat Customers</div><div class="kpi-val" id="ss-rep">—</div><div class="kpi-sub">Returning buyers</div></div>
     </div>
-  </div>
-
-  <!-- Geography + Trend -->
-  <div class="section-label">Geography & activity</div>
-  <div class="two-col">
-    <div class="card">
-      <div class="card-title">Customers by region</div>
-      <div class="card-sub">Geographic distribution across all segments</div>
-      <div class="legend" id="geo-legend"></div>
-      <div style="position:relative; height:200px;"><canvas id="geoChart"></canvas></div>
+    <div class="cards-2">
+      <div class="card"><div class="card-title">New vs Repeat</div><div class="card-sub">Count split</div><div style="position:relative;height:170px;"><canvas id="ss-nr"></canvas></div></div>
+      <div class="card"><div class="card-title">Gender split</div><div class="card-sub">Distribution by gender</div><div style="position:relative;height:170px;"><canvas id="ss-gender"></canvas></div></div>
     </div>
-    <div class="card">
-      <div class="card-title">Monthly activity</div>
-      <div class="card-sub">Customers and leads contacted per month</div>
-      <div class="legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#1a4fa0;"></div>Customers</div>
-        <div class="legend-item"><div class="legend-dot" style="background:#c97d10;"></div>Leads</div>
-      </div>
-      <div style="position:relative; height:180px;"><canvas id="trendChart"></canvas></div>
+    <div class="cards-2">
+      <div class="card"><div class="card-title">Age group</div><div class="card-sub">Customer count by age bracket</div><div style="position:relative;height:190px;"><canvas id="ss-age"></canvas></div></div>
+      <div class="card"><div class="card-title">Region breakdown</div><div class="card-sub">Top countries</div><div style="position:relative;height:190px;"><canvas id="ss-region"></canvas></div></div>
+    </div>
+    <div class="cards-2">
+      <div class="card"><div class="card-title">Source segmentation</div><div class="card-sub">Acquisition source (excl. External Event)</div><div id="ss-src"></div></div>
+      <div class="card"><div class="card-title">Customer segmentation</div><div class="card-sub">Pyramid tier distribution</div><div id="ss-seg"></div></div>
     </div>
   </div>
 
-  <!-- Heatmap -->
-  <div class="section-label">Segment × region heatmap</div>
-  <div class="card-full">
-    <div class="card-title">Distribution of customers across segments and regions</div>
-    <div class="card-sub">Darker cell = higher concentration</div>
-    <div id="heatmap" style="overflow-x:auto; margin-top:0.5rem;"></div>
+  <!-- TS -->
+  <div class="section" id="tab-ts">
+    <div class="sec-header"><div class="sec-title">Customers: TS/PS/O</div><div class="sec-sub">Trunk show / private show / other</div></div>
+    <div class="filters">
+      <span class="filter-label">Filter:</span>
+      <button class="flt-btn on" id="ts-f-all" onclick="setFilter('ts','all')">All</button>
+      <button class="flt-btn" id="ts-f-New" onclick="setFilter('ts','New')">New</button>
+      <button class="flt-btn" id="ts-f-Repeat" onclick="setFilter('ts','Repeat')">Repeat</button>
+      <select class="flt" id="ts-yr" onchange="renderCust('ts')"><option value="">All Years</option></select>
+      <select class="flt" id="ts-country" onchange="renderCust('ts')"><option value="">All Countries</option></select>
+      <select class="flt" id="ts-source" onchange="renderCust('ts')"><option value="">All Sources</option></select>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi" style="--acc:var(--gold)"><div class="kpi-lbl">Total Customers</div><div class="kpi-val" id="ts-tc">—</div><div class="kpi-sub">Filtered count</div></div>
+      <div class="kpi" style="--acc:var(--teal)"><div class="kpi-lbl">Total Revenue</div><div class="kpi-val" id="ts-rev">—</div><div class="kpi-sub">Sum of total spend</div></div>
+      <div class="kpi" style="--acc:var(--green)"><div class="kpi-lbl">New Customers</div><div class="kpi-val" id="ts-new">—</div><div class="kpi-sub">First time buyers</div></div>
+      <div class="kpi" style="--acc:var(--coral)"><div class="kpi-lbl">Repeat Customers</div><div class="kpi-val" id="ts-rep">—</div><div class="kpi-sub">Returning buyers</div></div>
+    </div>
+    <div class="cards-2">
+      <div class="card"><div class="card-title">New vs Repeat</div><div class="card-sub">Count split</div><div style="position:relative;height:170px;"><canvas id="ts-nr"></canvas></div></div>
+      <div class="card"><div class="card-title">Gender split</div><div class="card-sub">Distribution by gender</div><div style="position:relative;height:170px;"><canvas id="ts-gender"></canvas></div></div>
+    </div>
+    <div class="cards-2">
+      <div class="card"><div class="card-title">Age group</div><div class="card-sub">Customer count by age bracket</div><div style="position:relative;height:190px;"><canvas id="ts-age"></canvas></div></div>
+      <div class="card"><div class="card-title">Region breakdown</div><div class="card-sub">Top countries</div><div style="position:relative;height:190px;"><canvas id="ts-region"></canvas></div></div>
+    </div>
+    <div class="cards-2">
+      <div class="card"><div class="card-title">Source segmentation</div><div class="card-sub">Acquisition source (excl. External Event)</div><div id="ts-src"></div></div>
+      <div class="card"><div class="card-title">Customer segmentation</div><div class="card-sub">Pyramid tier distribution</div><div id="ts-seg"></div></div>
+    </div>
   </div>
 
-  <!-- Insights -->
-  <div class="section-label">Key insights</div>
-  <div class="card-full" style="margin-bottom:2rem;">
-    <div class="card-title">Auto-generated from latest data</div>
-    <div class="card-sub">Updates every time you refresh</div>
-    <div id="insights" style="margin-top:0.75rem;"></div>
+  <!-- LEADS -->
+  <div class="section" id="tab-leads">
+    <div class="sec-header"><div class="sec-title">Leads: SF</div><div class="sec-sub">Lead pipeline analytics</div></div>
+    <div class="filters">
+      <span class="filter-label">Filter:</span>
+      <button class="flt-btn on" id="ld-f-all" onclick="setFilter('ld','all')">All</button>
+      <button class="flt-btn" id="ld-f-New" onclick="setFilter('ld','New')">New</button>
+      <button class="flt-btn" id="ld-f-Repeat" onclick="setFilter('ld','Repeat')">Repeat</button>
+      <select class="flt" id="ld-yr" onchange="renderLeads()"><option value="">All Years</option></select>
+      <select class="flt" id="ld-country" onchange="renderLeads()"><option value="">All Countries</option></select>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi" style="--acc:var(--gold)"><div class="kpi-lbl">Total Leads</div><div class="kpi-val" id="ld-tc">—</div><div class="kpi-sub">All leads</div></div>
+      <div class="kpi" style="--acc:var(--green)"><div class="kpi-lbl">New Leads</div><div class="kpi-val" id="ld-new">—</div><div class="kpi-sub">First contact</div></div>
+      <div class="kpi" style="--acc:var(--teal)"><div class="kpi-lbl">Repeat Leads</div><div class="kpi-val" id="ld-rep">—</div><div class="kpi-sub">Returning</div></div>
+      <div class="kpi" style="--acc:var(--coral)"><div class="kpi-lbl">New Lead %</div><div class="kpi-val" id="ld-pct">—</div><div class="kpi-sub">Of total leads</div></div>
+    </div>
+    <div class="cards-2">
+      <div class="card"><div class="card-title">New vs Repeat</div><div class="card-sub">Lead status split</div><div style="position:relative;height:170px;"><canvas id="ld-nr"></canvas></div></div>
+      <div class="card"><div class="card-title">Gender split</div><div class="card-sub">Lead distribution by gender</div><div style="position:relative;height:170px;"><canvas id="ld-gender"></canvas></div></div>
+    </div>
+    <div class="cards-2">
+      <div class="card"><div class="card-title">Age group</div><div class="card-sub">Lead count by age bracket</div><div style="position:relative;height:190px;"><canvas id="ld-age"></canvas></div></div>
+      <div class="card"><div class="card-title">Region breakdown</div><div class="card-sub">Top countries</div><div style="position:relative;height:190px;"><canvas id="ld-region"></canvas></div></div>
+    </div>
+    <div class="card-full"><div class="card-title">Source segmentation</div><div class="card-sub">How leads were acquired (excl. External Event)</div><div id="ld-src"></div></div>
   </div>
-
 </div>
 
 <script>
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSVCz0euggxnmSJCXl3FmSqKPB8lxd6cfw9joEb-wyuLC7OsgPbAHiHeND34y2hFoZ7r794YHy81k9N/pub?gid=2056313168&single=true&output=csv&t=' + Date.now();
+const URLS={
+  seg:'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?output=csv',
+  ss: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=0&single=true&output=csv',
+  ts: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=1828153604&single=true&output=csv',
+  ld: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=1319626729&single=true&output=csv'
+};
 
-let geoChart = null, trendChart = null;
+let raw={ss:[],ts:[],ld:[]};
+let filters={ss:'all',ts:'all',ld:'all'};
+let C={};
 
-function parseCSV(text) {
-  return text.split('\n').map(r => r.split(',').map(c => c.replace(/^"|"$/g,'').trim()));
-}
-
-function findVal(rows, label) {
-  for (let r of rows) {
-    for (let i = 0; i < r.length - 1; i++) {
-      if (r[i] && r[i].toString().toLowerCase().includes(label.toLowerCase())) {
-        const v = parseInt(r[i+1]);
-        if (!isNaN(v)) return v;
-      }
-    }
+function parseCSV(txt){
+  const lines=txt.split('\n');
+  if(!lines.length) return [];
+  const hdrs=splitCSVLine(lines[0]);
+  const rows=[];
+  for(let i=1;i<lines.length;i++){
+    const line=lines[i].trim();
+    if(!line) continue;
+    const vals=splitCSVLine(line);
+    if(!vals[0]&&!vals[1]) continue;
+    const obj={};
+    hdrs.forEach((h,j)=>obj[h]=(vals[j]||'').trim());
+    rows.push(obj);
   }
-  return 0;
+  return rows;
 }
 
-function bar(container, label, value, max, fill, text, countColor) {
-  const pct = max > 0 ? Math.max(2, (value / max) * 95) : 2;
-  const el = document.createElement('div');
-  el.className = 'pyramid-row';
-  el.innerHTML = `
-    <div class="pyramid-lbl">${label}</div>
-    <div class="pyramid-track">
-      <div class="pyramid-fill" style="width:0%;background:${fill};color:${text};" data-pct="${pct}">
-        ${value > 8 ? value : ''}
-      </div>
-    </div>
-    <div class="pyramid-count" style="color:${countColor};">${value}</div>`;
-  container.appendChild(el);
-  setTimeout(() => { el.querySelector('.pyramid-fill').style.width = pct + '%'; }, 80);
+function splitCSVLine(line){
+  const vals=[];let cur='',inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){inQ=!inQ;}
+    else if(c===','&&!inQ){vals.push(cur.trim());cur='';}
+    else cur+=c;
+  }
+  vals.push(cur.trim());
+  return vals;
 }
 
-async function loadData() {
-  const dot = document.getElementById('live-dot');
-  const liveText = document.getElementById('live-text');
-  dot.className = 'live-dot loading';
-  liveText.textContent = 'Loading';
-  document.getElementById('last-updated').textContent = 'Fetching from Google Sheets...';
-  document.getElementById('error-area').style.display = 'none';
+function fmtN(n){
+  if(n>=10000000)return(n/10000000).toFixed(1)+'Cr';
+  if(n>=100000)return(n/100000).toFixed(1)+'L';
+  if(n>=1000)return(n/1000).toFixed(1)+'K';
+  return Math.round(n).toString();
+}
 
-  try {
-    const res = await fetch(CSV_URL + '&t=' + Date.now());
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    const rows = parseCSV(text);
+function countBy(rows,key){
+  const m={};
+  rows.forEach(r=>{const v=(r[key]||'').trim();if(v&&v!=='—'&&v!=='-'&&v!=='N/A')m[v]=(m[v]||0)+1;});
+  return m;
+}
 
-    // Find summary block specifically — "Segmentation (0.2x0.8)" header
-    const summaryIdx = rows.findIndex(r => r[0] && r[0].toString().includes('Segmentation'));
-    const summaryBlock = summaryIdx >= 0 ? rows.slice(summaryIdx, summaryIdx + 10) : rows.slice(0, 25);
+function topN(obj,n=8){return Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n);}
 
-    function segVal(label) {
-      const row = summaryBlock.find(r => r[0] && r[0].toString().trim() === label);
-      if (row) return parseInt(row[1]) || 0;
-      return 0;
-    }
+function mkDonut(id,labels,data,colors){
+  const el=document.getElementById(id);if(!el)return;
+  if(C[id])C[id].destroy();
+  C[id]=new Chart(el,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'58%',
+      plugins:{legend:{display:true,position:'right',labels:{color:'#9a9680',font:{size:10},boxWidth:8,padding:6}}}}});
+}
 
-    const vic        = segVal('VIC');
-    const family     = segVal('Family');
-    const adventurer = segVal('Adventurer');
-    const core       = segVal('Core');
-    const novice     = segVal('Novice');
-    const totalCust  = vic + family + adventurer + core + novice;
+function mkBar(id,labels,data,color,horizontal=false){
+  const el=document.getElementById(id);if(!el)return;
+  if(C[id])C[id].destroy();
+  const opts={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a5848',font:{size:10}}},
+            y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a5848',font:{size:10}}}}};
+  if(horizontal)opts.indexAxis='y';
+  C[id]=new Chart(el,{type:'bar',data:{labels,datasets:[{data,backgroundColor:color,borderRadius:3}]},options:opts});
+}
 
-    // Leads sit in columns 3-4 (right side of summary block)
-    function leadVal(label) {
-      const row = summaryBlock.find(r => r[3] && r[3].toString().trim() === label);
-      if (row) return parseInt(row[4]) || 0;
-      const row2 = summaryBlock.find(r => r[0] && r[0].toString().trim() === label);
-      if (row2) return parseInt(row2[1]) || 0;
-      return 0;
-    }
-    const hotLeads  = leadVal('Hot Leads');
-    const warmLeads = leadVal('Warm Leads');
-    const coldLeads = leadVal('Cold Leads');
-    const totalLeads = hotLeads + warmLeads + coldLeads;
+function bars(cid,entries,color){
+  const el=document.getElementById(cid);if(!el)return;
+  el.innerHTML='';
+  const mx=Math.max(...entries.map(e=>e[1]),1);
+  entries.forEach(([lbl,val])=>{
+    const pct=Math.max(2,(val/mx)*93);
+    el.innerHTML+=`<div class="bar-row"><div class="bar-lbl" title="${lbl}">${lbl}</div><div class="bar-track"><div class="bar-fill" style="width:0%;background:${color};color:rgba(255,255,255,0.75);" data-p="${pct}">${val>4?val:''}</div></div><div class="bar-num">${val}</div></div>`;
+  });
+  setTimeout(()=>el.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.p+'%'),60);
+}
 
-    // KPIs
-    document.getElementById('kpi-cust').textContent  = totalCust.toLocaleString();
-    document.getElementById('kpi-leads').textContent = totalLeads.toLocaleString();
-    document.getElementById('kpi-vic').textContent   = vic;
-    const conv = totalCust + totalLeads > 0 ? ((totalCust / (totalCust + totalLeads)) * 100).toFixed(1) + '%' : '—';
-    document.getElementById('kpi-conv').textContent  = conv;
+function fillSelect(id,vals,ph){
+  const s=document.getElementById(id);if(!s)return;
+  const cur=s.value;
+  s.innerHTML=`<option value="">${ph}</option>`;
+  [...new Set(vals.filter(Boolean))].sort().forEach(v=>s.innerHTML+=`<option value="${v}"${v===cur?'selected':''}>${v}</option>`);
+}
 
-    // Pyramid
-    const pb = document.getElementById('pyramid-bars'); pb.innerHTML = '';
-    const pm = Math.max(vic, family, adventurer, core, novice);
-    bar(pb, 'VIC',        vic,        pm, '#1a4fa0', '#c8d8f0', '#1a4fa0');
-    bar(pb, 'Family',     family,     pm, '#2980c4', '#fff',    '#2980c4');
-    bar(pb, 'Adventurer', adventurer, pm, '#2d6e2d', '#fff',    '#2d6e2d');
-    bar(pb, 'Core',       core,       pm, '#c97d10', '#fff',    '#c97d10');
-    bar(pb, 'Novice',     novice,     pm, '#c45030', '#fff',    '#c45030');
+function showTab(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const tabs=['segments','ss','ts','leads'];
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{if(tabs[i]===name)t.classList.add('active');});
+}
 
-    // Leads
-    const lb = document.getElementById('lead-bars'); lb.innerHTML = '';
-    const lm = Math.max(hotLeads, warmLeads, coldLeads);
-    bar(lb, 'Hot leads',  hotLeads,  lm, '#b83030', '#fff',    '#b83030');
-    bar(lb, 'Warm leads', warmLeads, lm, '#c97d10', '#fff',    '#c97d10');
-    bar(lb, 'Cold leads', coldLeads, lm, '#6b6b63', '#f0efe9', '#6b6b63');
+function setFilter(pfx,val){
+  filters[pfx]=val;
+  ['all','New','Repeat'].forEach(v=>document.getElementById(`${pfx}-f-${v}`)?.classList.remove('on'));
+  document.getElementById(`${pfx}-f-${val}`)?.classList.add('on');
+  if(pfx==='ld')renderLeads();else renderCust(pfx);
+}
 
-    // Geography - find "Categories" header row with Africa in col 1
-    // Row format: Total,3,79,330,1,37,117,1,13,0,581
-    const regions   = ['Africa','America','Asia','Australia','Europe','MEA','Oceania','SEA'];
-    const geoColors = ['#7c6fb0','#2d6e2d','#1a4fa0','#c45030','#2980c4','#c97d10','#b83030','#6b6b63'];
-    const geoHeaderIdx = rows.findIndex(r => r[0] && r[0].toString().trim() === 'Categories' && r[1] && r[1].toString().trim() === 'Africa');
-    const geoTotalRow = geoHeaderIdx >= 0
-      ? rows.slice(geoHeaderIdx+1, geoHeaderIdx+8).find(r => r[0] && r[0].toString().trim() === 'Total')
-      : null;
-    let geoData = regions.map((_,i) => parseInt(geoTotalRow ? geoTotalRow[i+1] : 0)||0);
+function applyFilters(rows,pfx,nrKey,yrKey,countryKey,sourceKey){
+  const f=filters[pfx];
+  const yr=document.getElementById(`${pfx}-yr`)?.value||'';
+  const country=document.getElementById(`${pfx}-country`)?.value||'';
+  const source=sourceKey?document.getElementById(`${pfx}-source`)?.value||'':'';
+  return rows.filter(r=>{
+    if(f!=='all'){const nr=(r[nrKey]||'').toLowerCase();if(f==='New'&&!nr.includes('new'))return false;if(f==='Repeat'&&!nr.includes('repeat'))return false;}
+    if(yr&&(r[yrKey]||'').trim()!==yr)return false;
+    if(country&&(r[countryKey]||'').trim()!==country)return false;
+    if(source&&(r[sourceKey]||'').trim()!==source)return false;
+    return true;
+  });
+}
 
-    const gl = document.getElementById('geo-legend'); gl.innerHTML = '';
-    regions.forEach((r,i) => {
-      if (geoData[i] > 0) {
-        gl.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${geoColors[i]};"></div>${r} ${geoData[i]}</div>`;
-      }
+// ── Segments ─────────────────────────────────────────────────────────────────
+function renderSeg(lines){
+  function sv(label){for(let r of lines){if(r[0]&&r[0].trim()===label){const v=parseInt(r[1]);if(!isNaN(v))return v;}}return 0;}
+  function lv(label){for(let r of lines){if(r[3]&&r[3].trim()===label){const v=parseInt(r[4]);if(!isNaN(v))return v;}}return 0;}
+  const vic=sv('VIC'),fam=sv('Family'),adv=sv('Adventurer'),core=sv('Core'),nov=sv('Novice');
+  const tc=vic+fam+adv+core+nov;
+  const hot=lv('Hot Leads'),warm=lv('Warm Leads'),cold=lv('Cold Leads'),tl=hot+warm+cold;
+  document.getElementById('s-tc').textContent=tc;
+  document.getElementById('s-tl').textContent=tl;
+  document.getElementById('s-vic').textContent=vic;
+  document.getElementById('s-conv').textContent=tc+tl>0?((tc/(tc+tl))*100).toFixed(1)+'%':'—';
+  bars('s-pyr',[['VIC',vic],['Family',fam],['Adventurer',adv],['Core',core],['Novice',nov]],'#c9a84c');
+  bars('s-ld',[['Hot Leads',hot],['Warm Leads',warm],['Cold Leads',cold]],'#c97060');
+  const ghi=lines.findIndex(r=>r[0]&&r[0].trim()==='Categories'&&r[1]&&r[1].trim()==='Africa');
+  const gtr=ghi>=0?lines.slice(ghi+1,ghi+8).find(r=>r[0]&&r[0].trim()==='Total'):null;
+  const regs=['Africa','America','Asia','Australia','Europe','MEA','Oceania','SEA'];
+  const gcols=['#7c6fb0','#6a9d6a','#c9a84c','#c97060','#5a7fb0','#e8c97a','#4a9d8f','#8a70c0'];
+  const gd=gtr?regs.map((_,i)=>parseInt(gtr[i+1])||0):regs.map(()=>0);
+  const gf=regs.map((r,i)=>({r,v:gd[i],c:gcols[i]})).filter(x=>x.v>0);
+  document.getElementById('s-geo-leg').innerHTML=gf.map(x=>`<div class="leg-item"><div class="leg-dot" style="background:${x.c}"></div>${x.r} ${x.v}</div>`).join('');
+  if(C['s-geo'])C['s-geo'].destroy();
+  C['s-geo']=new Chart(document.getElementById('s-geo'),{type:'doughnut',data:{labels:gf.map(x=>x.r),datasets:[{data:gf.map(x=>x.v),backgroundColor:gf.map(x=>x.c),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:true,position:'right',labels:{color:'#9a9680',font:{size:10},boxWidth:8,padding:6}}}}});
+  const ms=['Apr - 1','May - 1','Jun - 1','Jul - 1','Aug - 1','Sep - 1','Oct - 1'];
+  const ml=['Apr','May','Jun','Jul','Aug','Sep','Oct'];
+  const cm=[],lm=[];
+  ms.forEach(sec=>{
+    const idx=lines.findIndex(r=>r[0]&&r[0].trim()===sec);
+    if(idx<0){cm.push(0);lm.push(0);return;}
+    const blk=lines.slice(idx+1,idx+14);
+    function rt(row){for(let i=row.length-1;i>=1;i--){const v=parseInt(row[i]);if(!isNaN(v)&&row[i]!=='')return v;}return 0;}
+    cm.push(['VIC','Family','Adventurer','Core','Novice'].reduce((s,seg)=>{const r=blk.find(r=>r[0]&&r[0].trim()===seg);return s+(r?rt(r):0);},0));
+    lm.push(['Hot Leads','Warm Leads','Cold Leads'].reduce((s,seg)=>{const r=blk.find(r=>r[0]&&r[0].trim()===seg);return s+(r?rt(r):0);},0));
+  });
+  if(C['s-trend'])C['s-trend'].destroy();
+  C['s-trend']=new Chart(document.getElementById('s-trend'),{type:'bar',data:{labels:ml,datasets:[{label:'Customers',data:cm,backgroundColor:'#c9a84c',borderRadius:3},{label:'Leads',data:lm,backgroundColor:'#c97060',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a5848',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#5a5848',font:{size:10}}}}}});
+}
+
+// ── Customer tabs ─────────────────────────────────────────────────────────────
+function renderCust(pfx){
+  const rows=raw[pfx];if(!rows.length)return;
+  const nameKey=pfx==='ss'?'Customer Name':'Name';
+  const nrKey='New/ Repeat';
+  const yrKey='Financial Year';
+  const genderKey='Gender';
+  const ageKey='Age Group';
+  const countryKey='Country';
+  const sourceKey='Primary Source';
+  const revKey='Total Spend';
+  const segKey='Segmentation';
+
+  let f=applyFilters(rows,pfx,nrKey,yrKey,countryKey,sourceKey);
+  f=f.filter(r=>(r[sourceKey]||'').trim()!=='External Event');
+  f=f.filter(r=>(r[nameKey]||'').trim());
+
+  const tc=f.length;
+  const rev=f.reduce((s,r)=>s+(parseFloat((r[revKey]||'').replace(/,/g,''))||0),0);
+  const nw=f.filter(r=>(r[nrKey]||'').toLowerCase().includes('new')).length;
+  const rp=f.filter(r=>(r[nrKey]||'').toLowerCase().includes('repeat')).length;
+
+  document.getElementById(`${pfx}-tc`).textContent=tc.toLocaleString();
+  document.getElementById(`${pfx}-rev`).textContent='₹'+fmtN(rev);
+  document.getElementById(`${pfx}-new`).textContent=nw.toLocaleString();
+  document.getElementById(`${pfx}-rep`).textContent=rp.toLocaleString();
+
+  mkDonut(`${pfx}-nr`,['New','Repeat'],[nw,rp],['#6a9d6a','#c9a84c']);
+
+  const gd=countBy(f,genderKey);
+  mkDonut(`${pfx}-gender`,Object.keys(gd),Object.values(gd),['#c9a84c','#4a9d8f','#8a70c0','#c97060'].slice(0,Object.keys(gd).length));
+
+  const ad=countBy(f,ageKey);
+  const ao=['10-20','20-30','30-40','40-50','50-60','60-70','70+'];
+  const al=[],av=[];
+  ao.forEach(a=>{if(ad[a]){al.push(a);av.push(ad[a]);}});
+  Object.entries(ad).forEach(([k,v])=>{if(!ao.includes(k)&&k){al.push(k);av.push(v);}});
+  mkBar(`${pfx}-age`,al,av,'#5a7fb0');
+
+  const rd=topN(countBy(f,countryKey));
+  mkBar(`${pfx}-region`,rd.map(e=>e[0]),rd.map(e=>e[1]),['#c9a84c','#4a9d8f','#c97060','#5a7fb0','#6a9d6a','#8a70c0','#e8c97a','#c9a84c'],true);
+
+  bars(`${pfx}-src`,topN(countBy(f,sourceKey)),'#4a9d8f');
+
+  const sd=countBy(f,segKey);
+  const so=['VIC','Family','Adventurer','Core','Novice'];
+  const se=so.map(s=>[s,sd[s]||0]).filter(e=>e[1]>0);
+  const sc={VIC:'#c9a84c',Family:'#5a7fb0',Adventurer:'#6a9d6a',Core:'#c97060',Novice:'#8a70c0'};
+  const sel=document.getElementById(`${pfx}-seg`);
+  if(sel){
+    sel.innerHTML='';
+    const mx=Math.max(...se.map(e=>e[1]),1);
+    se.forEach(([lbl,val])=>{
+      const pct=Math.max(2,(val/mx)*93);
+      sel.innerHTML+=`<div class="bar-row"><div class="bar-lbl">${lbl}</div><div class="bar-track"><div class="bar-fill" style="width:0%;background:${sc[lbl]};color:rgba(255,255,255,0.8);" data-p="${pct}">${val>3?val:''}</div></div><div class="bar-num">${val}</div></div>`;
     });
-
-    if (geoChart) geoChart.destroy();
-    const filt = regions.map((r,i) => ({r,v:geoData[i],c:geoColors[i]})).filter(x=>x.v>0);
-    geoChart = new Chart(document.getElementById('geoChart'), {
-      type: 'doughnut',
-      data: { labels: filt.map(x=>x.r), datasets:[{ data:filt.map(x=>x.v), backgroundColor:filt.map(x=>x.c), borderWidth:2, borderColor:'#fff' }] },
-      options: {
-        responsive:true, maintainAspectRatio:false,
-        cutout: '62%',
-        plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>' '+ctx.label+': '+ctx.parsed+' ('+Math.round(ctx.parsed/totalCust*100)+'%)' } } }
-      }
-    });
-
-    // Monthly trend - find each month block and read Total row
-    // Block header e.g. "Oct - 1", followed by Categories row, then segment rows
-    // Total row: col A=Total, then weekly cols, then grand total in last non-empty col
-    const monthSecs = ['Apr - 1','May - 1','Jun - 1','Jul - 1','Aug - 1','Sep - 1','Oct - 1'];
-    const monthLbls = ['Apr','May','Jun','Jul','Aug','Sep','Oct'];
-    const custM = [], leadM = [];
-    monthSecs.forEach(sec => {
-      const idx = rows.findIndex(r => r[0] && r[0].toString().trim() === sec);
-      if (idx === -1) { custM.push(0); leadM.push(0); return; }
-      const block = rows.slice(idx+1, idx+14);
-      // Get total from each segment row: find last non-empty numeric value in the row
-      function rowTotal(row) {
-        for (let i = row.length-1; i >= 1; i--) {
-          const v = parseInt(row[i]);
-          if (!isNaN(v) && row[i].toString().trim() !== '') return v;
-        }
-        return 0;
-      }
-      const c = ['VIC','Family','Adventurer','Core','Novice'].reduce((s,seg) => {
-        const row = block.find(r => r[0] && r[0].toString().trim() === seg);
-        return s + (row ? rowTotal(row) : 0);
-      }, 0);
-      const l = ['Hot Leads','Warm Leads','Cold Leads'].reduce((s,seg) => {
-        const row = block.find(r => r[0] && r[0].toString().trim() === seg);
-        return s + (row ? rowTotal(row) : 0);
-      }, 0);
-      custM.push(c); leadM.push(l);
-    });
-
-    if (trendChart) trendChart.destroy();
-    trendChart = new Chart(document.getElementById('trendChart'), {
-      type: 'bar',
-      data: {
-        labels: monthLbls,
-        datasets: [
-          { label:'Customers', data:custM, backgroundColor:'#1a4fa0', borderRadius:4, borderSkipped:false },
-          { label:'Leads',     data:leadM, backgroundColor:'#c97d10', borderRadius:4, borderSkipped:false }
-        ]
-      },
-      options: {
-        responsive:true, maintainAspectRatio:false,
-        scales: {
-          x: { grid:{display:false}, ticks:{color:'#9b9b92', font:{size:11}} },
-          y: { grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#9b9b92', font:{size:11}} }
-        },
-        plugins:{ legend:{display:false} }
-      }
-    });
-
-    // Heatmap - geography section starts after "Categories,Africa,America,Asia..." header row
-    // Cols: A=segment, B=Africa(1), C=America(2), D=Asia(3), E=Australia(4), F=Europe(5), G=MEA(6), H=Oceania(7), I=SEA(8)
-    // Display order: Asia(3), MEA(6), America(2), Europe(5), SEA(8)
-    const segs     = ['VIC','Family','Adventurer','Core','Novice'];
-    const regCols  = ['Asia','MEA','America','Europe','SEA'];
-    const segClr   = ['#1a4fa0','#2980c4','#2d6e2d','#c97d10','#c45030'];
-
-    // Use geoHeaderIdx already declared above to get the geo block
-    const geoBlock = geoHeaderIdx >= 0 ? rows.slice(geoHeaderIdx + 1, geoHeaderIdx + 7) : [];
-
-    const matrix = segs.map(seg => {
-      const row = geoBlock.find(r => r[0] && r[0].toString().trim() === seg);
-      if (!row) return [0,0,0,0,0];
-      // Asia=col3, MEA=col6, America=col2, Europe=col5, SEA=col8
-      return [parseInt(row[3])||0, parseInt(row[6])||0, parseInt(row[2])||0, parseInt(row[5])||0, parseInt(row[8])||0];
-    });
-    const maxV = Math.max(...matrix.flat(), 1);
-    let ht = '<table class="heatmap-table"><tr><th></th>';
-    regCols.forEach(r => { ht += `<th>${r}</th>`; });
-    ht += '</tr>';
-    segs.forEach((seg,si) => {
-      ht += '<tr>';
-      ht += `<td style="color:${segClr[si]}">${seg}</td>`;
-      matrix[si].forEach(val => {
-        const alpha = val === 0 ? 0 : 0.07 + (val/maxV)*0.82;
-        const bg    = val === 0 ? 'transparent' : `rgba(26,79,160,${alpha.toFixed(2)})`;
-        const tc    = alpha > 0.55 ? '#fff' : (val > 0 ? '#1a4fa0' : '#9b9b92');
-        ht += `<td style="background:${bg};color:${tc};">${val||'—'}</td>`;
-      });
-      ht += '</tr>';
-    });
-    ht += '</table>';
-    document.getElementById('heatmap').innerHTML = ht;
-
-    // Insights
-    const topIdx    = geoData.indexOf(Math.max(...geoData));
-    const topR      = regions[topIdx];
-    const topPct    = Math.round(geoData[topIdx]/totalCust*100);
-    const novPct    = Math.round(novice/totalCust*100);
-    const coldPct   = Math.round(coldLeads/totalLeads*100);
-    const hotPct    = Math.round(hotLeads/totalLeads*100);
-    const totals    = custM.map((c,i)=>c+(leadM[i]||0));
-    const peakIdx   = totals.indexOf(Math.max(...totals));
-    const peakM     = monthLbls[peakIdx];
-
-    const insightsData = [
-      { icon:'🌏', bg:'#e8eef8', text:`<strong>${topR} is your #1 market</strong> — ${topPct}% of all customers. MEA is a strong #2 worth further investment.` },
-      { icon:'📊', bg:'#f0f7e8', text:`<strong>${novPct}% of your base is Novice tier</strong> — representing the largest upsell opportunity if even 10% convert to Core.` },
-      { icon:'🔥', bg:'#fdf3e0', text:`<strong>Only ${hotPct}% of leads are Hot</strong> (${hotLeads} leads) vs ${coldPct}% Cold (${coldLeads} leads) — warming the pipeline should be a priority.` },
-      { icon:'📅', bg:'#fceaea', text:`<strong>${peakM} was your busiest month</strong> with ${totals[peakIdx]} total contacts — analyse what drove that spike and replicate it.` },
-      { icon:'👑', bg:'#e8f4e8', text:`<strong>VIC + Family = ${vic+family} customers</strong> — your highest LTV segment. Protecting and nurturing these relationships is critical.` },
-    ];
-
-    document.getElementById('insights').innerHTML = insightsData.map(d => `
-      <div class="insight-item">
-        <div class="insight-icon" style="background:${d.bg};">${d.icon}</div>
-        <div class="insight-text">${d.text}</div>
-      </div>`).join('');
-
-    // Status
-    const now = new Date().toLocaleString('en-IN', {day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-    dot.className = 'live-dot';
-    liveText.textContent = 'Live';
-    document.getElementById('last-updated').textContent = 'Last synced: ' + now;
-
-  } catch(err) {
-    dot.className = 'live-dot error';
-    liveText.textContent = 'Error';
-    document.getElementById('last-updated').textContent = 'Could not connect to Google Sheets';
-    document.getElementById('error-area').style.display = 'block';
-    document.getElementById('error-area').innerHTML = `<div class="error-msg">⚠️ Could not fetch live data: ${err.message}. Please check your internet connection or ensure the Google Sheet is still published, then click Refresh.</div>`;
+    setTimeout(()=>sel.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.p+'%'),60);
   }
 }
 
-loadData();
+// ── Leads ─────────────────────────────────────────────────────────────────────
+function renderLeads(){
+  const rows=raw.ld;if(!rows.length)return;
+  const nrKey='Lead Status (New/ Repeat)';
+  const nameKey='Name';
+  const yrKey='Financial Year';
+  const countryKey='Country';
+  const genderKey='Gender';
+  const ageKey='Age Group';
+  const sourceKey='Primary Source';
+
+  let f=applyFilters(rows,'ld',nrKey,yrKey,countryKey,null);
+  f=f.filter(r=>(r[sourceKey]||'').trim()!=='External Event');
+  f=f.filter(r=>(r[nameKey]||'').trim());
+
+  const tc=f.length;
+  const nw=f.filter(r=>(r[nrKey]||'').toLowerCase().includes('new')).length;
+  const rp=f.filter(r=>(r[nrKey]||'').toLowerCase().includes('repeat')).length;
+
+  document.getElementById('ld-tc').textContent=tc.toLocaleString();
+  document.getElementById('ld-new').textContent=nw.toLocaleString();
+  document.getElementById('ld-rep').textContent=rp.toLocaleString();
+  document.getElementById('ld-pct').textContent=tc>0?((nw/tc)*100).toFixed(1)+'%':'—';
+
+  mkDonut('ld-nr',['New','Repeat'],[nw,rp],['#6a9d6a','#c9a84c']);
+
+  const gd=countBy(f,genderKey);
+  mkDonut('ld-gender',Object.keys(gd),Object.values(gd),['#c9a84c','#4a9d8f','#8a70c0','#c97060'].slice(0,Object.keys(gd).length));
+
+  const ad=countBy(f,ageKey);
+  const ao=['10-20','20-30','30-40','40-50','50-60','60-70','70+'];
+  const al=[],av=[];
+  ao.forEach(a=>{if(ad[a]){al.push(a);av.push(ad[a]);}});
+  Object.entries(ad).forEach(([k,v])=>{if(!ao.includes(k)&&k){al.push(k);av.push(v);}});
+  mkBar('ld-age',al,av,'#5a7fb0');
+
+  const rd=topN(countBy(f,countryKey));
+  mkBar('ld-region',rd.map(e=>e[0]),rd.map(e=>e[1]),['#c9a84c','#4a9d8f','#c97060','#5a7fb0','#6a9d6a','#8a70c0','#e8c97a','#c9a84c'],true);
+
+  bars('ld-src',topN(countBy(f,sourceKey)),'#4a9d8f');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function init(){
+  const dot=document.getElementById('live-dot'),txt=document.getElementById('live-txt');
+  dot.className='live-dot loading';txt.textContent='Loading';
+  document.getElementById('last-sync').textContent='Fetching all sheets...';
+  document.getElementById('err-area').innerHTML='';
+  try{
+    const t=Date.now();
+    const [sR,ssR,tsR,ldR]=await Promise.all([fetch(URLS.seg+'&t='+t),fetch(URLS.ss+'&t='+t),fetch(URLS.ts+'&t='+t),fetch(URLS.ld+'&t='+t)]);
+    const [sTx,ssTx,tsTx,ldTx]=await Promise.all([sR.text(),ssR.text(),tsR.text(),ldR.text()]);
+
+    // Segments - parse as raw lines
+    const segLines=sTx.split('\n').map(l=>{
+      const v=[];let cur='',inQ=false;
+      for(const c of l){if(c==='"'){inQ=!inQ;}else if(c===','&&!inQ){v.push(cur.trim());cur='';}else cur+=c;}
+      v.push(cur.trim());return v;
+    });
+    renderSeg(segLines);
+
+    // Flat tables
+    raw.ss=parseCSV(ssTx);
+    raw.ts=parseCSV(tsTx);
+    raw.ld=parseCSV(ldTx);
+
+    // Populate dropdowns
+    fillSelect('ss-yr',raw.ss.map(r=>r['Financial Year']),'All Years');
+    fillSelect('ss-country',raw.ss.map(r=>r['Country']),'All Countries');
+    fillSelect('ss-source',raw.ss.filter(r=>(r['Primary Source']||'')!=='External Event').map(r=>r['Primary Source']),'All Sources');
+    fillSelect('ts-yr',raw.ts.map(r=>r['Financial Year']),'All Years');
+    fillSelect('ts-country',raw.ts.map(r=>r['Country']),'All Countries');
+    fillSelect('ts-source',raw.ts.filter(r=>(r['Primary Source']||'')!=='External Event').map(r=>r['Primary Source']),'All Sources');
+    fillSelect('ld-yr',raw.ld.map(r=>r['Financial Year']),'All Years');
+    fillSelect('ld-country',raw.ld.map(r=>r['Country']),'All Countries');
+
+    renderCust('ss');
+    renderCust('ts');
+    renderLeads();
+
+    dot.className='live-dot ok';txt.textContent='Live';
+    document.getElementById('last-sync').textContent='Last synced: '+new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  }catch(e){
+    dot.className='live-dot loading';txt.textContent='Error';
+    document.getElementById('last-sync').textContent='Could not connect';
+    document.getElementById('err-area').innerHTML=`<div class="err">⚠️ ${e.message} — ensure all 4 tabs are published as CSV and click Refresh.</div>`;
+  }
+}
+init();
 </script>
 </body>
 </html>
