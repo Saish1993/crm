@@ -247,10 +247,10 @@ const CSV = {
 };
 
 // Colour definitions for exclusion
-// Pink background = RGB approx (255, 182, 193) or (255, 204, 204) area
-// Yellow highlight = RGB approx (255, 255, 0) or (255, 242, 204)
-const PINK_THRESHOLD  = { r: 220, g: 150, b: 150 }; // pinkish
-const YELLOW_THRESHOLD = { r: 240, g: 230, b: 150 }; // yellowish
+// Pink = Google Sheets standard pink #FCE4EC or #FFE4E1
+// Light Yellow 3 = Google Sheets #FFF2CC
+const PINK_THRESHOLD   = { r: 240, g: 200, b: 200 };
+const YELLOW_THRESHOLD = { r: 240, g: 225, b: 180 };
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let raw = { ss:[], ts:[], ld:[] };
@@ -278,25 +278,33 @@ async function fetchSheetWithColors(gid, sheetName) {
 
 function isPink(bg) {
   if (!bg) return false;
-  const r = (bg.red || 0) * 255;
+  const r = (bg.red   || 0) * 255;
   const g = (bg.green || 0) * 255;
-  const b = (bg.blue || 0) * 255;
-  return r > PINK_THRESHOLD.r && g < PINK_THRESHOLD.g + 50 && b < PINK_THRESHOLD.b + 50 && r > g && r > b;
+  const b = (bg.blue  || 0) * 255;
+  // White/default = skip
+  if (r > 250 && g > 250 && b > 250) return false;
+  // Pink: high red, medium-high green, medium-high blue but red dominates
+  // Covers #FCE4EC (252,228,236), #FFE4E1 (255,228,225), #F4CCCC (244,204,204)
+  return r > PINK_THRESHOLD.r && g > 180 && b > 180 && r >= g && r >= b && (r - b) > 10;
 }
 
 function isYellow(bg) {
   if (!bg) return false;
-  const r = (bg.red || 0) * 255;
+  const r = (bg.red   || 0) * 255;
   const g = (bg.green || 0) * 255;
-  const b = (bg.blue || 0) * 255;
-  return r > YELLOW_THRESHOLD.r && g > YELLOW_THRESHOLD.g && b < YELLOW_THRESHOLD.b + 30;
+  const b = (bg.blue  || 0) * 255;
+  // White/default = skip
+  if (r > 250 && g > 250 && b > 250) return false;
+  // Light Yellow 3 = #FFF2CC (255,242,204)
+  // High red, high green, low-medium blue
+  return r > YELLOW_THRESHOLD.r && g > YELLOW_THRESHOLD.g && b < 220 && r >= b && g >= b;
 }
 
 function isWhiteOrDefault(bg) {
   if (!bg) return true;
-  const r = (bg.red || 1) * 255;
+  const r = (bg.red   || 1) * 255;
   const g = (bg.green || 1) * 255;
-  const b = (bg.blue || 1) * 255;
+  const b = (bg.blue  || 1) * 255;
   return r > 250 && g > 250 && b > 250;
 }
 
@@ -451,13 +459,27 @@ function applyFilters(rows, pfx, nrKey, excSet) {
   const fromEl  = document.getElementById(`${pfx}-from`);
   const toEl    = document.getElementById(`${pfx}-to`);
 
+  // Yellow AB = exclude from New; Green AB = include only for Repeat
+  const yellowAB = pfx === 'ss' ? (window.ssYellowAB || new Set()) : new Set();
+  const greenAB  = pfx === 'ss' ? (window.ssGreenAB  || new Set()) : new Set();
+
   return rows.filter((r, idx) => {
-    if (excSet && excSet.has(idx)) return false; // excluded by colour
-    if (f !== 'all') {
+    if (excSet && excSet.has(idx)) return false; // pink AF = exclude always
+
+    if (f === 'New') {
       const nr = (r[nrKey]||'').toLowerCase();
-      if (f === 'New'    && (!nr.includes('new') || nr.includes('repeat'))) return false;
-      if (f === 'Repeat' && !nr.includes('repeat')) return false;
+      if (!nr.includes('new') || nr.includes('repeat')) return false;
+      if (yellowAB.has(idx)) return false; // yellow AB = exclude from New
     }
+    if (f === 'Repeat') {
+      const nr = (r[nrKey]||'').toLowerCase();
+      if (!nr.includes('repeat')) return false;
+    }
+    if (f === 'all') {
+      // For All view: still exclude yellow AB rows from New count
+      // (handled in renderCust separately)
+    }
+
     if (country && (r['Country']||'').trim() !== country) return false;
     if (source  && (r['Primary Source']||'').trim() !== source) return false;
     if (seg     && (r['Segmentation']||'').trim() !== seg) return false;
@@ -603,23 +625,22 @@ function renderLeads() {
   bars('ld-src', topN(countBy(f,'Primary Source')), '#2a7d6f');
 }
 
-// ─── Fetch with colour data ───────────────────────────────────────────────────
-async function fetchWithColors(tabName, excSet, colIdx) {
-  try {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?ranges=${encodeURIComponent(tabName)}&fields=sheets(data(rowData(values(effectiveFormat/backgroundColor))))&key=${API_KEY}`;
-    const res = await fetch(url);
-    if (!res.ok) return;
-    const data = await res.json();
-    const rows = data?.sheets?.[0]?.data?.[0]?.rowData || [];
-    rows.forEach((row, idx) => {
-      if (idx === 0) return; // skip header
-      const cell = row?.values?.[colIdx];
-      const bg   = cell?.effectiveFormat?.backgroundColor;
-      if (isPink(bg) || isYellow(bg)) excSet.add(idx - 1); // -1 for header offset
-    });
-  } catch(e) {
-    console.warn('Colour fetch failed:', e.message);
-  }
+// ─── Hardcoded colour data extracted from Excel file ─────────────────────────
+// These indices are 0-based data row indices (excluding header)
+const COLOR_DATA = {"ss": {"pink_af": [0, 9, 25, 38, 39, 58, 60, 65, 83, 104, 118, 134, 137, 144, 146, 157, 160, 164, 169, 176, 190, 192, 221, 229, 241, 243, 251, 254, 274, 275, 286, 287, 288, 291, 292, 314, 356, 365, 371, 377, 384, 388, 389, 390, 391, 395, 397, 399, 410, 426, 433, 434, 450, 451, 456, 468, 475, 483, 484, 509, 519, 524, 525, 543, 545, 553, 557, 582, 586, 644, 662, 664, 679, 718, 722, 736, 740, 775, 785, 843, 858, 883, 893, 972, 974, 976, 984, 988, 991, 1002, 1011, 1036, 1043, 1047, 1078, 1085, 1108, 1124, 1125, 1145, 1146, 1147, 1172, 1176, 1177, 1182, 1185, 1187, 1212, 1241, 1242, 1256, 1257, 1260, 1268, 1269, 1270, 1290, 1333, 1335, 1353, 1375, 1379, 1380, 1393, 1394, 1427, 1431, 1437, 1450, 1457, 1486, 1509, 1510, 1515, 1518, 1519, 1581, 1597, 1601, 1610, 1620, 1642, 1679, 1698, 1705, 1738, 1757], "yellow_ab": [7, 14, 17, 27, 31, 53, 62, 71, 74, 77, 88, 96, 99, 105, 109, 115, 135, 147, 151, 153, 155, 156, 167, 200, 215, 226, 244, 306, 311, 312, 357, 358, 385, 402, 427, 445, 459, 461, 466, 473, 474, 480, 491, 498, 535, 536, 549, 574, 601, 608, 615, 624, 625, 638, 672, 704, 705, 726, 727, 736, 745, 749, 758, 770, 784, 792, 808, 815, 827, 848, 861, 866, 878, 907, 908, 930, 949, 958, 1004, 1017, 1020, 1099, 1150, 1154, 1169, 1178, 1197, 1210, 1225, 1230, 1246, 1276, 1290, 1306, 1307, 1313, 1322, 1337, 1342, 1398, 1427, 1478, 1488, 1495, 1516, 1525, 1552, 1562, 1578, 1603, 1637, 1665, 1682, 1748], "green_ab": [20, 30, 49, 106, 196, 204, 220, 293, 366, 369, 378, 386, 418, 450, 453, 481, 529, 551, 556, 650, 680, 683, 695, 711, 738, 754, 766, 824, 865, 882, 917, 975, 978, 1010, 1019, 1042, 1056, 1063, 1109, 1110, 1114, 1148, 1151, 1163, 1171, 1174, 1200, 1202, 1207, 1240, 1279, 1284, 1304, 1305, 1312, 1314, 1321, 1323, 1327, 1338, 1341, 1346, 1351, 1371, 1377, 1383, 1426, 1430, 1458, 1477, 1484, 1520, 1521, 1526, 1527, 1544, 1555, 1558, 1580, 1586, 1592, 1599, 1602, 1605, 1606, 1608, 1617, 1618, 1625, 1650, 1652, 1653, 1675, 1677, 1683, 1684, 1686, 1687, 1688, 1695, 1696, 1699, 1700, 1702, 1715, 1732, 1734, 1751, 1753, 1756, 1758]}, "ts": {"pink_af": [], "yellow_ab": [], "green_ab": []}, "ld": {"yellow_d": [40, 61, 62, 63, 64, 71, 75, 83, 85, 87, 106, 109, 110, 113, 114, 115, 116, 117, 118, 119, 121, 142, 143, 144, 145, 147, 148, 151, 282, 365, 366, 367, 368, 369, 372, 373, 374, 375, 377, 380, 382, 383, 393, 398, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 431, 441, 462, 463, 464, 469, 476, 492, 493, 494, 495, 496, 497, 498, 500, 501, 502, 503, 504, 505, 507, 508, 511, 512, 513, 514, 515, 516, 518, 519, 520, 522, 523, 524, 525, 526, 527, 528, 530, 532, 535, 536, 590, 602, 603, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 691, 692, 826, 828, 830, 835, 844, 851, 853, 946, 947, 948, 949, 953, 962, 964, 966, 967, 968, 969, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 1037, 1038, 1039, 1040, 1041, 1042, 1043, 1048, 1049, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1060, 1068, 1084, 1100, 1123, 1133, 1322, 1323, 1324, 1325, 1326, 1327, 1328, 1329, 1330, 1331, 1332, 1333, 1334, 1335, 1336, 1337, 1338, 1339, 1340, 1341, 1342, 1344, 1346, 1347, 1348, 1349, 1350, 1351, 1352, 1353, 1354, 1355, 1356, 1357, 1358, 1359, 1360, 1361, 1362, 1363, 1364, 1365, 1366, 1367, 1368, 1369, 1370, 1371, 1372, 1373, 1374, 1375, 1376, 1377, 1378, 1379, 1380, 1381, 1382, 1383, 1384, 1385, 1386, 1387, 1388, 1389, 1390, 1391, 1392, 1393, 1394, 1395, 1396, 1397, 1398, 1399, 1400, 1401, 1402, 1403, 1404, 1405, 1406, 1407, 1409, 1410, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1437, 1438, 1439, 1440, 1441, 1442, 1443, 1444, 1445, 1446, 1447, 1448, 1449, 1450, 1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470, 1471, 1472, 1473, 1474, 1475, 1476, 1477, 1478, 1479, 1480, 1481, 1482, 1483, 1484, 1485, 1486, 1487, 1488, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501, 1502, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512, 1513, 1514, 1515, 1516, 1517, 1518, 1519, 1520, 1521, 1522, 1523, 1524, 1525, 1526, 1527, 1528, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548, 1549, 1550, 1551, 1552, 1553, 1554, 1555, 1556, 1557, 1558, 1559, 1560, 1561, 1562, 1563, 1564, 1565, 1566, 1567, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588, 1589, 1590, 1591, 1592, 1593, 1594, 1595, 1596, 1597, 1598, 1599, 1600, 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631, 1632, 1633, 1634, 1635, 1636, 1637, 1638, 1639, 1640, 1641, 1642, 1643, 1644, 1645, 1646, 1647, 1648, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677, 1678, 1679, 1680, 1681, 1682, 1683, 1684, 1685, 1690, 1691, 1692, 1693, 1694, 1695, 1811, 1947, 1948, 1949, 1950, 1951, 1952, 1953, 1954, 1955, 1956, 1957, 1958, 1959, 1960, 1961, 1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972, 1973, 1974, 1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 2651, 2652]}};
+
+async function loadColorData() {
+  // SS: pink_af = exclude row entirely
+  COLOR_DATA.ss.pink_af.forEach(i => excluded.ss.add(i));
+  // LD: yellow_d = exclude lead row
+  COLOR_DATA.ld.yellow_d.forEach(i => excluded.ld.add(i));
+  // TS: no colour data found
+  return {
+    ssExcluded: COLOR_DATA.ss.pink_af.length,
+    ldExcluded: COLOR_DATA.ld.yellow_d.length,
+    ssYellowAB: new Set(COLOR_DATA.ss.yellow_ab),
+    ssGreenAB:  new Set(COLOR_DATA.ss.green_ab)
+  };
 }
 
 // ─── Sheet name lookup ────────────────────────────────────────────────────────
@@ -660,26 +681,11 @@ async function init() {
     raw.ts = parseCSV(tsTxt);
     raw.ld = parseCSV(ldTxt);
 
-    // Try to get colour exclusions via API
-    try {
-      const sheets = await getSheetNames();
-      const ssName = sheets.find(s=>s.gid===GIDS.ss)?.name || 'Customers: SS';
-      const tsName = sheets.find(s=>s.gid===GIDS.ts)?.name || 'Customers: TS/PS/O';
-      const ldName = sheets.find(s=>s.gid===GIDS.ld)?.name || 'Leads: SF';
-
-      // Fetch colours in parallel
-      // SS/TS: col AF (index 31) = Additional Comments pink exclusion
-      // Leads: col D (index 3) = Name yellow exclusion
-      await Promise.all([
-        fetchWithColors(ssName, excluded.ss, 31),
-        fetchWithColors(tsName, excluded.ts, 31),
-        fetchWithColors(ldName, excluded.ld, 3)
-      ]);
-      document.getElementById('err-area').innerHTML = `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(58,125,58,0.08);border:1px solid rgba(58,125,58,0.2);border-radius:20px;padding:4px 12px;font-size:10px;color:#3a7d3a;margin-bottom:1rem;">✦ Colour exclusions loaded — ${excluded.ss.size + excluded.ts.size + excluded.ld.size} rows excluded</div>`;
-    } catch(apiErr) {
-      console.warn('API colour fetch failed, proceeding without colour exclusions:', apiErr.message);
-      document.getElementById('err-area').innerHTML = `<div class="err" style="font-size:11px;">⚠️ Could not load colour exclusions via API (${apiErr.message}). All rows included — make sure sheet is shared as "Anyone with link can view".</div>`;
-    }
+    // Load colour exclusions from hardcoded data extracted from Excel
+    const colorResult = await loadColorData();
+    window.ssYellowAB = colorResult.ssYellowAB;
+    window.ssGreenAB  = colorResult.ssGreenAB;
+    document.getElementById('err-area').innerHTML = `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(58,125,58,0.08);border:1px solid rgba(58,125,58,0.2);border-radius:20px;padding:4px 12px;font-size:10px;color:#3a7d3a;margin-bottom:1rem;">✦ Colour exclusions active — ${colorResult.ssExcluded} customer rows + ${colorResult.ldExcluded} lead rows excluded</div>`;
 
     // Populate dropdowns
     const validFY = v => v && v.toString().trim().toUpperCase().startsWith('FY');
