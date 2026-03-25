@@ -5,351 +5,358 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aneka KG — CRM Analytics</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-:root{--bg:#f5f4f0;--bg2:#ffffff;--bg3:#f0efe9;--surface:#ffffff;--border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.12);--text:#1a1a18;--text2:#5a5848;--text3:#9a9680;--gold:#b8860b;--gold2:#9a6f0a;--gold3:#7a5508;--gold-dim:rgba(184,134,11,0.08);--teal:#2a7d6f;--coral:#c05040;--blue:#3a5f90;--green:#3a7d3a;--purple:#6a50a0;--radius:14px;--radius-sm:8px;}
+:root{
+  --bg:#f5f4f0;--surface:#fff;--surface2:#f0efe9;
+  --border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.13);
+  --text:#1a1a18;--text2:#5a5848;--text3:#9a9680;
+  --gold:#b8860b;--gold2:#9a6f0a;--gold-dim:rgba(184,134,11,0.09);
+  --teal:#2a7d6f;--coral:#c05040;--blue:#3a5f90;
+  --green:#3a7d3a;--purple:#6a50a0;
+  --r:14px;--rs:8px;
+}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-.header{background:#1a1a18;border-bottom:1px solid rgba(0,0,0,0.2);padding:1.25rem 2.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.brand{display:flex;align-items:center;gap:12px;}
-.brand-mark{width:34px;height:34px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;}
-.brand-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:500;color:#f5e4b0;}
-.brand-sub{font-size:10px;color:rgba(255,255,255,0.4);font-family:'DM Mono',monospace;margin-top:2px;}
-.header-right{display:flex;align-items:center;gap:10px;}
-.live-badge{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:5px 12px;font-size:11px;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.6);}
-.live-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite;}
-.live-dot.ok{background:#6a9d6a;}
-.live-dot.loading{background:#c97060;animation:none;}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
-.refresh-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.8);padding:6px 14px;border-radius:20px;font-size:11px;cursor:pointer;transition:all 0.2s;}
-.refresh-btn:hover{background:rgba(255,255,255,0.18);}
-.nav{background:#ffffff;border-bottom:1px solid rgba(0,0,0,0.08);padding:0 2.5rem;display:flex;overflow-x:auto;}
-.nav-tab{padding:11px 18px;font-size:12px;font-weight:500;color:#9a9680;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
-.nav-tab:hover{color:#5a5848;}
-.nav-tab.active{color:#9a6f0a;border-bottom-color:#b8860b;}
-.main{padding:2rem 2.5rem;max-width:1300px;margin:0 auto;}
-.section{display:none;}
-.section.active{display:block;}
-.sec-header{margin-bottom:1.5rem;}
-.sec-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;color:#1a1a18;}
-.sec-sub{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:3px;}
-.filters{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;}
-.filter-label{font-size:11px;color:var(--text3);}
-select.flt{background:var(--surface);border:1px solid var(--border2);color:var(--text2);padding:6px 10px;border-radius:var(--radius-sm);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;outline:none;}
-select.flt:focus{border-color:var(--gold);}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
-.flt-btn{background:var(--surface);border:1px solid var(--border2);color:var(--text2);padding:6px 12px;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;transition:all 0.15s;}
-.flt-btn.on{background:var(--gold-dim);border-color:rgba(184,134,11,0.35);color:var(--gold2);}
-.flt-sep{width:1px;height:20px;background:var(--border2);margin:0 4px;}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.25rem;}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.25rem;position:relative;overflow:hidden;}
-.kpi::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--acc,var(--gold));opacity:0.45;}
-.kpi-lbl{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
-.kpi-val{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--text);letter-spacing:-0.02em;line-height:1;margin-bottom:5px;}
-.kpi-sub{font-size:10px;color:var(--text3);}
-.cards-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
-.cards-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;}
-.card-full{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem 1.5rem;margin-bottom:10px;}
-.card-title{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:3px;}
-.card-sub{font-size:10px;color:var(--text3);margin-bottom:1rem;}
-.leg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
-.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);}
-.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
-.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
-.bar-lbl{font-size:11px;color:var(--text2);width:110px;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.bar-track{flex:1;background:var(--bg3);border-radius:3px;height:20px;overflow:hidden;}
-.bar-fill{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:7px;font-size:10px;font-weight:500;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);}
-.bar-num{font-size:10px;color:var(--text2);width:36px;text-align:right;flex-shrink:0;}
-.err{background:rgba(192,80,64,0.08);border:1px solid rgba(192,80,64,0.25);border-radius:var(--radius-sm);padding:1rem;font-size:12px;color:var(--coral);margin-bottom:1rem;}
-.info-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(184,134,11,0.08);border:1px solid rgba(184,134,11,0.2);border-radius:20px;padding:4px 10px;font-size:10px;color:var(--gold2);margin-bottom:1rem;}
-@media(max-width:768px){.main{padding:1rem;}.header{padding:1rem;}.kpi-grid{grid-template-columns:1fr 1fr;}.cards-2,.cards-3{grid-template-columns:1fr;}}
+/* Header */
+.hdr{background:#1a1a18;padding:1.1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.hdr-l{display:flex;align-items:center;gap:10px;}
+.hdr-icon{width:32px;height:32px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.hdr-title{font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:500;color:#f5e4b0;}
+.hdr-sub{font-size:10px;color:rgba(255,255,255,0.35);font-family:"DM Mono",monospace;margin-top:1px;}
+.hdr-r{display:flex;align-items:center;gap:8px;}
+.badge{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:20px;padding:4px 10px;font-size:10px;font-family:"DM Mono",monospace;color:rgba(255,255,255,0.55);}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite;}
+.dot.ok{background:#6a9d6a;}.dot.err{background:#c05040;animation:none;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.btn-refresh{background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.8);padding:5px 13px;border-radius:20px;font-size:11px;cursor:pointer;}
+.btn-refresh:hover{background:rgba(255,255,255,0.16);}
+
+/* Nav */
+.nav{background:#fff;border-bottom:1px solid var(--border);padding:0 2rem;display:flex;overflow-x:auto;}
+.tab{padding:10px 16px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab:hover{color:var(--text2);}
+.tab.on{color:var(--gold2);border-bottom-color:var(--gold);}
+
+/* Main */
+.main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto;}
+.page{display:none;}.page.on{display:block;}
+
+/* Section header */
+.ph{margin-bottom:1.25rem;}
+.pt{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:400;color:var(--text);}
+.ps{font-size:10px;color:var(--text3);font-family:"DM Mono",monospace;margin-top:2px;}
+
+/* Info bar */
+.info-bar{display:inline-flex;align-items:center;gap:5px;background:rgba(58,125,58,0.07);border:1px solid rgba(58,125,58,0.18);border-radius:20px;padding:4px 12px;font-size:10px;color:#3a7d3a;margin-bottom:1rem;}
+
+/* Filters */
+.filters{display:flex;gap:7px;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center;}
+.flbl{font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;}
+.fsep{width:1px;height:18px;background:var(--border2);margin:0 3px;}
+select.fsel{background:var(--surface);border:1px solid var(--border2);color:var(--text2);padding:5px 9px;border-radius:var(--rs);font-size:11px;cursor:pointer;outline:none;font-family:"DM Sans",sans-serif;}
+select.fsel:focus{border-color:var(--gold);}
+.fbtn{background:var(--surface);border:1px solid var(--border2);color:var(--text2);padding:5px 11px;border-radius:var(--rs);font-size:11px;cursor:pointer;transition:all .15s;}
+.fbtn.on{background:var(--gold-dim);border-color:rgba(184,134,11,.3);color:var(--gold2);}
+.fbtn:hover:not(.on){background:var(--surface2);}
+
+/* KPI grid */
+.kgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.1rem;}
+.kcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.2rem;position:relative;overflow:hidden;}
+.kcard::after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--ac,var(--gold));opacity:.4;}
+.klbl{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;}
+.kval{font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:300;color:var(--text);letter-spacing:-.02em;line-height:1;margin-bottom:4px;}
+.ksub{font-size:10px;color:var(--text3);}
+
+/* Cards */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.4rem;}
+.cfu{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.4rem;margin-bottom:10px;}
+.ct{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:3px;}
+.cs{font-size:10px;color:var(--text3);margin-bottom:.9rem;}
+
+/* Bar chart rows */
+.br{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.bl{font-size:11px;color:var(--text2);width:110px;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bt{flex:1;background:var(--surface2);border-radius:3px;height:20px;overflow:hidden;}
+.bf{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:7px;font-size:10px;font-weight:500;transition:width .8s cubic-bezier(.4,0,.2,1);}
+.bn{font-size:10px;color:var(--text2);width:36px;text-align:right;flex-shrink:0;}
+
+/* Legend */
+.leg{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:9px;}
+.li{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);}
+.ld{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+
+/* Error */
+.err{background:rgba(192,80,64,.08);border:1px solid rgba(192,80,64,.22);border-radius:var(--rs);padding:.9rem;font-size:12px;color:var(--coral);margin-bottom:1rem;}
+
+@media(max-width:768px){
+  .main{padding:1rem;}
+  .hdr{padding:1rem;}
+  .kgrid{grid-template-columns:1fr 1fr;}
+  .g2,.g3{grid-template-columns:1fr;}
+}
 </style>
 </head>
 <body>
-<div class="header">
-  <div class="brand">
-    <div class="brand-mark">💎</div>
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="hdr-icon">💎</div>
     <div>
-      <div class="brand-title">Aneka KG — CRM Analytics</div>
-      <div class="brand-sub" id="last-sync">Initialising...</div>
+      <div class="hdr-title">Aneka KG — CRM Analytics</div>
+      <div class="hdr-sub" id="sync-txt">Initialising...</div>
     </div>
   </div>
-  <div class="header-right">
-    <div class="live-badge"><div class="live-dot loading" id="live-dot"></div><span id="live-txt">Loading</span></div>
-    <button class="refresh-btn" onclick="init()">↻ Refresh</button>
+  <div class="hdr-r">
+    <div class="badge"><div class="dot err" id="dot"></div><span id="dot-txt">Loading</span></div>
+    <button class="btn-refresh" onclick="init()">↻ Refresh</button>
   </div>
 </div>
+
+<!-- Nav -->
 <div class="nav">
-  <div class="nav-tab active" onclick="showTab('segments')">Segments 25-26</div>
-  <div class="nav-tab" onclick="showTab('ss')">Customers: SS</div>
-  <div class="nav-tab" onclick="showTab('ts')">Customers: TS/PS/O</div>
-  <div class="nav-tab" onclick="showTab('leads')">Leads: SF</div>
+  <div class="tab on" onclick="showPage('seg')">Segments 25-26</div>
+  <div class="tab" onclick="showPage('ss')">Customers: SS</div>
+  <div class="tab" onclick="showPage('ts')">Customers: TS/PS/O</div>
+  <div class="tab" onclick="showPage('ld')">Leads: SF</div>
 </div>
+
 <div class="main">
-  <div id="err-area"></div>
+<div id="err-area"></div>
 
-  <!-- SEGMENTS -->
-  <div class="section active" id="tab-segments">
-    <div class="sec-header"><div class="sec-title">Segments: 25–26</div><div class="sec-sub">Customer pyramid & lead pipeline overview</div></div>
-    <div class="kpi-grid">
-      <div class="kpi" style="--acc:#b8860b"><div class="kpi-lbl">Total Customers</div><div class="kpi-val" id="s-tc">—</div><div class="kpi-sub">Active paying clients</div></div>
-      <div class="kpi" style="--acc:#c05040"><div class="kpi-lbl">Total Leads</div><div class="kpi-val" id="s-tl">—</div><div class="kpi-sub">In pipeline</div></div>
-      <div class="kpi" style="--acc:#2a7d6f"><div class="kpi-lbl">VIC Customers</div><div class="kpi-val" id="s-vic">—</div><div class="kpi-sub">Top tier ≥ ₹40L</div></div>
-      <div class="kpi" style="--acc:#3a7d3a"><div class="kpi-lbl">Conversion Rate</div><div class="kpi-val" id="s-conv">—</div><div class="kpi-sub">Customers / total</div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">Customer pyramid</div><div class="card-sub">20% frequency + 80% monetary</div><div id="s-pyr"></div></div>
-      <div class="card"><div class="card-title">Lead pipeline</div><div class="card-sub">Lead temperature distribution</div><div id="s-ld"></div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">Customers by region</div><div class="card-sub">Geographic distribution</div><div class="leg" id="s-geo-leg"></div><div style="position:relative;height:190px;"><canvas id="s-geo"></canvas></div></div>
-      <div class="card"><div class="card-title">Monthly activity</div><div class="card-sub">Customers and leads per month</div><div class="leg"><div class="leg-item"><div class="leg-dot" style="background:#b8860b"></div>Customers</div><div class="leg-item"><div class="leg-dot" style="background:#c05040"></div>Leads</div></div><div style="position:relative;height:170px;"><canvas id="s-trend"></canvas></div></div>
-    </div>
+<!-- SEGMENTS PAGE -->
+<div class="page on" id="page-seg">
+  <div class="ph"><div class="pt">Segments: 25–26</div><div class="ps">Customer pyramid & lead pipeline overview</div></div>
+  <div class="kgrid">
+    <div class="kcard" style="--ac:var(--gold)"><div class="klbl">Total Customers</div><div class="kval" id="s-tc">—</div><div class="ksub">Active paying clients</div></div>
+    <div class="kcard" style="--ac:var(--coral)"><div class="klbl">Total Leads</div><div class="kval" id="s-tl">—</div><div class="ksub">In pipeline</div></div>
+    <div class="kcard" style="--ac:var(--teal)"><div class="klbl">VIC Customers</div><div class="kval" id="s-vic">—</div><div class="ksub">Top tier ≥ ₹40L</div></div>
+    <div class="kcard" style="--ac:var(--green)"><div class="klbl">Conversion Rate</div><div class="kval" id="s-conv">—</div><div class="ksub">Customers / total contacts</div></div>
   </div>
-
-  <!-- SS -->
-  <div class="section" id="tab-ss">
-    <div class="sec-header"><div class="sec-title">Customers: SS</div><div class="sec-sub">Single sale customer analytics</div></div>
-    <div class="info-badge">✦ Colour-coded exclusions active via Google Sheets API</div>
-    <div class="filters">
-      <span class="filter-label">Status:</span>
-      <button class="flt-btn on" id="ss-f-all" onclick="setFilter('ss','all')">All</button>
-      <button class="flt-btn" id="ss-f-New" onclick="setFilter('ss','New')">New</button>
-      <button class="flt-btn" id="ss-f-Repeat" onclick="setFilter('ss','Repeat')">Repeat</button>
-      <div class="flt-sep"></div>
-      <span class="filter-label">Year:</span>
-      <select class="flt" id="ss-fy" onchange="renderCust('ss')">
-        <option value="">All Years</option>
-        <option>FY 19-20</option>
-        <option>FY 20-21</option>
-        <option>FY 21-22</option>
-        <option>FY 22-23</option>
-        <option>FY 23-24</option>
-        <option>FY 24-25</option>
-        <option>FY 25-26</option>
-      </select>
-      <select class="flt" id="ss-month" onchange="renderCust('ss')">
-        <option value="">All Months</option>
-        <option>April</option><option>May</option><option>June</option>
-        <option>July</option><option>August</option><option>September</option>
-        <option>October</option><option>November</option><option>December</option>
-        <option>January</option><option>February</option><option>March</option>
-      </select>
-      <div class="flt-sep"></div>
-      <select class="flt" id="ss-country" onchange="renderCust('ss')"><option value="">All Countries</option></select>
-      <select class="flt" id="ss-source" onchange="renderCust('ss')"><option value="">All Sources</option></select>
-      <select class="flt" id="ss-seg" onchange="renderCust('ss')"><option value="">All Segments</option></select>
-      <button class="flt-btn" onclick="clearFilters('ss')">Clear</button>
-    </div>
-    <div class="kpi-grid">
-      <div class="kpi" style="--acc:#b8860b"><div class="kpi-lbl">Total Customers</div><div class="kpi-val" id="ss-tc">—</div><div class="kpi-sub">Filtered count</div></div>
-      <div class="kpi" style="--acc:#2a7d6f"><div class="kpi-lbl">Total Revenue</div><div class="kpi-val" id="ss-rev">—</div><div class="kpi-sub">Sum of total spend</div></div>
-      <div class="kpi" style="--acc:#3a7d3a"><div class="kpi-lbl">New Customers</div><div class="kpi-val" id="ss-new">—</div><div class="kpi-sub">First time buyers</div></div>
-      <div class="kpi" style="--acc:#c05040"><div class="kpi-lbl">Repeat Customers</div><div class="kpi-val" id="ss-rep">—</div><div class="kpi-sub">Returning buyers</div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">New vs Repeat — count</div><div class="card-sub">Customer status split</div><div style="position:relative;height:170px;"><canvas id="ss-nr"></canvas></div></div>
-      <div class="card"><div class="card-title">New vs Repeat — revenue</div><div class="card-sub">Revenue split by status</div><div style="position:relative;height:170px;"><canvas id="ss-nr-rev"></canvas></div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">Gender split</div><div class="card-sub">Distribution by gender</div><div style="position:relative;height:170px;"><canvas id="ss-gender"></canvas></div></div>
-      <div class="card"><div class="card-title">Age group</div><div class="card-sub">Customer count by age bracket</div><div style="position:relative;height:170px;"><canvas id="ss-age"></canvas></div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">Region breakdown</div><div class="card-sub">Top countries</div><div style="position:relative;height:200px;"><canvas id="ss-region"></canvas></div></div>
-      <div class="card"><div class="card-title">NRI vs Non-NRI</div><div class="card-sub">NRI customer identification</div><div style="position:relative;height:200px;"><canvas id="ss-nri"></canvas></div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">Source segmentation</div><div class="card-sub">Acquisition source (excl. External Event)</div><div id="ss-src"></div></div>
-      <div class="card"><div class="card-title">Customer segmentation</div><div class="card-sub">Pyramid tier distribution</div><div id="ss-seg-bars"></div></div>
-    </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Customer pyramid</div><div class="cs">Scored by 20% frequency + 80% monetary</div><div id="s-pyr"></div></div>
+    <div class="card"><div class="ct">Lead pipeline</div><div class="cs">Lead temperature distribution</div><div id="s-ld"></div></div>
   </div>
-
-  <!-- TS -->
-  <div class="section" id="tab-ts">
-    <div class="sec-header"><div class="sec-title">Customers: TS/PS/O</div><div class="sec-sub">Trunk show / private show / other</div></div>
-    <div class="info-badge">✦ Colour-coded exclusions active via Google Sheets API</div>
-    <div class="filters">
-      <span class="filter-label">Status:</span>
-      <button class="flt-btn on" id="ts-f-all" onclick="setFilter('ts','all')">All</button>
-      <button class="flt-btn" id="ts-f-New" onclick="setFilter('ts','New')">New</button>
-      <button class="flt-btn" id="ts-f-Repeat" onclick="setFilter('ts','Repeat')">Repeat</button>
-      <div class="flt-sep"></div>
-      <span class="filter-label">Year:</span>
-      <select class="flt" id="ts-fy" onchange="renderCust('ts')">
-        <option value="">All Years</option>
-        <option>FY 22-23</option>
-        <option>FY 23-24</option>
-        <option>FY 24-25</option>
-        <option>FY 25-26</option>
-      </select>
-      <select class="flt" id="ts-month" onchange="renderCust('ts')">
-        <option value="">All Months</option>
-        <option>April</option><option>May</option><option>June</option>
-        <option>July</option><option>August</option><option>September</option>
-        <option>October</option><option>November</option><option>December</option>
-        <option>January</option><option>February</option><option>March</option>
-      </select>
-      <div class="flt-sep"></div>
-      <select class="flt" id="ts-country" onchange="renderCust('ts')"><option value="">All Countries</option></select>
-      <select class="flt" id="ts-source" onchange="renderCust('ts')"><option value="">All Sources</option></select>
-      <select class="flt" id="ts-seg" onchange="renderCust('ts')"><option value="">All Segments</option></select>
-      <button class="flt-btn" onclick="clearFilters('ts')">Clear</button>
-    </div>
-    <div class="kpi-grid">
-      <div class="kpi" style="--acc:#b8860b"><div class="kpi-lbl">Total Customers</div><div class="kpi-val" id="ts-tc">—</div><div class="kpi-sub">Filtered count</div></div>
-      <div class="kpi" style="--acc:#2a7d6f"><div class="kpi-lbl">Total Revenue</div><div class="kpi-val" id="ts-rev">—</div><div class="kpi-sub">Sum of total spend</div></div>
-      <div class="kpi" style="--acc:#3a7d3a"><div class="kpi-lbl">New Customers</div><div class="kpi-val" id="ts-new">—</div><div class="kpi-sub">First time buyers</div></div>
-      <div class="kpi" style="--acc:#c05040"><div class="kpi-lbl">Repeat Customers</div><div class="kpi-val" id="ts-rep">—</div><div class="kpi-sub">Returning buyers</div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">New vs Repeat — count</div><div class="card-sub">Customer status split</div><div style="position:relative;height:170px;"><canvas id="ts-nr"></canvas></div></div>
-      <div class="card"><div class="card-title">New vs Repeat — revenue</div><div class="card-sub">Revenue split by status</div><div style="position:relative;height:170px;"><canvas id="ts-nr-rev"></canvas></div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">Gender split</div><div class="card-sub">Distribution by gender</div><div style="position:relative;height:170px;"><canvas id="ts-gender"></canvas></div></div>
-      <div class="card"><div class="card-title">Age group</div><div class="card-sub">Customer count by age bracket</div><div style="position:relative;height:170px;"><canvas id="ts-age"></canvas></div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">Region breakdown</div><div class="card-sub">Top countries</div><div style="position:relative;height:200px;"><canvas id="ts-region"></canvas></div></div>
-      <div class="card"><div class="card-title">NRI vs Non-NRI</div><div class="card-sub">NRI customer identification</div><div style="position:relative;height:200px;"><canvas id="ts-nri"></canvas></div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">Source segmentation</div><div class="card-sub">Acquisition source (excl. External Event)</div><div id="ts-src"></div></div>
-      <div class="card"><div class="card-title">Customer segmentation</div><div class="card-sub">Pyramid tier distribution</div><div id="ts-seg-bars"></div></div>
-    </div>
-  </div>
-
-  <!-- LEADS -->
-  <div class="section" id="tab-leads">
-    <div class="sec-header"><div class="sec-title">Leads: SF</div><div class="sec-sub">Lead pipeline analytics</div></div>
-    <div class="info-badge">✦ Colour-coded exclusions active via Google Sheets API</div>
-    <div class="filters">
-      <span class="filter-label">Status:</span>
-      <button class="flt-btn on" id="ld-f-all" onclick="setFilter('ld','all')">All</button>
-      <button class="flt-btn" id="ld-f-New" onclick="setFilter('ld','New')">New</button>
-      <button class="flt-btn" id="ld-f-Repeat" onclick="setFilter('ld','Repeat')">Repeat</button>
-      <div class="flt-sep"></div>
-      <span class="filter-label">Year:</span>
-      <select class="flt" id="ld-fy" onchange="renderLeads()">
-        <option value="">All Years</option>
-        <option>FY 22-23</option>
-        <option>FY 23-24</option>
-        <option>FY 24-25</option>
-        <option>FY 25-26</option>
-      </select>
-      <select class="flt" id="ld-month" onchange="renderLeads()">
-        <option value="">All Months</option>
-        <option>April</option><option>May</option><option>June</option>
-        <option>July</option><option>August</option><option>September</option>
-        <option>October</option><option>November</option><option>December</option>
-        <option>January</option><option>February</option><option>March</option>
-      </select>
-      <div class="flt-sep"></div>
-      <select class="flt" id="ld-country" onchange="renderLeads()"><option value="">All Countries</option></select>
-      <select class="flt" id="ld-source" onchange="renderLeads()"><option value="">All Sources</option></select>
-      <button class="flt-btn" onclick="clearFilters('ld')">Clear</button>
-    </div>
-    <div class="kpi-grid">
-      <div class="kpi" style="--acc:#b8860b"><div class="kpi-lbl">Total Leads</div><div class="kpi-val" id="ld-tc">—</div><div class="kpi-sub">All leads</div></div>
-      <div class="kpi" style="--acc:#3a7d3a"><div class="kpi-lbl">New Leads</div><div class="kpi-val" id="ld-new">—</div><div class="kpi-sub">First contact</div></div>
-      <div class="kpi" style="--acc:#2a7d6f"><div class="kpi-lbl">Repeat Leads</div><div class="kpi-val" id="ld-rep">—</div><div class="kpi-sub">Returning</div></div>
-      <div class="kpi" style="--acc:#c05040"><div class="kpi-lbl">New Lead %</div><div class="kpi-val" id="ld-pct">—</div><div class="kpi-sub">Of total leads</div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">New vs Repeat</div><div class="card-sub">Lead status split</div><div style="position:relative;height:170px;"><canvas id="ld-nr"></canvas></div></div>
-      <div class="card"><div class="card-title">Gender split</div><div class="card-sub">Lead distribution by gender</div><div style="position:relative;height:170px;"><canvas id="ld-gender"></canvas></div></div>
-    </div>
-    <div class="cards-2">
-      <div class="card"><div class="card-title">Age group</div><div class="card-sub">Lead count by age bracket</div><div style="position:relative;height:190px;"><canvas id="ld-age"></canvas></div></div>
-      <div class="card"><div class="card-title">Region breakdown</div><div class="card-sub">Top countries</div><div style="position:relative;height:190px;"><canvas id="ld-region"></canvas></div></div>
-    </div>
-    <div class="card-full"><div class="card-title">Source segmentation</div><div class="card-sub">How leads were acquired (excl. External Event)</div><div id="ld-src"></div></div>
+  <div class="g2">
+    <div class="card"><div class="ct">Customers by region</div><div class="cs">Geographic distribution</div><div class="leg" id="s-geo-leg"></div><div style="position:relative;height:190px"><canvas id="s-geo"></canvas></div></div>
+    <div class="card"><div class="ct">Monthly activity</div><div class="cs">Customers and leads per month</div><div class="leg"><div class="li"><div class="ld" style="background:var(--gold)"></div>Customers</div><div class="li"><div class="ld" style="background:var(--coral)"></div>Leads</div></div><div style="position:relative;height:170px"><canvas id="s-trend"></canvas></div></div>
   </div>
 </div>
+
+<!-- SS PAGE -->
+<div class="page" id="page-ss">
+  <div class="ph"><div class="pt">Customers: SS</div><div class="ps">Single sale customer analytics</div></div>
+  <div class="info-bar" id="ss-info">✦ Loading colour exclusions...</div>
+  <div class="filters">
+    <span class="flbl">Status</span>
+    <button class="fbtn on" id="ss-fall" onclick="setF('ss','all')">All</button>
+    <button class="fbtn" id="ss-fnew" onclick="setF('ss','New')">New</button>
+    <button class="fbtn" id="ss-frep" onclick="setF('ss','Repeat')">Repeat</button>
+    <div class="fsep"></div>
+    <span class="flbl">Year</span>
+    <select class="fsel" id="ss-fy" onchange="renderSS()">
+      <option value="">All Years</option>
+      <option>FY 19-20</option><option>FY 20-21</option><option>FY 21-22</option>
+      <option>FY 22-23</option><option>FY 23-24</option><option>FY 24-25</option><option>FY 25-26</option>
+    </select>
+    <select class="fsel" id="ss-mo" onchange="renderSS()">
+      <option value="">All Months</option>
+      <option>April</option><option>May</option><option>June</option><option>July</option>
+      <option>August</option><option>September</option><option>October</option>
+      <option>November</option><option>December</option>
+      <option>January</option><option>February</option><option>March</option>
+    </select>
+    <div class="fsep"></div>
+    <select class="fsel" id="ss-country" onchange="renderSS()"><option value="">All Countries</option></select>
+    <select class="fsel" id="ss-source" onchange="renderSS()"><option value="">All Sources</option></select>
+    <select class="fsel" id="ss-seg" onchange="renderSS()"><option value="">All Segments</option></select>
+    <button class="fbtn" onclick="clearF('ss')">✕ Clear</button>
+  </div>
+  <div class="kgrid">
+    <div class="kcard" style="--ac:var(--gold)"><div class="klbl">Total Customers</div><div class="kval" id="ss-tc">—</div><div class="ksub">After exclusions applied</div></div>
+    <div class="kcard" style="--ac:var(--teal)"><div class="klbl">Total Revenue</div><div class="kval" id="ss-rev">—</div><div class="ksub">Sum of total spend</div></div>
+    <div class="kcard" style="--ac:var(--green)"><div class="klbl">New Customers</div><div class="kval" id="ss-new">—</div><div class="ksub">First time buyers</div></div>
+    <div class="kcard" style="--ac:var(--coral)"><div class="klbl">Repeat Customers</div><div class="kval" id="ss-rep">—</div><div class="ksub">Returning buyers</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">New vs Repeat — count</div><div class="cs">Customer status split</div><div style="position:relative;height:170px"><canvas id="ss-nr"></canvas></div></div>
+    <div class="card"><div class="ct">New vs Repeat — revenue</div><div class="cs">Revenue by customer status</div><div style="position:relative;height:170px"><canvas id="ss-nr-rev"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Gender split</div><div class="cs">Customer count by gender</div><div style="position:relative;height:170px"><canvas id="ss-gender"></canvas></div></div>
+    <div class="card"><div class="ct">Age group</div><div class="cs">Customer count by age bracket</div><div style="position:relative;height:170px"><canvas id="ss-age"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Region breakdown</div><div class="cs">Top countries by customer count</div><div style="position:relative;height:220px"><canvas id="ss-region"></canvas></div></div>
+    <div class="card"><div class="ct">NRI vs Non-NRI</div><div class="cs">NRI customer identification (col O)</div><div style="position:relative;height:220px"><canvas id="ss-nri"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Source segmentation</div><div class="cs">Acquisition source — External Event excluded</div><div id="ss-src-bars"></div></div>
+    <div class="card"><div class="ct">Customer segmentation</div><div class="cs">Pyramid tier distribution</div><div id="ss-seg-bars"></div></div>
+  </div>
+</div>
+
+<!-- TS PAGE -->
+<div class="page" id="page-ts">
+  <div class="ph"><div class="pt">Customers: TS/PS/O</div><div class="ps">Trunk show / private show / other customer analytics</div></div>
+  <div class="info-bar" id="ts-info">✦ Loading colour exclusions...</div>
+  <div class="filters">
+    <span class="flbl">Status</span>
+    <button class="fbtn on" id="ts-fall" onclick="setF('ts','all')">All</button>
+    <button class="fbtn" id="ts-fnew" onclick="setF('ts','New')">New</button>
+    <button class="fbtn" id="ts-frep" onclick="setF('ts','Repeat')">Repeat</button>
+    <div class="fsep"></div>
+    <span class="flbl">Year</span>
+    <select class="fsel" id="ts-fy" onchange="renderTS()">
+      <option value="">All Years</option>
+      <option>FY 22-23</option><option>FY 23-24</option><option>FY 24-25</option><option>FY 25-26</option>
+    </select>
+    <select class="fsel" id="ts-mo" onchange="renderTS()">
+      <option value="">All Months</option>
+      <option>April</option><option>May</option><option>June</option><option>July</option>
+      <option>August</option><option>September</option><option>October</option>
+      <option>November</option><option>December</option>
+      <option>January</option><option>February</option><option>March</option>
+    </select>
+    <div class="fsep"></div>
+    <select class="fsel" id="ts-country" onchange="renderTS()"><option value="">All Countries</option></select>
+    <select class="fsel" id="ts-source" onchange="renderTS()"><option value="">All Sources</option></select>
+    <select class="fsel" id="ts-seg" onchange="renderTS()"><option value="">All Segments</option></select>
+    <button class="fbtn" onclick="clearF('ts')">✕ Clear</button>
+  </div>
+  <div class="kgrid">
+    <div class="kcard" style="--ac:var(--gold)"><div class="klbl">Total Customers</div><div class="kval" id="ts-tc">—</div><div class="ksub">After exclusions applied</div></div>
+    <div class="kcard" style="--ac:var(--teal)"><div class="klbl">Total Revenue</div><div class="kval" id="ts-rev">—</div><div class="ksub">Sum of total spend</div></div>
+    <div class="kcard" style="--ac:var(--green)"><div class="klbl">New Customers</div><div class="kval" id="ts-new">—</div><div class="ksub">First time buyers</div></div>
+    <div class="kcard" style="--ac:var(--coral)"><div class="klbl">Repeat Customers</div><div class="kval" id="ts-rep">—</div><div class="ksub">Returning buyers</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">New vs Repeat — count</div><div class="cs">Customer status split</div><div style="position:relative;height:170px"><canvas id="ts-nr"></canvas></div></div>
+    <div class="card"><div class="ct">New vs Repeat — revenue</div><div class="cs">Revenue by customer status</div><div style="position:relative;height:170px"><canvas id="ts-nr-rev"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Gender split</div><div class="cs">Customer count by gender</div><div style="position:relative;height:170px"><canvas id="ts-gender"></canvas></div></div>
+    <div class="card"><div class="ct">Age group</div><div class="cs">Customer count by age bracket</div><div style="position:relative;height:170px"><canvas id="ts-age"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Region breakdown</div><div class="cs">Top countries by customer count</div><div style="position:relative;height:200px"><canvas id="ts-region"></canvas></div></div>
+    <div class="card"><div class="ct">Source segmentation</div><div class="cs">Acquisition source — External Event excluded</div><div id="ts-src-bars"></div></div>
+  </div>
+  <div class="card"><div class="ct">Customer segmentation</div><div class="cs">Pyramid tier distribution</div><div id="ts-seg-bars"></div></div>
+</div>
+
+<!-- LEADS PAGE -->
+<div class="page" id="page-ld">
+  <div class="ph"><div class="pt">Leads: SF</div><div class="ps">Lead pipeline analytics</div></div>
+  <div class="info-bar" id="ld-info">✦ Loading colour exclusions...</div>
+  <div class="filters">
+    <span class="flbl">Status</span>
+    <button class="fbtn on" id="ld-fall" onclick="setF('ld','all')">All</button>
+    <button class="fbtn" id="ld-fnew" onclick="setF('ld','New')">New</button>
+    <button class="fbtn" id="ld-frep" onclick="setF('ld','Repeat')">Repeat</button>
+    <div class="fsep"></div>
+    <span class="flbl">Year</span>
+    <select class="fsel" id="ld-fy" onchange="renderLD()">
+      <option value="">All Years</option>
+      <option>FY 22-23</option><option>FY 23-24</option><option>FY 24-25</option><option>FY 25-26</option>
+    </select>
+    <select class="fsel" id="ld-mo" onchange="renderLD()">
+      <option value="">All Months</option>
+      <option>April</option><option>May</option><option>June</option><option>July</option>
+      <option>August</option><option>September</option><option>October</option>
+      <option>November</option><option>December</option>
+      <option>January</option><option>February</option><option>March</option>
+    </select>
+    <div class="fsep"></div>
+    <select class="fsel" id="ld-country" onchange="renderLD()"><option value="">All Countries</option></select>
+    <select class="fsel" id="ld-source" onchange="renderLD()"><option value="">All Sources</option></select>
+    <button class="fbtn" onclick="clearF('ld')">✕ Clear</button>
+  </div>
+  <div class="kgrid">
+    <div class="kcard" style="--ac:var(--gold)"><div class="klbl">Total Leads</div><div class="kval" id="ld-tc">—</div><div class="ksub">After exclusions applied</div></div>
+    <div class="kcard" style="--ac:var(--green)"><div class="klbl">New Leads</div><div class="kval" id="ld-new">—</div><div class="ksub">First contact</div></div>
+    <div class="kcard" style="--ac:var(--teal)"><div class="klbl">Repeat Leads</div><div class="kval" id="ld-rep">—</div><div class="ksub">Returning leads</div></div>
+    <div class="kcard" style="--ac:var(--coral)"><div class="klbl">New Lead %</div><div class="kval" id="ld-pct">—</div><div class="ksub">Of total leads</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">New vs Repeat</div><div class="cs">Lead status split</div><div style="position:relative;height:170px"><canvas id="ld-nr"></canvas></div></div>
+    <div class="card"><div class="ct">Gender split</div><div class="cs">Lead count by gender</div><div style="position:relative;height:170px"><canvas id="ld-gender"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Age group</div><div class="cs">Lead count by age bracket</div><div style="position:relative;height:190px"><canvas id="ld-age"></canvas></div></div>
+    <div class="card"><div class="ct">Region breakdown</div><div class="cs">Top countries by lead count</div><div style="position:relative;height:190px"><canvas id="ld-region"></canvas></div></div>
+  </div>
+  <div class="cfu"><div class="ct">Source segmentation</div><div class="cs">How leads were acquired — External Event excluded</div><div id="ld-src-bars"></div></div>
+</div>
+
+</div><!-- /main -->
 
 <script>
-// ─── Config ───────────────────────────────────────────────────────────────────
-const API_KEY  = 'AIzaSyA8EqjaSCvAyAUWH-9DJND-0vclslf-tog';
+// ── CONFIG ────────────────────────────────────────────────────────────────────
 const SHEET_ID = '1DuOpK-6kzG_tnNzqtVnDk-PhlSgTgc7vT1NO2EBY2Kk';
-const GIDS = { seg:'1513903427', ss:'0', ts:'1828153604', ld:'1319626729' };
-
-// Fallback CSV URLs
+const API_KEY  = 'AIzaSyA8EqjaSCvAyAUWH-9DJND-0vclslf-tog';
 const CSV = {
-  seg: `https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=1513903427&single=true&output=csv`,
-  ss:  `https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=0&single=true&output=csv`,
-  ts:  `https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=1828153604&single=true&output=csv`,
-  ld:  `https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=1319626729&single=true&output=csv`
+  seg: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?output=csv',
+  ss:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=0&single=true&output=csv',
+  ts:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=1828153604&single=true&output=csv',
+  ld:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=1319626729&single=true&output=csv'
 };
 
-// Colour definitions for exclusion
-// Pink = Google Sheets standard pink #FCE4EC or #FFE4E1
-// Light Yellow 3 = Google Sheets #FFF2CC
-const PINK_THRESHOLD   = { r: 240, g: 200, b: 200 };
-const YELLOW_THRESHOLD = { r: 240, g: 225, b: 180 };
+// ── COLOUR DATA (extracted from Excel) ───────────────────────────────────────
+// Indices are 0-based CSV row positions (matching parsed row arrays, excl. header)
+const CD = {"ss": {"pink_af": [0, 7, 20, 29, 30, 37, 39, 42, 51, 64, 75, 84, 86, 87, 89, 95, 96, 97, 101, 102, 106, 108, 128, 133, 134, 136, 138, 139, 140, 141, 144, 145, 146, 149, 150, 167, 169, 172, 178, 179, 184, 187, 188, 189, 190, 192, 194, 196, 201, 213, 220, 221, 230, 231, 234, 240, 243, 249, 250, 263, 271, 272, 273, 281, 282, 287, 290, 302, 303, 332, 343, 344, 349, 375, 376, 381, 385, 403, 410, 437, 447, 462, 466, 493, 495, 497, 502, 505, 508, 514, 522, 536, 540, 543, 565, 568, 573, 584, 585, 595, 596, 597, 606, 609, 610, 613, 615, 617, 635, 642, 643, 648, 649, 651, 654, 655, 656, 669, 697, 699, 712, 714, 717, 718, 725, 726, 740, 744, 745, 748, 752, 763, 772, 773, 776, 778, 779, 810, 820, 824, 830, 838, 848, 867, 879, 885, 902, 915], "yellow_ab": [5, 11, 14, 22, 26, 35, 41, 47, 48, 49, 55, 59, 60, 65, 69, 72, 85, 90, 91, 92, 93, 94, 99, 115, 124, 132, 137, 160, 164, 165, 170, 171, 185, 198, 214, 227, 237, 238, 239, 241, 242, 246, 254, 256, 278, 279, 284, 297, 307, 313, 316, 320, 321, 330, 345, 367, 368, 377, 378, 381, 389, 392, 396, 399, 409, 413, 415, 419, 426, 441, 449, 454, 458, 468, 469, 475, 483, 488, 516, 525, 527, 569, 599, 601, 604, 611, 624, 634, 638, 639, 646, 657, 669, 680, 681, 686, 691, 701, 704, 728, 740, 757, 764, 765, 777, 783, 799, 804, 808, 826, 845, 860, 870, 909], "green_ab": [16, 25, 32, 66, 111, 117, 127, 151, 173, 176, 180, 186, 207, 230, 232, 247, 276, 285, 289, 337, 350, 352, 361, 369, 383, 394, 397, 424, 453, 461, 472, 496, 498, 521, 526, 539, 549, 555, 574, 575, 579, 598, 600, 603, 605, 608, 625, 627, 631, 641, 659, 664, 678, 679, 685, 687, 690, 692, 695, 702, 703, 707, 711, 713, 716, 720, 739, 743, 753, 756, 761, 780, 781, 784, 785, 794, 801, 803, 809, 814, 817, 822, 825, 827, 828, 829, 835, 836, 839, 851, 852, 853, 864, 866, 871, 872, 874, 875, 876, 877, 878, 880, 881, 883, 889, 899, 900, 911, 913, 914, 916]}, "ts": {"pink_af": [22, 29, 40, 41, 42, 43, 56, 58, 62, 90, 124], "yellow_ab": [74, 80, 83], "green_ab": [50, 71, 79, 89, 100, 104, 105, 116, 123, 126, 127]}, "ld": {"yellow_d": [37, 58, 59, 60, 61, 66, 70, 77, 79, 81, 94, 96, 97, 100, 101, 102, 103, 104, 105, 106, 108, 118, 119, 120, 121, 123, 124, 127, 188, 222, 223, 224, 225, 226, 229, 230, 231, 232, 234, 237, 239, 240, 250, 255, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 293, 313, 314, 315, 320, 327, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 372, 373, 374, 375, 397, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 460, 461, 544, 545, 546, 547, 549, 550, 551, 588, 589, 590, 591, 593, 597, 599, 601, 602, 603, 604, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633, 639, 640, 641, 642, 643, 644, 645, 646, 647, 648, 649, 650, 651, 652, 653, 655, 656, 658, 659, 660, 661, 662, 663, 664, 667, 675, 691, 705, 728, 737, 811, 812, 813, 814, 815, 816, 817, 818, 819, 820, 821, 822, 823, 824, 825, 826, 827, 828, 829, 830, 831, 833, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 852, 853, 854, 855, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874, 875, 876, 877, 878, 879, 880, 881, 882, 883, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 894, 895, 896, 898, 899, 900, 901, 902, 903, 904, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 915, 916, 917, 918, 919, 920, 921, 922, 923, 924, 925, 926, 927, 928, 929, 930, 931, 932, 933, 934, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 952, 953, 954, 955, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 973, 974, 975, 976, 977, 978, 979, 980, 981, 982, 983, 984, 985, 986, 987, 988, 989, 990, 991, 994, 995, 996, 997, 998, 999, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 1037, 1038, 1039, 1040, 1041, 1042, 1043, 1044, 1045, 1046, 1047, 1048, 1049, 1050, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058, 1059, 1060, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074, 1075, 1076, 1077, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094, 1095, 1096, 1097, 1098, 1099, 1100, 1101, 1102, 1103, 1104, 1105, 1106, 1107, 1108, 1109, 1110, 1111, 1112, 1113, 1114, 1115, 1116, 1117, 1118, 1119, 1120, 1121, 1122, 1123, 1124, 1125, 1126, 1127, 1128, 1129, 1130, 1131, 1132, 1133, 1134, 1135, 1136, 1137, 1138, 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163, 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1179, 1180, 1181, 1182, 1183, 1184, 1202, 1260, 1261, 1262, 1263, 1264, 1265, 1266, 1267, 1268, 1269, 1270, 1271, 1272, 1273, 1274, 1275, 1276, 1277, 1278, 1279, 1280, 1281, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289, 1290, 1291, 1292, 1293, 1294, 1295, 1296, 1297, 1429, 1430]}};
 
-// ─── State ────────────────────────────────────────────────────────────────────
-let raw = { ss:[], ts:[], ld:[] };
-let excluded = { ss: new Set(), ts: new Set(), ld: new Set() };
-let filters = { ss:'all', ts:'all', ld:'all' };
-let C = {};
-let useAPI = true;
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const RAW = {ss:[], ts:[], ld:[]};
+const EXC = {
+  ss: new Set(CD.ss.pink_af),   // pink AF = exclude row entirely
+  ts: new Set(CD.ts.pink_af),   // pink AE = exclude row entirely
+  ld: new Set(CD.ld.yellow_d)   // yellow D = exclude lead row
+};
+const YAB = {
+  ss: new Set(CD.ss.yellow_ab), // yellow AB = exclude from New filter
+  ts: new Set(CD.ts.yellow_ab)
+};
+const F = {ss:'all', ts:'all', ld:'all'};
+const CH = {};
 
-// ─── Google Sheets API ────────────────────────────────────────────────────────
-async function fetchSheetAPI(gid, range) {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('API error ' + res.status);
-  const data = await res.json();
-  return data.values || [];
+// ── COLUMN MAPS (header name -> used in JS) ───────────────────────────────────
+// SS: name=Customer Name, nr=New/ Repeat, src=Primary Source, seg=Segmentation, rev=Total Spend
+// TS: name=Name, nr=New/ Repeat, src=Primary Source, seg=Segmentation, rev=Total Spend
+// LD: name=Name, nr=Lead Status\n(New/ Repeat), src=Primary Source
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function parseCSV(txt) {
+  const lines = txt.split('\n');
+  // Find header row - must contain Financial Year or Salutation
+  let hi = 0;
+  for (let i = 0; i < Math.min(5, lines.length); i++) {
+    const l = lines[i].toLowerCase();
+    if (l.includes('financial year') || l.includes('salutation') || l.includes('sr. no')) { hi = i; break; }
+  }
+  const hdrs = splitLine(lines[hi]).map(h => h.replace(/\n/g,' ').replace(/\r/g,'').trim());
+  const rows = [];
+  for (let i = hi+1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const vals = splitLine(line);
+    // Skip rows where first 2 cols are empty (truly blank)
+    if (!vals[0] && !vals[1] && !vals[2] && !vals[3]) continue;
+    const obj = {};
+    hdrs.forEach((h,j) => obj[h] = (vals[j]||'').trim());
+    rows.push(obj);
+  }
+  return rows;
 }
 
-async function fetchSheetWithColors(gid, sheetName) {
-  // Get values and formatting in one call
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?ranges=${encodeURIComponent(sheetName)}&fields=sheets(data(rowData(values(userEnteredValue,effectiveFormat/backgroundColor))))&key=${API_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('API error ' + res.status);
-  return res.json();
-}
-
-function isPink(bg) {
-  if (!bg) return false;
-  const r = (bg.red   || 0) * 255;
-  const g = (bg.green || 0) * 255;
-  const b = (bg.blue  || 0) * 255;
-  // White/default = skip
-  if (r > 250 && g > 250 && b > 250) return false;
-  // Pink: high red, medium-high green, medium-high blue but red dominates
-  // Covers #FCE4EC (252,228,236), #FFE4E1 (255,228,225), #F4CCCC (244,204,204)
-  return r > PINK_THRESHOLD.r && g > 180 && b > 180 && r >= g && r >= b && (r - b) > 10;
-}
-
-function isYellow(bg) {
-  if (!bg) return false;
-  const r = (bg.red   || 0) * 255;
-  const g = (bg.green || 0) * 255;
-  const b = (bg.blue  || 0) * 255;
-  // White/default = skip
-  if (r > 250 && g > 250 && b > 250) return false;
-  // Light Yellow 3 = #FFF2CC (255,242,204)
-  // High red, high green, low-medium blue
-  return r > YELLOW_THRESHOLD.r && g > YELLOW_THRESHOLD.g && b < 220 && r >= b && g >= b;
-}
-
-function isWhiteOrDefault(bg) {
-  if (!bg) return true;
-  const r = (bg.red   || 1) * 255;
-  const g = (bg.green || 1) * 255;
-  const b = (bg.blue  || 1) * 255;
-  return r > 250 && g > 250 && b > 250;
-}
-
-// ─── CSV Parsing ──────────────────────────────────────────────────────────────
 function splitLine(line) {
   const vals = []; let cur = '', inQ = false;
-  for (const c of line) {
+  for (const c of (line||'')) {
     if (c === '"') { inQ = !inQ; }
     else if (c === ',' && !inQ) { vals.push(cur.trim()); cur = ''; }
     else cur += c;
@@ -358,167 +365,302 @@ function splitLine(line) {
   return vals;
 }
 
-function parseCSV(txt) {
-  const lines = txt.split('\n');
-  if (!lines.length) return [];
-  let hdrIdx = 0;
-  for (let i = 0; i < Math.min(5, lines.length); i++) {
-    const l = lines[i].toLowerCase();
-    if (l.includes('financial year') || l.includes('salutation') || l.includes('sr. no') || l.includes('sr no')) { hdrIdx = i; break; }
-  }
-  const hdrs = splitLine(lines[hdrIdx]).map(h => h.replace(/\n/g,' ').replace(/\r/g,'').trim());
-  const rows = [];
-  for (let i = hdrIdx + 1; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-    const vals = splitLine(line);
-    if (!vals[0] && !vals[1]) continue;
-    if (vals[0] && vals[0].toLowerCase().includes('new/ repeat')) continue;
-    const obj = {}; hdrs.forEach((h, j) => obj[h] = (vals[j] || '').trim());
-    rows.push(obj);
-  }
-  return rows;
+function fmtRev(n) {
+  if (!n || isNaN(n)) return '₹0';
+  if (n >= 10000000) return '₹' + (n/10000000).toFixed(2) + 'Cr';
+  if (n >= 100000)   return '₹' + (n/100000).toFixed(1) + 'L';
+  if (n >= 1000)     return '₹' + (n/1000).toFixed(0) + 'K';
+  return '₹' + Math.round(n);
 }
 
-// ─── Utils ────────────────────────────────────────────────────────────────────
-function fmtN(n) {
-  if (n >= 10000000) return (n/10000000).toFixed(1) + 'Cr';
-  if (n >= 100000)   return (n/100000).toFixed(1) + 'L';
-  if (n >= 1000)     return (n/1000).toFixed(1) + 'K';
-  return Math.round(n).toString();
-}
-
-function countBy(rows, key) {
+function cntBy(rows, key) {
   const m = {};
-  rows.forEach(r => { const v = (r[key]||'').trim(); if (v && v !== '—' && v !== '-' && v !== 'N/A' && v.length > 0) m[v] = (m[v]||0) + 1; });
+  rows.forEach(r => {
+    const v = (r[key]||'').trim();
+    if (v) m[v] = (m[v]||0)+1;
+  });
   return m;
 }
 
-function topN(obj, n=8) { return Object.entries(obj).sort((a,b) => b[1]-a[1]).slice(0, n); }
+function topN(obj, n=10) {
+  return Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n);
+}
+
+function fillSel(id, vals, ph) {
+  const el = document.getElementById(id); if (!el) return;
+  const cur = el.value;
+  el.innerHTML = `<option value="">${ph}</option>`;
+  [...new Set(vals.filter(v => v && v.trim().length > 0))].sort()
+    .forEach(v => el.innerHTML += `<option value="${v}"${v===cur?' selected':''}>${v}</option>`);
+}
 
 function mkDonut(id, labels, data, colors) {
   const el = document.getElementById(id); if (!el) return;
-  if (C[id]) C[id].destroy();
-  C[id] = new Chart(el, { type:'doughnut', data:{labels, datasets:[{data, backgroundColor:colors, borderWidth:0}]},
-    options:{responsive:true, maintainAspectRatio:false, cutout:'58%',
-      plugins:{legend:{display:true, position:'right', labels:{color:'#5a5848', font:{size:10}, boxWidth:8, padding:6}}}}});
+  if (CH[id]) CH[id].destroy();
+  CH[id] = new Chart(el, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '58%',
+      plugins: { legend: { display: true, position: 'right',
+        labels: { color: '#5a5848', font: { size: 10 }, boxWidth: 8, padding: 6 } } }
+    }
+  });
 }
 
-function mkBar(id, labels, data, color, horizontal=false) {
+function mkHBar(id, labels, data, colors) {
   const el = document.getElementById(id); if (!el) return;
-  if (C[id]) C[id].destroy();
-  const opts = {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-    scales:{x:{grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#9a9680', font:{size:10}}},
-            y:{grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#9a9680', font:{size:10}}}}};
-  if (horizontal) opts.indexAxis = 'y';
-  C[id] = new Chart(el, {type:'bar', data:{labels, datasets:[{data, backgroundColor:color, borderRadius:3}]}, options:opts});
+  if (CH[id]) CH[id].destroy();
+  const isArr = Array.isArray(colors);
+  CH[id] = new Chart(el, {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: isArr ? colors : colors, borderRadius: 3 }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { color: '#9a9680', font: { size: 10 } } },
+        y: { grid: { display: false }, ticks: { color: '#5a5848', font: { size: 10 } } }
+      }
+    }
+  });
 }
 
-function bars(cid, entries, color) {
+function mkVBar(id, labels, data, color) {
+  const el = document.getElementById(id); if (!el) return;
+  if (CH[id]) CH[id].destroy();
+  CH[id] = new Chart(el, {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: color, borderRadius: 3 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#9a9680', font: { size: 10 } } },
+        y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { color: '#9a9680', font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function barsHTML(cid, entries, color) {
   const el = document.getElementById(cid); if (!el) return;
   el.innerHTML = '';
   const mx = Math.max(...entries.map(e=>e[1]), 1);
   entries.forEach(([lbl, val]) => {
     const pct = Math.max(2, (val/mx)*93);
-    el.innerHTML += `<div class="bar-row"><div class="bar-lbl" title="${lbl}">${lbl}</div><div class="bar-track"><div class="bar-fill" style="width:0%;background:${color};color:rgba(255,255,255,0.85);" data-p="${pct}">${val>4?val:''}</div></div><div class="bar-num">${val}</div></div>`;
+    el.innerHTML += `<div class="br">
+      <div class="bl" title="${lbl}">${lbl}</div>
+      <div class="bt"><div class="bf" style="width:0%;background:${color};color:rgba(255,255,255,.85);" data-p="${pct}">${val>4?val:''}</div></div>
+      <div class="bn">${val}</div>
+    </div>`;
   });
-  setTimeout(() => el.querySelectorAll('.bar-fill').forEach(b => b.style.width = b.dataset.p + '%'), 60);
+  setTimeout(() => el.querySelectorAll('.bf').forEach(b => b.style.width = b.dataset.p+'%'), 50);
 }
 
-function fillSelect(id, vals, ph) {
-  const s = document.getElementById(id); if (!s) return;
-  const cur = s.value;
-  s.innerHTML = `<option value="">${ph}</option>`;
-  [...new Set(vals.filter(v => v && v.length > 0 && v !== 'N/A'))].sort().forEach(v => s.innerHTML += `<option value="${v}"${v===cur?'selected':''}>${v}</option>`);
-}
-
-function showTab(name) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  const tabs = ['segments','ss','ts','leads'];
-  document.querySelectorAll('.nav-tab').forEach((t,i) => { if (tabs[i]===name) t.classList.add('active'); });
-}
-
-function setFilter(pfx, val) {
-  filters[pfx] = val;
-  ['all','New','Repeat'].forEach(v => document.getElementById(`${pfx}-f-${v}`)?.classList.remove('on'));
-  document.getElementById(`${pfx}-f-${val}`)?.classList.add('on');
-  if (pfx === 'ld') renderLeads(); else renderCust(pfx);
-}
-
-function clearFilters(pfx) {
-  filters[pfx] = 'all';
-  ['all','New','Repeat'].forEach(v => document.getElementById(`${pfx}-f-${v}`)?.classList.remove('on'));
-  document.getElementById(`${pfx}-f-all`)?.classList.add('on');
-  ['country','source','seg','fy','month'].forEach(k => { const el=document.getElementById(`${pfx}-${k}`); if(el) el.value=''; });
-  if (pfx === 'ld') renderLeads(); else renderCust(pfx);
-}
-
-// ─── Month parsing ────────────────────────────────────────────────────────────
-// Financial year and month filtering handled via dropdowns
-
-// ─── Filter rows ──────────────────────────────────────────────────────────────
-function applyFilters(rows, pfx, nrKey, excSet) {
-  const f       = filters[pfx];
+// ── FILTER ENGINE ─────────────────────────────────────────────────────────────
+function applyF(rows, pfx, nrKey, srcKey) {
+  const status  = F[pfx];
+  const fy      = document.getElementById(`${pfx}-fy`)?.value  || '';
+  const mo      = document.getElementById(`${pfx}-mo`)?.value  || '';
   const country = document.getElementById(`${pfx}-country`)?.value || '';
   const source  = document.getElementById(`${pfx}-source`)?.value  || '';
   const seg     = document.getElementById(`${pfx}-seg`)?.value     || '';
-  const fy      = document.getElementById(`${pfx}-fy`)?.value    || '';
-  const month   = document.getElementById(`${pfx}-month`)?.value  || '';
-
-  // Yellow AB = exclude from New; Green AB = include only for Repeat
-  const yellowAB = pfx === 'ss' ? (window.ssYellowAB || new Set()) : pfx === 'ts' ? (window.tsYellowAB || new Set()) : new Set();
-  const greenAB  = pfx === 'ss' ? (window.ssGreenAB  || new Set()) : pfx === 'ts' ? (window.tsGreenAB  || new Set()) : new Set();
+  const exc     = EXC[pfx];
+  const yab     = YAB[pfx] || new Set();
 
   return rows.filter((r, idx) => {
-    if (excSet && excSet.has(idx)) return false;
-
-    if (f === 'New') {
+    // 1. Exclude pink/yellow coloured rows
+    if (exc.has(idx)) return false;
+    // 2. Exclude rows with no name
+    const nameKey = pfx === 'ss' ? 'Customer Name' : 'Name';
+    if (!(r[nameKey]||'').trim()) return false;
+    // 3. Exclude External Event (case insensitive)
+    const src = (r[srcKey]||'').trim().toLowerCase();
+    if (src === 'external event' || src === 'external events') return false;
+    // 4. Status filter
+    if (status !== 'all') {
       const nr = (r[nrKey]||'').toLowerCase();
-      if (!nr.includes('new') || nr.includes('repeat')) return false;
-      if (yellowAB.has(idx)) return false;
+      if (status === 'New') {
+        if (!nr.includes('new') || nr.includes('repeat')) return false;
+        if (yab.has(idx)) return false; // yellow AB = exclude from New
+      }
+      if (status === 'Repeat') {
+        if (!nr.includes('repeat')) return false;
+      }
     }
-    if (f === 'Repeat') {
-      const nr = (r[nrKey]||'').toLowerCase();
-      if (!nr.includes('repeat')) return false;
-    }
-
-    if (fy     && (r['Financial Year']||'').trim() !== fy) return false;
-    if (month  && (r['Month']||'').trim().toLowerCase() !== month.toLowerCase()) return false;
+    // 5. FY filter
+    const fyKey = pfx === 'ld' ? 'Financial Year' : 'Financial Year';
+    if (fy && (r[fyKey]||'').trim() !== fy) return false;
+    // 6. Month filter
+    const moKey = 'Month';
+    if (mo && (r[moKey]||'').trim().toLowerCase() !== mo.toLowerCase()) return false;
+    // 7. Country filter
     if (country && (r['Country']||'').trim() !== country) return false;
-    // Source key varies by tab - check both possible column names
-    if (source) {
-      const rowSrc = (r['Primary Source']||r['Primary Source']||'').trim();
-      if (rowSrc !== source) return false;
-    }
-    if (seg     && (r['Segmentation']||'').trim() !== seg) return false;
+    // 8. Source filter
+    if (source && (r[srcKey]||'').trim() !== source) return false;
+    // 9. Segment filter (customers only)
+    if (seg && (r['Segmentation']||'').trim() !== seg) return false;
     return true;
   });
 }
 
-// ─── Segments tab ─────────────────────────────────────────────────────────────
+const AGE_ORDER = ['10-20','20-30','30-40','40-50','50-60','60-70','70-75','75+'];
+const SEG_COLORS = {VIC:'#b8860b',Family:'#3a5f90',Adventurer:'#3a7d3a',Core:'#c05040',Novice:'#8a70c0'};
+const REG_COLORS = ['#b8860b','#2a7d6f','#c05040','#3a5f90','#3a7d3a','#8a70c0','#c9a84c','#6a50a0'];
+
+// ── RENDER CUSTOMERS ──────────────────────────────────────────────────────────
+function renderCust(pfx) {
+  const rows = RAW[pfx]; if (!rows.length) return;
+  const nrKey  = pfx === 'ss' ? 'New/ Repeat' : 'New/ Repeat';
+  const srcKey = 'Primary Source';
+  const revKey = 'Total Spend';
+
+  const f = applyF(rows, pfx, nrKey, srcKey);
+
+  // KPIs
+  const tc   = f.length;
+  const newR = f.filter(r => { const v=(r[nrKey]||'').toLowerCase(); return v.includes('new')&&!v.includes('repeat') && !YAB[pfx].has(rows.indexOf(r)); });
+  // Recalculate new properly using original index
+  const newC = f.filter((r,i) => {
+    const origIdx = rows.indexOf(r);
+    const nr = (r[nrKey]||'').toLowerCase();
+    return nr.includes('new') && !nr.includes('repeat') && !YAB[pfx].has(origIdx);
+  }).length;
+  const repC = f.filter(r => (r[nrKey]||'').toLowerCase().includes('repeat')).length;
+  const rev  = f.reduce((s,r) => s + (parseFloat((r[revKey]||'').replace(/,/g,''))||0), 0);
+  const newRev = f.filter((r,i) => {
+    const origIdx = rows.indexOf(r);
+    const nr = (r[nrKey]||'').toLowerCase();
+    return nr.includes('new') && !nr.includes('repeat') && !YAB[pfx].has(origIdx);
+  }).reduce((s,r) => s + (parseFloat((r[revKey]||'').replace(/,/g,''))||0), 0);
+  const repRev = f.filter(r => (r[nrKey]||'').toLowerCase().includes('repeat'))
+                  .reduce((s,r) => s + (parseFloat((r[revKey]||'').replace(/,/g,''))||0), 0);
+
+  document.getElementById(`${pfx}-tc`).textContent  = tc.toLocaleString();
+  document.getElementById(`${pfx}-rev`).textContent = fmtRev(rev);
+  document.getElementById(`${pfx}-new`).textContent = newC.toLocaleString();
+  document.getElementById(`${pfx}-rep`).textContent = repC.toLocaleString();
+
+  // New vs Repeat donut
+  mkDonut(`${pfx}-nr`, ['New','Repeat'], [newC, repC], ['#3a7d3a','#b8860b']);
+  mkDonut(`${pfx}-nr-rev`, ['New','Repeat'], [Math.round(newRev), Math.round(repRev)], ['#3a7d3a','#b8860b']);
+
+  // Gender
+  const gd = cntBy(f, 'Gender');
+  mkDonut(`${pfx}-gender`, Object.keys(gd), Object.values(gd),
+    ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0, Object.keys(gd).length));
+
+  // Age group - only valid brackets
+  const ad = cntBy(f, 'Age Group');
+  const al = [], av = [];
+  AGE_ORDER.forEach(a => { if (ad[a]) { al.push(a); av.push(ad[a]); } });
+  mkVBar(`${pfx}-age`, al, av, '#3a5f90');
+
+  // Region
+  const rd = topN(cntBy(f, 'Country'), 8);
+  mkHBar(`${pfx}-region`, rd.map(e=>e[0]), rd.map(e=>e[1]), REG_COLORS.slice(0, rd.length));
+
+  // Source bars
+  barsHTML(`${pfx}-src-bars`, topN(cntBy(f, srcKey)), '#2a7d6f');
+
+  // Segmentation bars
+  const sd = cntBy(f, 'Segmentation');
+  const se = ['VIC','Family','Adventurer','Core','Novice'].map(s=>[s,sd[s]||0]).filter(e=>e[1]>0);
+  const segEl = document.getElementById(`${pfx}-seg-bars`);
+  if (segEl) {
+    segEl.innerHTML = '';
+    const mx = Math.max(...se.map(e=>e[1]), 1);
+    se.forEach(([lbl,val]) => {
+      const pct = Math.max(2,(val/mx)*93);
+      segEl.innerHTML += `<div class="br">
+        <div class="bl">${lbl}</div>
+        <div class="bt"><div class="bf" style="width:0%;background:${SEG_COLORS[lbl]||'#b8860b'};color:rgba(255,255,255,.9);" data-p="${pct}">${val>3?val:''}</div></div>
+        <div class="bn">${val}</div>
+      </div>`;
+    });
+    setTimeout(() => segEl.querySelectorAll('.bf').forEach(b => b.style.width = b.dataset.p+'%'), 50);
+  }
+
+  // NRI (SS only)
+  if (pfx === 'ss') {
+    const nriC = f.filter(r => (r['NRI']||'').trim().toLowerCase() === 'yes').length;
+    mkDonut('ss-nri', ['NRI','Non-NRI'], [nriC, tc-nriC], ['#c05040','#b8860b']);
+  }
+}
+
+function renderSS() { renderCust('ss'); }
+function renderTS() { renderCust('ts'); }
+
+// ── RENDER LEADS ──────────────────────────────────────────────────────────────
+function renderLD() {
+  const rows = RAW.ld; if (!rows.length) return;
+  // Lead Status header has newline: 'Lead Status\n(New/ Repeat)'
+  // Find the actual key dynamically
+  const nrKey = Object.keys(rows[0]||{}).find(k => {
+    const kn = k.replace(/\s+/g,' ').replace(/\n/g,' ').toLowerCase();
+    return kn.includes('lead status') || kn === 'new/ repeat';
+  }) || 'Lead Status (New/ Repeat)';
+  const srcKey = 'Primary Source';
+
+  const f = applyF(rows, 'ld', nrKey, srcKey);
+
+  const tc  = f.length;
+  const nwC = f.filter(r => { const v=(r[nrKey]||'').toLowerCase(); return v.includes('new')&&!v.includes('repeat'); }).length;
+  const rpC = f.filter(r => (r[nrKey]||'').toLowerCase().includes('repeat')).length;
+
+  document.getElementById('ld-tc').textContent  = tc.toLocaleString();
+  document.getElementById('ld-new').textContent = nwC.toLocaleString();
+  document.getElementById('ld-rep').textContent = rpC.toLocaleString();
+  document.getElementById('ld-pct').textContent = tc > 0 ? ((nwC/tc)*100).toFixed(1)+'%' : '—';
+
+  mkDonut('ld-nr', ['New','Repeat'], [nwC, rpC], ['#3a7d3a','#b8860b']);
+
+  const gd = cntBy(f, 'Gender');
+  mkDonut('ld-gender', Object.keys(gd), Object.values(gd),
+    ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0, Object.keys(gd).length));
+
+  const ad = cntBy(f, 'Age Group');
+  const al = [], av = [];
+  AGE_ORDER.forEach(a => { if (ad[a]) { al.push(a); av.push(ad[a]); } });
+  mkVBar('ld-age', al, av, '#3a5f90');
+
+  const rd = topN(cntBy(f, 'Country'), 8);
+  mkHBar('ld-region', rd.map(e=>e[0]), rd.map(e=>e[1]), REG_COLORS.slice(0, rd.length));
+
+  barsHTML('ld-src-bars', topN(cntBy(f, srcKey)), '#2a7d6f');
+}
+
+// ── RENDER SEGMENTS ───────────────────────────────────────────────────────────
 function renderSeg(lines) {
-  function sv(label) { for (const r of lines) { if (r[0]&&r[0].trim()===label) { const v=parseInt(r[1]); if(!isNaN(v)) return v; } } return 0; }
-  function lv(label) { for (const r of lines) { if (r[3]&&r[3].trim()===label) { const v=parseInt(r[4]); if(!isNaN(v)) return v; } } return 0; }
+  function sv(l) { for(const r of lines){if(r[0]&&r[0].trim()===l){const v=parseInt(r[1]);if(!isNaN(v))return v;}}return 0; }
+  function lv(l) { for(const r of lines){if(r[3]&&r[3].trim()===l){const v=parseInt(r[4]);if(!isNaN(v))return v;}}return 0; }
   const vic=sv('VIC'),fam=sv('Family'),adv=sv('Adventurer'),core=sv('Core'),nov=sv('Novice');
   const tc=vic+fam+adv+core+nov;
   const hot=lv('Hot Leads'),warm=lv('Warm Leads'),cold=lv('Cold Leads'),tl=hot+warm+cold;
-  document.getElementById('s-tc').textContent = tc;
-  document.getElementById('s-tl').textContent = tl;
-  document.getElementById('s-vic').textContent = vic;
-  document.getElementById('s-conv').textContent = tc+tl > 0 ? ((tc/(tc+tl))*100).toFixed(1)+'%' : '—';
-  bars('s-pyr', [['VIC',vic],['Family',fam],['Adventurer',adv],['Core',core],['Novice',nov]], '#b8860b');
-  bars('s-ld',  [['Hot Leads',hot],['Warm Leads',warm],['Cold Leads',cold]], '#c05040');
-  const ghi = lines.findIndex(r => r[0]&&r[0].trim()==='Categories'&&r[1]&&r[1].trim()==='Africa');
-  const gtr = ghi >= 0 ? lines.slice(ghi+1,ghi+8).find(r=>r[0]&&r[0].trim()==='Total') : null;
+
+  document.getElementById('s-tc').textContent   = tc;
+  document.getElementById('s-tl').textContent   = tl;
+  document.getElementById('s-vic').textContent  = vic;
+  document.getElementById('s-conv').textContent = tc+tl>0 ? ((tc/(tc+tl))*100).toFixed(1)+'%' : '—';
+
+  barsHTML('s-pyr',[['VIC',vic],['Family',fam],['Adventurer',adv],['Core',core],['Novice',nov]],'#b8860b');
+  barsHTML('s-ld',[['Hot Leads',hot],['Warm Leads',warm],['Cold Leads',cold]],'#c05040');
+
+  const ghi = lines.findIndex(r=>r[0]&&r[0].trim()==='Categories'&&r[1]&&r[1].trim()==='Africa');
+  const gtr = ghi>=0 ? lines.slice(ghi+1,ghi+8).find(r=>r[0]&&r[0].trim()==='Total') : null;
   const regs = ['Africa','America','Asia','Australia','Europe','MEA','Oceania','SEA'];
-  const gcols = ['#7c6fb0','#6a9d6a','#b8860b','#c05040','#3a5f90','#e8c97a','#2a7d6f','#8a70c0'];
-  const gd = gtr ? regs.map((_,i) => parseInt(gtr[i+1])||0) : regs.map(()=>0);
-  const gf = regs.map((r,i) => ({r,v:gd[i],c:gcols[i]})).filter(x=>x.v>0);
-  document.getElementById('s-geo-leg').innerHTML = gf.map(x=>`<div class="leg-item"><div class="leg-dot" style="background:${x.c}"></div>${x.r} ${x.v}</div>`).join('');
-  if (C['s-geo']) C['s-geo'].destroy();
-  C['s-geo'] = new Chart(document.getElementById('s-geo'), {type:'doughnut',data:{labels:gf.map(x=>x.r),datasets:[{data:gf.map(x=>x.v),backgroundColor:gf.map(x=>x.c),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:true,position:'right',labels:{color:'#5a5848',font:{size:10},boxWidth:8,padding:6}}}}});
+  const gcols = ['#7c6fb0','#6a9d6a','#b8860b','#c05040','#3a5f90','#c9a84c','#2a7d6f','#8a70c0'];
+  const gd = gtr ? regs.map((_,i)=>parseInt(gtr[i+1])||0) : regs.map(()=>0);
+  const gf = regs.map((r,i)=>({r,v:gd[i],c:gcols[i]})).filter(x=>x.v>0);
+
+  document.getElementById('s-geo-leg').innerHTML = gf.map(x=>`<div class="li"><div class="ld" style="background:${x.c}"></div>${x.r} ${x.v}</div>`).join('');
+  if(CH['s-geo'])CH['s-geo'].destroy();
+  CH['s-geo'] = new Chart(document.getElementById('s-geo'),{type:'doughnut',
+    data:{labels:gf.map(x=>x.r),datasets:[{data:gf.map(x=>x.v),backgroundColor:gf.map(x=>x.c),borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'58%',
+      plugins:{legend:{display:true,position:'right',labels:{color:'#5a5848',font:{size:10},boxWidth:8,padding:6}}}}});
+
   const ms=['Apr - 1','May - 1','Jun - 1','Jul - 1','Aug - 1','Sep - 1','Oct - 1'];
   const ml=['Apr','May','Jun','Jul','Aug','Sep','Oct'];
   const cm=[],lm=[];
@@ -530,224 +672,102 @@ function renderSeg(lines) {
     cm.push(['VIC','Family','Adventurer','Core','Novice'].reduce((s,seg)=>{const r=blk.find(r=>r[0]&&r[0].trim()===seg);return s+(r?rt(r):0);},0));
     lm.push(['Hot Leads','Warm Leads','Cold Leads'].reduce((s,seg)=>{const r=blk.find(r=>r[0]&&r[0].trim()===seg);return s+(r?rt(r):0);},0));
   });
-  if(C['s-trend'])C['s-trend'].destroy();
-  C['s-trend']=new Chart(document.getElementById('s-trend'),{type:'bar',data:{labels:ml,datasets:[{label:'Customers',data:cm,backgroundColor:'#b8860b',borderRadius:3},{label:'Leads',data:lm,backgroundColor:'#c05040',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9a9680',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9a9680',font:{size:10}}}}}});
+  if(CH['s-trend'])CH['s-trend'].destroy();
+  CH['s-trend']=new Chart(document.getElementById('s-trend'),{type:'bar',
+    data:{labels:ml,datasets:[{label:'Customers',data:cm,backgroundColor:'#b8860b',borderRadius:3},{label:'Leads',data:lm,backgroundColor:'#c05040',borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false},ticks:{color:'#9a9680',font:{size:10}}},
+              y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9a9680',font:{size:10}}}}}});
 }
 
-// ─── Customer tabs ────────────────────────────────────────────────────────────
-function renderCust(pfx) {
-  const rows = raw[pfx]; if (!rows.length) return;
-  const nameKey = pfx==='ss' ? 'Customer Name' : 'Name';
-  const nrKey   = 'New/ Repeat';
-  const revKey  = pfx==='ts' ? 'Total Spend' : 'Total Spend';
-  const segKey  = pfx==='ts' ? 'Segmentation' : 'Segmentation';
-  const nriKey  = 'NRI';
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('page-'+name).classList.add('on');
+  const tabs=['seg','ss','ts','ld'];
+  document.querySelectorAll('.tab').forEach((t,i)=>{if(tabs[i]===name)t.classList.add('on');});
+}
 
-  let f = applyFilters(rows, pfx, nrKey, excluded[pfx]);
-  f = f.filter(r => {
-    const src = (r['Primary Source']||'').trim().toLowerCase();
-    return src !== 'external event' && src !== 'external events';
+function setF(pfx, val) {
+  F[pfx] = val;
+  ['all','new','rep'].forEach(v => document.getElementById(`${pfx}-f${v}`)?.classList.remove('on'));
+  document.getElementById(`${pfx}-f${val==='all'?'all':val==='New'?'new':'rep'}`)?.classList.add('on');
+  if (pfx==='ss') renderSS();
+  else if (pfx==='ts') renderTS();
+  else renderLD();
+}
+
+function clearF(pfx) {
+  F[pfx] = 'all';
+  ['all','new','rep'].forEach(v=>document.getElementById(`${pfx}-f${v}`)?.classList.remove('on'));
+  document.getElementById(`${pfx}-fall`)?.classList.add('on');
+  ['fy','mo','country','source','seg'].forEach(k=>{
+    const el=document.getElementById(`${pfx}-${k}`);if(el)el.value='';
   });
-  f = f.filter(r => (r[nameKey]||'').trim() && !(r[nameKey]||'').includes('Exclude'));
-
-  const tc  = f.length;
-  const rev = f.reduce((s,r) => s + (parseFloat((r[revKey]||'').replace(/,/g,''))||0), 0);
-  const nw  = f.filter(r => { const v=(r[nrKey]||'').toLowerCase(); return v.includes('new')&&!v.includes('repeat'); }).length;
-  const rp  = f.filter(r => (r[nrKey]||'').toLowerCase().includes('repeat')).length;
-  const nwRev = f.filter(r=>{ const v=(r[nrKey]||'').toLowerCase(); return v.includes('new')&&!v.includes('repeat'); }).reduce((s,r)=>s+(parseFloat((r[revKey]||'').replace(/,/g,''))||0),0);
-  const rpRev = f.filter(r=>(r[nrKey]||'').toLowerCase().includes('repeat')).reduce((s,r)=>s+(parseFloat((r[revKey]||'').replace(/,/g,''))||0),0);
-
-  document.getElementById(`${pfx}-tc`).textContent  = tc.toLocaleString();
-  document.getElementById(`${pfx}-rev`).textContent = '₹' + fmtN(rev);
-  document.getElementById(`${pfx}-new`).textContent = nw.toLocaleString();
-  document.getElementById(`${pfx}-rep`).textContent = rp.toLocaleString();
-
-  mkDonut(`${pfx}-nr`, ['New','Repeat'], [nw,rp], ['#3a7d3a','#b8860b']);
-  mkDonut(`${pfx}-nr-rev`, ['New','Repeat'], [Math.round(nwRev),Math.round(rpRev)], ['#3a7d3a','#b8860b']);
-
-  const gd = countBy(f,'Gender');
-  mkDonut(`${pfx}-gender`, Object.keys(gd), Object.values(gd), ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0,Object.keys(gd).length));
-
-  const ad = countBy(f,'Age Group');
-  const ao = ['10-20','20-30','30-40','40-50','50-60','60-70','70+'];
-  const al=[],av=[];
-  ao.forEach(a=>{if(ad[a]){al.push(a);av.push(ad[a]);}});
-  // Also add 70-75 and 75+ if present, skip date values
-  Object.entries(ad).forEach(([k,v])=>{
-    if(!ao.includes(k)&&k&&!k.includes('-')===false&&k.length<=5){al.push(k);av.push(v);}
-  });
-  mkBar(`${pfx}-age`, al, av, '#3a5f90');
-
-  const rd = topN(countBy(f,'Country'));
-  mkBar(`${pfx}-region`, rd.map(e=>e[0]), rd.map(e=>e[1]), ['#b8860b','#2a7d6f','#c05040','#3a5f90','#3a7d3a','#8a70c0','#e8c97a','#b8860b'], true);
-
-  // NRI chart - 'Yes' = NRI, blank = Non-NRI
-  const nriCount = f.filter(r => (r[nriKey]||'').trim().toLowerCase() === 'yes').length;
-  const nonNRI = tc - nriCount;
-  if(nriCount > 0) {
-    mkDonut(`${pfx}-nri`, ['NRI','Non-NRI'], [nriCount, nonNRI], ['#c05040','#b8860b']);
-  } else {
-    mkDonut(`${pfx}-nri`, ['Non-NRI'], [nonNRI], ['#b8860b']);
-  }
-
-  bars(`${pfx}-src`, topN(countBy(f,'Primary Source')), '#2a7d6f');
-
-  const sd = countBy(f, segKey);
-  const so = ['VIC','Family','Adventurer','Core','Novice'];
-  const se = so.map(s=>[s,sd[s]||0]).filter(e=>e[1]>0);
-  const sc = {VIC:'#b8860b',Family:'#3a5f90',Adventurer:'#3a7d3a',Core:'#c05040',Novice:'#8a70c0'};
-  const sel = document.getElementById(`${pfx}-seg-bars`);
-  if (sel) {
-    sel.innerHTML='';
-    const mx=Math.max(...se.map(e=>e[1]),1);
-    se.forEach(([lbl,val])=>{
-      const pct=Math.max(2,(val/mx)*93);
-      sel.innerHTML+=`<div class="bar-row"><div class="bar-lbl">${lbl}</div><div class="bar-track"><div class="bar-fill" style="width:0%;background:${sc[lbl]};color:rgba(255,255,255,0.9);" data-p="${pct}">${val>3?val:''}</div></div><div class="bar-num">${val}</div></div>`;
-    });
-    setTimeout(()=>sel.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.p+'%'),60);
-  }
+  if (pfx==='ss') renderSS();
+  else if (pfx==='ts') renderTS();
+  else renderLD();
 }
 
-// ─── Leads ────────────────────────────────────────────────────────────────────
-function renderLeads() {
-  const rows = raw.ld; if (!rows.length) return;
-  // Leads SF correct columns:
-  // Lead Status = col Y header = 'Lead Status\n(New/ Repeat)'
-  // Source = col AE header = 'Primary Source'
-  const nrKey = Object.keys(rows[0]||{}).find(k => {
-    const kl = k.toLowerCase().replace(/\s+/g,' ').replace(/\n/g,' ');
-    return kl.includes('lead status') || kl.includes('new/ repeat') || kl === 'new/ repeat';
-  }) || 'Lead Status\n(New/ Repeat)';
-  const srcKey = 'Primary Source';
-
-  let f = applyFilters(rows, 'ld', nrKey, excluded.ld);
-  // Exclude External Event - note case variations
-  f = f.filter(r => {
-    const src = (r[srcKey]||'').trim().toLowerCase();
-    return src !== 'external event' && src !== 'external events';
-  });
-  f = f.filter(r => (r['Name']||'').trim() && !(r['Name']||'').includes('Exclude'));
-
-  const tc = f.length;
-  const nw = f.filter(r => { const v=(r[nrKey]||'').toLowerCase(); return v.includes('new')&&!v.includes('repeat'); }).length;
-  const rp = f.filter(r => (r[nrKey]||'').toLowerCase().includes('repeat')).length;
-
-  document.getElementById('ld-tc').textContent  = tc.toLocaleString();
-  document.getElementById('ld-new').textContent = nw.toLocaleString();
-  document.getElementById('ld-rep').textContent = rp.toLocaleString();
-  document.getElementById('ld-pct').textContent = tc > 0 ? ((nw/tc)*100).toFixed(1)+'%' : '—';
-
-  mkDonut('ld-nr', ['New','Repeat'], [nw,rp], ['#3a7d3a','#b8860b']);
-
-  const gd = countBy(f,'Gender');
-  mkDonut('ld-gender', Object.keys(gd), Object.values(gd), ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0,Object.keys(gd).length));
-
-  const ao = ['10-20','20-30','30-40','40-50','50-60','60-70','70-75','75+'];
-  const ad = countBy(f,'Age Group');
-  const al=[],av=[];
-  ao.forEach(a=>{if(ad[a]){al.push(a);av.push(ad[a]);}});
-  mkBar('ld-age', al, av, '#3a5f90');
-
-  const rd = topN(countBy(f,'Country'));
-  mkBar('ld-region', rd.map(e=>e[0]), rd.map(e=>e[1]), ['#b8860b','#2a7d6f','#c05040','#3a5f90','#3a7d3a','#8a70c0','#e8c97a','#b8860b'], true);
-
-  bars('ld-src', topN(countBy(f, srcKey)), '#2a7d6f');
-
-  // Populate dropdowns with correct source key
-  fillSelect('ld-country', raw.ld.map(r=>r['Country']).filter(v=>v&&v.length>1), 'All Countries');
-  fillSelect('ld-source', raw.ld.filter(r=>{const s=(r[srcKey]||'').toLowerCase();return s&&s!=='external event';}).map(r=>r[srcKey]).filter(v=>v&&v.length>1), 'All Sources');
-}
-
-// ─── Hardcoded colour data extracted from Excel file ─────────────────────────
-// These indices are 0-based data row indices (excluding header)
-const COLOR_DATA = {"ss": {"pink_af": [0, 7, 20, 29, 30, 37, 39, 42, 51, 64, 75, 84, 86, 87, 89, 95, 96, 97, 101, 102, 106, 108, 128, 133, 134, 136, 138, 139, 140, 141, 144, 145, 146, 149, 150, 167, 169, 172, 178, 179, 184, 187, 188, 189, 190, 192, 194, 196, 201, 213, 220, 221, 230, 231, 234, 240, 243, 249, 250, 263, 271, 272, 273, 281, 282, 287, 290, 302, 303, 332, 343, 344, 349, 375, 376, 381, 385, 403, 410, 437, 447, 462, 466, 493, 495, 497, 502, 505, 508, 514, 522, 536, 540, 543, 565, 568, 573, 584, 585, 595, 596, 597, 606, 609, 610, 613, 615, 617, 635, 642, 643, 648, 649, 651, 654, 655, 656, 669, 697, 699, 712, 714, 717, 718, 725, 726, 740, 744, 745, 748, 752, 763, 772, 773, 776, 778, 779, 810, 820, 824, 830, 838, 848, 867, 879, 885, 902, 915], "yellow_ab": [5, 11, 14, 22, 26, 35, 41, 47, 48, 49, 55, 59, 60, 65, 69, 72, 85, 90, 91, 92, 93, 94, 99, 115, 124, 132, 137, 160, 164, 165, 170, 171, 185, 198, 214, 227, 237, 238, 239, 241, 242, 246, 254, 256, 278, 279, 284, 297, 307, 313, 316, 320, 321, 330, 345, 367, 368, 377, 378, 381, 389, 392, 396, 399, 409, 413, 415, 419, 426, 441, 449, 454, 458, 468, 469, 475, 483, 488, 516, 525, 527, 569, 599, 601, 604, 611, 624, 634, 638, 639, 646, 657, 669, 680, 681, 686, 691, 701, 704, 728, 740, 757, 764, 765, 777, 783, 799, 804, 808, 826, 845, 860, 870, 909], "green_ab": [16, 25, 32, 66, 111, 117, 127, 151, 173, 176, 180, 186, 207, 230, 232, 247, 276, 285, 289, 337, 350, 352, 361, 369, 383, 394, 397, 424, 453, 461, 472, 496, 498, 521, 526, 539, 549, 555, 574, 575, 579, 598, 600, 603, 605, 608, 625, 627, 631, 641, 659, 664, 678, 679, 685, 687, 690, 692, 695, 702, 703, 707, 711, 713, 716, 720, 739, 743, 753, 756, 761, 780, 781, 784, 785, 794, 801, 803, 809, 814, 817, 822, 825, 827, 828, 829, 835, 836, 839, 851, 852, 853, 864, 866, 871, 872, 874, 875, 876, 877, 878, 880, 881, 883, 889, 899, 900, 911, 913, 914, 916]}, "ts": {"pink_af": [22, 29, 40, 41, 42, 43, 56, 58, 62, 90, 124], "yellow_ab": [74, 80, 83], "green_ab": [50, 71, 79, 89, 100, 104, 105, 116, 123, 126, 127]}, "ld": {"yellow_d": [37, 58, 59, 60, 61, 66, 70, 77, 79, 81, 94, 96, 97, 100, 101, 102, 103, 104, 105, 106, 108, 118, 119, 120, 121, 123, 124, 127, 188, 222, 223, 224, 225, 226, 229, 230, 231, 232, 234, 237, 239, 240, 250, 255, 267, 268, 269, 270, 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 293, 313, 314, 315, 320, 327, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 372, 373, 374, 375, 397, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 460, 461, 544, 545, 546, 547, 549, 550, 551, 588, 589, 590, 591, 593, 597, 599, 601, 602, 603, 604, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 631, 632, 633, 639, 640, 641, 642, 643, 644, 645, 646, 647, 648, 649, 650, 651, 652, 653, 655, 656, 658, 659, 660, 661, 662, 663, 664, 667, 675, 691, 705, 728, 737, 811, 812, 813, 814, 815, 816, 817, 818, 819, 820, 821, 822, 823, 824, 825, 826, 827, 828, 829, 830, 831, 833, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 852, 853, 854, 855, 856, 857, 858, 859, 860, 861, 862, 863, 864, 865, 866, 867, 868, 869, 870, 871, 872, 873, 874, 875, 876, 877, 878, 879, 880, 881, 882, 883, 884, 885, 886, 887, 888, 889, 890, 891, 892, 893, 894, 895, 896, 898, 899, 900, 901, 902, 903, 904, 905, 906, 907, 908, 909, 910, 911, 912, 913, 914, 915, 916, 917, 918, 919, 920, 921, 922, 923, 924, 925, 926, 927, 928, 929, 930, 931, 932, 933, 934, 935, 936, 937, 938, 939, 940, 941, 942, 943, 944, 945, 946, 947, 948, 949, 950, 951, 952, 953, 954, 955, 956, 957, 958, 959, 960, 961, 962, 963, 964, 965, 966, 967, 968, 969, 970, 971, 972, 973, 974, 975, 976, 977, 978, 979, 980, 981, 982, 983, 984, 985, 986, 987, 988, 989, 990, 991, 994, 995, 996, 997, 998, 999, 1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1017, 1018, 1019, 1020, 1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 1037, 1038, 1039, 1040, 1041, 1042, 1043, 1044, 1045, 1046, 1047, 1048, 1049, 1050, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1058, 1059, 1060, 1061, 1062, 1063, 1064, 1065, 1066, 1067, 1068, 1069, 1070, 1071, 1072, 1073, 1074, 1075, 1076, 1077, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087, 1088, 1089, 1090, 1091, 1092, 1093, 1094, 1095, 1096, 1097, 1098, 1099, 1100, 1101, 1102, 1103, 1104, 1105, 1106, 1107, 1108, 1109, 1110, 1111, 1112, 1113, 1114, 1115, 1116, 1117, 1118, 1119, 1120, 1121, 1122, 1123, 1124, 1125, 1126, 1127, 1128, 1129, 1130, 1131, 1132, 1133, 1134, 1135, 1136, 1137, 1138, 1139, 1140, 1141, 1142, 1143, 1144, 1145, 1146, 1147, 1148, 1149, 1150, 1151, 1152, 1153, 1154, 1155, 1156, 1157, 1158, 1159, 1160, 1161, 1162, 1163, 1164, 1165, 1166, 1167, 1168, 1169, 1170, 1171, 1172, 1173, 1174, 1179, 1180, 1181, 1182, 1183, 1184, 1202, 1260, 1261, 1262, 1263, 1264, 1265, 1266, 1267, 1268, 1269, 1270, 1271, 1272, 1273, 1274, 1275, 1276, 1277, 1278, 1279, 1280, 1281, 1282, 1283, 1284, 1285, 1286, 1287, 1288, 1289, 1290, 1291, 1292, 1293, 1294, 1295, 1296, 1297, 1429, 1430]}}
-
-async function loadColorData() {
-  // SS: pink_af = exclude row entirely
-  COLOR_DATA.ss.pink_af.forEach(i => excluded.ss.add(i));
-  // TS: pink_af = exclude row entirely
-  COLOR_DATA.ts.pink_af.forEach(i => excluded.ts.add(i));
-  // LD: yellow_d = exclude lead row
-  COLOR_DATA.ld.yellow_d.forEach(i => excluded.ld.add(i));
-  return {
-    ssExcluded: COLOR_DATA.ss.pink_af.length,
-    tsExcluded: COLOR_DATA.ts.pink_af.length,
-    ldExcluded: COLOR_DATA.ld.yellow_d.length,
-    ssYellowAB: new Set(COLOR_DATA.ss.yellow_ab),
-    ssGreenAB:  new Set(COLOR_DATA.ss.green_ab),
-    tsYellowAB: new Set(COLOR_DATA.ts.yellow_ab),
-    tsGreenAB:  new Set(COLOR_DATA.ts.green_ab)
-  };
-}
-
-// ─── Sheet name lookup ────────────────────────────────────────────────────────
-async function getSheetNames() {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?fields=sheets.properties&key=${API_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Cannot read sheet metadata');
-  const data = await res.json();
-  return data.sheets.map(s => ({name: s.properties.title, gid: s.properties.sheetId.toString()}));
-}
-
-// ─── Init ─────────────────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
-  const dot = document.getElementById('live-dot');
-  const txt = document.getElementById('live-txt');
-  dot.className = 'live-dot loading'; txt.textContent = 'Loading';
-  document.getElementById('last-sync').textContent = 'Fetching all sheets...';
-  document.getElementById('err-area').innerHTML = '';
+  const dot=document.getElementById('dot'),txt=document.getElementById('dot-txt');
+  dot.className='dot err'; txt.textContent='Loading';
+  document.getElementById('sync-txt').textContent='Fetching all sheets...';
+  document.getElementById('err-area').innerHTML='';
 
   try {
     const t = Date.now();
-
-    // Fetch CSV data for all tabs
-    const [segRes, ssRes, tsRes, ldRes] = await Promise.all([
-      fetch(CSV.seg + '&t=' + t), fetch(CSV.ss + '&t=' + t),
-      fetch(CSV.ts + '&t=' + t),  fetch(CSV.ld + '&t=' + t)
-    ]);
-    const [segTxt, ssTxt, tsTxt, ldTxt] = await Promise.all([
-      segRes.text(), ssRes.text(), tsRes.text(), ldRes.text()
+    const [sR,ssR,tsR,ldR] = await Promise.all([
+      fetch(CSV.seg+'&t='+t), fetch(CSV.ss+'&t='+t),
+      fetch(CSV.ts+'&t='+t),  fetch(CSV.ld+'&t='+t)
     ]);
 
-    // Parse segments
-    const segLines = segTxt.split('\n').map(l => splitLine(l));
+    if (!sR.ok||!ssR.ok||!tsR.ok||!ldR.ok) throw new Error('One or more sheets failed to load');
+
+    const [sTx,ssTx,tsTx,ldTx] = await Promise.all([sR.text(),ssR.text(),tsR.text(),ldR.text()]);
+
+    // Parse segments (raw line array)
+    const segLines = sTx.split('\n').map(l => splitLine(l));
     renderSeg(segLines);
 
     // Parse flat tables
-    raw.ss = parseCSV(ssTxt);
-    raw.ts = parseCSV(tsTxt);
-    raw.ld = parseCSV(ldTxt);
+    RAW.ss = parseCSV(ssTx);
+    RAW.ts = parseCSV(tsTx);
+    RAW.ld = parseCSV(ldTx);
 
-    // Load colour exclusions from hardcoded data extracted from Excel
-    const colorResult = await loadColorData();
-    window.ssYellowAB = colorResult.ssYellowAB;
-    window.ssGreenAB  = colorResult.ssGreenAB;
-    window.tsYellowAB = colorResult.tsYellowAB;
-    window.tsGreenAB  = colorResult.tsGreenAB;
-    document.getElementById('err-area').innerHTML = `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(58,125,58,0.08);border:1px solid rgba(58,125,58,0.2);border-radius:20px;padding:4px 12px;font-size:10px;color:#3a7d3a;margin-bottom:1rem;">✦ Colour exclusions active — SS: ${colorResult.ssExcluded} rows | TS: ${colorResult.tsExcluded} rows | Leads: ${colorResult.ldExcluded} rows excluded</div>`;
+    // Update info badges
+    document.getElementById('ss-info').textContent = `✦ ${EXC.ss.size} rows excluded (pink AF) · ${YAB.ss.size} rows excluded from New filter (yellow AB)`;
+    document.getElementById('ts-info').textContent = `✦ ${EXC.ts.size} rows excluded (pink AE) · ${YAB.ts.size} rows excluded from New filter (yellow AB)`;
+    document.getElementById('ld-info').textContent = `✦ ${EXC.ld.size} lead rows excluded (light yellow col D)`;
 
-    // Populate dropdowns
-    const validFY = v => v && v.toString().trim().toUpperCase().startsWith('FY');
-    fillSelect('ss-country', raw.ss.map(r=>r['Country']).filter(v=>v&&v.length>1), 'All Countries');
-    fillSelect('ss-source',  raw.ss.filter(r=>(r['Primary Source']||'')!=='External Event').map(r=>r['Primary Source']).filter(v=>v&&v.length>1), 'All Sources');
-    fillSelect('ss-seg',     raw.ss.map(r=>r['Segmentation']).filter(v=>v&&v.length>1), 'All Segments');
-    fillSelect('ts-country', raw.ts.map(r=>r['Country']).filter(v=>v&&v.length>1), 'All Countries');
-    fillSelect('ts-source',  raw.ts.filter(r=>(r['Primary Source']||'')!=='External Event').map(r=>r['Primary Source']).filter(v=>v&&v.length>1), 'All Sources');
-    fillSelect('ts-seg',     raw.ts.map(r=>r['Segmentation']).filter(v=>v&&v.length>1), 'All Segments');
-    fillSelect('ld-country', raw.ld.map(r=>r['Country']).filter(v=>v&&v.length>1), 'All Countries');
-    fillSelect('ld-source',  raw.ld.filter(r=>(r['Primary Source']||'')!=='External Event').map(r=>r['Primary Source']).filter(v=>v&&v.length>1), 'All Sources');
+    // Populate filter dropdowns
+    const notExt = v => v && v.trim().length > 0 && v.trim().toLowerCase() !== 'external event' && v.trim().toLowerCase() !== 'external events';
 
-    renderCust('ss');
-    renderCust('ts');
-    renderLeads();
+    fillSel('ss-country', RAW.ss.map(r=>r['Country']), 'All Countries');
+    fillSel('ss-source',  RAW.ss.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
+    fillSel('ss-seg',     RAW.ss.map(r=>r['Segmentation']).filter(v=>v&&!v.includes('2024')&&!v.includes('2025')), 'All Segments');
 
-    dot.className = 'live-dot ok'; txt.textContent = 'Live';
-    document.getElementById('last-sync').textContent = 'Last synced: ' + new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    fillSel('ts-country', RAW.ts.map(r=>r['Country']), 'All Countries');
+    fillSel('ts-source',  RAW.ts.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
+    fillSel('ts-seg',     RAW.ts.map(r=>r['Segmentation']).filter(v=>v&&!v.includes('2024')&&!v.includes('2025')), 'All Segments');
+
+    fillSel('ld-country', RAW.ld.map(r=>r['Country']), 'All Countries');
+    fillSel('ld-source',  RAW.ld.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
+
+    // Render all tabs
+    renderSS();
+    renderTS();
+    renderLD();
+
+    dot.className='dot ok'; txt.textContent='Live';
+    document.getElementById('sync-txt').textContent = 'Last synced: '+new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
   } catch(e) {
-    dot.className = 'live-dot loading'; txt.textContent = 'Error';
-    document.getElementById('last-sync').textContent = 'Could not connect';
-    document.getElementById('err-area').innerHTML = `<div class="err">⚠️ ${e.message} — ensure all tabs are published as CSV and click Refresh.</div>`;
+    dot.className='dot err'; txt.textContent='Error';
+    document.getElementById('sync-txt').textContent='Could not connect';
+    document.getElementById('err-area').innerHTML=`<div class="err">⚠️ ${e.message} — ensure all tabs are published as CSV and click Refresh.</div>`;
   }
 }
 
