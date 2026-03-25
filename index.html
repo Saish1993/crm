@@ -365,7 +365,16 @@ async function fetchColours(sheetName) {
   return data?.sheets?.[0]?.data?.[0]?.rowData || [];
 }
 
-async function buildColourSets() {
+function buildExclusionSets() {
+  // SS: exclude if Additional Comment (AF) contains 'No CRM'
+  RAW.ss.forEach((r, idx) => {
+    if ((r['Additional Comment']||'').toLowerCase().includes('no crm')) EXC.ss.add(idx);
+  });
+  // TS: exclude if Additional Comments (AE) contains 'No CRM'
+  RAW.ts.forEach((r, idx) => {
+    if ((r['Additional Comments']||'').toLowerCase().includes('no crm')) EXC.ts.add(idx);
+  });
+  return { ssExc: EXC
   // Get exact sheet names first
   const metaUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?fields=sheets.properties&key=${API_KEY}`;
   const metaRes = await fetch(metaUrl);
@@ -793,6 +802,12 @@ async function init() {
     fillSel('ts-country', RAW.ts.map(r=>r['Country']), 'All Countries');
     fillSel('ts-source',  RAW.ts.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
     fillSel('ts-seg',     RAW.ts.map(r=>r['Segmentation']).filter(v=>v&&v.length>1), 'All Segments');
+    // Debug: log first LD row keys to console
+    if (RAW.ld.length > 0) {
+      console.log('LD first row keys:', Object.keys(RAW.ld[0]));
+      console.log('LD Primary Source sample:', RAW.ld[0]['Primary Source']);
+      console.log('LD sources found:', [...new Set(RAW.ld.map(r=>r['Primary Source']).filter(v=>v))].slice(0,5));
+    }
     fillSel('ld-country', RAW.ld.map(r=>r['Country']), 'All Countries');
     fillSel('ld-source',  RAW.ld.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
 
