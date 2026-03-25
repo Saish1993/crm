@@ -384,22 +384,22 @@ async function buildColourSets() {
     fetchColours(ldName)
   ]);
 
-  // SS: col AF=32(idx 31) pink=exclude, col AB=28(idx 27) yellow=excl new, green=repeat
+  // SS: AF(32) Additional Comment pink=exclude idx31, AB(28) New/Repeat yellow idx27
   ssRows.forEach((row, ri) => {
-    if (ri === 0) return; // skip header
-    const csvIdx = ri - 1; // 0-based CSV index (row 1 in sheet = row 0 in CSV data)
-    const afCell = row?.values?.[31]?.effectiveFormat?.backgroundColor;
-    const abCell = row?.values?.[27]?.effectiveFormat?.backgroundColor;
+    if (ri === 0) return;
+    const csvIdx = ri - 1;
+    const afCell = row?.values?.[31]?.effectiveFormat?.backgroundColor; // AF=32 idx31
+    const abCell = row?.values?.[27]?.effectiveFormat?.backgroundColor; // AB=28 idx27
     if (isPink(afCell))   EXC.ss.add(csvIdx);
     if (isYellow(abCell)) YAB.ss.add(csvIdx);
   });
 
-  // TS: col AE=31(idx 30) pink=exclude, col AA=27(idx 26) yellow/green
+  // TS: AE(31) Additional Comments pink=exclude idx30, AA(27) New/Repeat yellow idx26
   tsRows.forEach((row, ri) => {
     if (ri === 0) return;
     const csvIdx = ri - 1;
-    const aeCell = row?.values?.[30]?.effectiveFormat?.backgroundColor;
-    const aaCell = row?.values?.[26]?.effectiveFormat?.backgroundColor;
+    const aeCell = row?.values?.[30]?.effectiveFormat?.backgroundColor; // AE=31 idx30
+    const aaCell = row?.values?.[26]?.effectiveFormat?.backgroundColor; // AA=27 idx26
     if (isPink(aeCell))   EXC.ts.add(csvIdx);
     if (isYellow(aaCell)) YAB.ts.add(csvIdx);
   });
@@ -589,9 +589,16 @@ const REG_COLORS = ['#b8860b','#2a7d6f','#c05040','#3a5f90','#3a7d3a','#8a70c0',
 
 function renderCust(pfx) {
   const rows = RAW[pfx]; if (!rows.length) return;
+  // SS cols: Name=E, NRI=O, Gender=P, AgeGroup=R, NR=AB, Src=AC, PinkExcl=AF, Rev=AV, Seg=BC
+  // TS cols: Name=E, Gender=O, AgeGroup=Q, NR=AA, Src=AB, PinkExcl=AE, Rev=AU, Seg=BB
   const nrKey  = 'New/ Repeat';
   const srcKey = 'Primary Source';
   const revKey = 'Total Spend';
+  const nameKey = pfx === 'ss' ? 'Customer Name' : 'Name';
+  const genderKey = 'Gender';
+  const ageKey = 'Age Group';
+  const segKey = 'Segmentation';
+  const nriKey = pfx === 'ss' ? 'NRI' : null; // TS has no NRI col
   const f = applyF(rows, pfx, nrKey, srcKey);
   const tc = f.length;
   const newC = f.filter(r => {
@@ -614,16 +621,16 @@ function renderCust(pfx) {
   document.getElementById(`${pfx}-rep`).textContent = repC.toLocaleString();
   mkDonut(`${pfx}-nr`, ['New','Repeat'], [newC, repC], ['#3a7d3a','#b8860b']);
   mkDonut(`${pfx}-nr-rev`, ['New','Repeat'], [Math.round(newRev), Math.round(repRev)], ['#3a7d3a','#b8860b']);
-  const gd = cntBy(f, 'Gender');
+  const gd = cntBy(f, genderKey);
   mkDonut(`${pfx}-gender`, Object.keys(gd), Object.values(gd), ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0,Object.keys(gd).length));
-  const ad = cntBy(f, 'Age Group');
+  const ad = cntBy(f, ageKey);
   const al = [], av = [];
   AGE_ORDER.forEach(a => { if (ad[a]) { al.push(a); av.push(ad[a]); } });
   mkVBar(`${pfx}-age`, al, av, '#3a5f90');
   const rd = topN(cntBy(f, 'Country'), 8);
   mkHBar(`${pfx}-region`, rd.map(e=>e[0]), rd.map(e=>e[1]), REG_COLORS.slice(0,rd.length));
   barsHTML(`${pfx}-src-bars`, topN(cntBy(f, srcKey)), '#2a7d6f');
-  const sd = cntBy(f, 'Segmentation');
+  const sd = cntBy(f, segKey);
   const se = ['VIC','Family','Adventurer','Core','Novice'].map(s=>[s,sd[s]||0]).filter(e=>e[1]>0);
   const segEl = document.getElementById(`${pfx}-seg-bars`);
   if (segEl) {
@@ -635,9 +642,13 @@ function renderCust(pfx) {
     });
     setTimeout(() => segEl.querySelectorAll('.bf').forEach(b => b.style.width = b.dataset.p+'%'), 50);
   }
-  if (pfx === 'ss') {
+  // NRI: SS has NRI at col O(15). TS has NO NRI column.
+  if (pfx === 'ss' && nriKey) {
     const nriC = f.filter(r => (r['NRI']||'').trim().toLowerCase() === 'yes').length;
     mkDonut('ss-nri', ['NRI','Non-NRI'], [nriC, tc-nriC], ['#c05040','#b8860b']);
+  } else if (pfx === 'ss') {
+    const el = document.getElementById('ss-nri');
+    if (el && el.closest) { const card = el.closest('.card'); if(card) card.style.display='none'; }
   }
 }
 
@@ -774,12 +785,14 @@ async function init() {
     RAW.ld = parseCSV(ldTx);
 
     const notExt = v => v && v.trim().length > 0 && v.trim().toLowerCase() !== 'external event' && v.trim().toLowerCase() !== 'external events';
+    // SS: Customer Name, Primary Source, Segmentation
+    // TS: Name, Primary Source, Segmentation
     fillSel('ss-country', RAW.ss.map(r=>r['Country']), 'All Countries');
     fillSel('ss-source',  RAW.ss.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
-    fillSel('ss-seg',     RAW.ss.map(r=>r['Segmentation']).filter(v=>v&&!v.includes('2024')&&!v.includes('2025')), 'All Segments');
+    fillSel('ss-seg',     RAW.ss.map(r=>r['Segmentation']).filter(v=>v&&v.length>1), 'All Segments');
     fillSel('ts-country', RAW.ts.map(r=>r['Country']), 'All Countries');
     fillSel('ts-source',  RAW.ts.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
-    fillSel('ts-seg',     RAW.ts.map(r=>r['Segmentation']).filter(v=>v&&!v.includes('2024')&&!v.includes('2025')), 'All Segments');
+    fillSel('ts-seg',     RAW.ts.map(r=>r['Segmentation']).filter(v=>v&&v.length>1), 'All Segments');
     fillSel('ld-country', RAW.ld.map(r=>r['Country']), 'All Countries');
     fillSel('ld-source',  RAW.ld.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
 
