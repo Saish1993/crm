@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aneka KG — CRM Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#f5f4f0;--surface:#fff;--surface2:#f0efe9;
+  --border:rgba(0,0,0,0.07);--border2:rgba(0,0,0,0.13);
+  --text:#1a1a18;--text2:#5a5848;--text3:#9a9680;
+  --gold:#b8860b;--gold2:#9a6f0a;--gold-dim:rgba(184,134,11,0.09);
+  --teal:#2a7d6f;--coral:#c05040;--blue:#3a5f90;
+  --green:#3a7d3a;--purple:#6a50a0;
+  --r:14px;--rs:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* Header */
+.hdr{background:#1a1a18;padding:1.1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.hdr-l{display:flex;align-items:center;gap:10px;}
+.hdr-icon{width:32px;height:32px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.18);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.hdr-title{font-family:"Cormorant Garamond",serif;font-size:18px;font-weight:500;color:#f5e4b0;}
+.hdr-sub{font-size:10px;color:rgba(255,255,255,0.35);font-family:"DM Mono",monospace;margin-top:1px;}
+.hdr-r{display:flex;align-items:center;gap:8px;}
+.badge{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.13);border-radius:20px;padding:4px 10px;font-size:10px;font-family:"DM Mono",monospace;color:rgba(255,255,255,0.55);}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s infinite;}
+.dot.ok{background:#6a9d6a;}.dot.err{background:#c05040;animation:none;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.btn-refresh{background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.18);color:rgba(255,255,255,0.8);padding:5px 13px;border-radius:20px;font-size:11px;cursor:pointer;}
+.btn-refresh:hover{background:rgba(255,255,255,0.16);}
+
+/* Nav */
+.nav{background:#fff;border-bottom:1px solid var(--border);padding:0 2rem;display:flex;overflow-x:auto;}
+.tab{padding:10px 16px;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab:hover{color:var(--text2);}
+.tab.on{color:var(--gold2);border-bottom-color:var(--gold);}
+
+/* Main */
+.main{padding:1.75rem 2rem;max-width:1300px;margin:0 auto;}
+.page{display:none;}.page.on{display:block;}
+
+/* Section header */
+.ph{margin-bottom:1.25rem;}
+.pt{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:400;color:var(--text);}
+.ps{font-size:10px;color:var(--text3);font-family:"DM Mono",monospace;margin-top:2px;}
+
+/* Info bar */
+.info-bar{display:inline-flex;align-items:center;gap:5px;background:rgba(58,125,58,0.07);border:1px solid rgba(58,125,58,0.18);border-radius:20px;padding:4px 12px;font-size:10px;color:#3a7d3a;margin-bottom:1rem;}
+
+/* Filters */
+.filters{display:flex;gap:7px;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center;}
+.flbl{font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.05em;}
+.fsep{width:1px;height:18px;background:var(--border2);margin:0 3px;}
+select.fsel{background:var(--surface);border:1px solid var(--border2);color:var(--text2);padding:5px 9px;border-radius:var(--rs);font-size:11px;cursor:pointer;outline:none;font-family:"DM Sans",sans-serif;}
+select.fsel:focus{border-color:var(--gold);}
+.fbtn{background:var(--surface);border:1px solid var(--border2);color:var(--text2);padding:5px 11px;border-radius:var(--rs);font-size:11px;cursor:pointer;transition:all .15s;}
+.fbtn.on{background:var(--gold-dim);border-color:rgba(184,134,11,.3);color:var(--gold2);}
+.fbtn:hover:not(.on){background:var(--surface2);}
+
+/* KPI grid */
+.kgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.1rem;}
+.kcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem 1.2rem;position:relative;overflow:hidden;}
+.kcard::after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--ac,var(--gold));opacity:.4;}
+.klbl{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;}
+.kval{font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:300;color:var(--text);letter-spacing:-.02em;line-height:1;margin-bottom:4px;}
+.ksub{font-size:10px;color:var(--text3);}
+
+/* Cards */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.4rem;}
+.cfu{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.2rem 1.4rem;margin-bottom:10px;}
+.ct{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:3px;}
+.cs{font-size:10px;color:var(--text3);margin-bottom:.9rem;}
+
+/* Bar chart rows */
+.br{display:flex;align-items:center;gap:7px;margin-bottom:6px;}
+.bl{font-size:11px;color:var(--text2);width:110px;text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bt{flex:1;background:var(--surface2);border-radius:3px;height:20px;overflow:hidden;}
+.bf{height:100%;border-radius:3px;display:flex;align-items:center;padding-left:7px;font-size:10px;font-weight:500;transition:width .8s cubic-bezier(.4,0,.2,1);}
+.bn{font-size:10px;color:var(--text2);width:36px;text-align:right;flex-shrink:0;}
+
+/* Legend */
+.leg{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:9px;}
+.li{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);}
+.ld{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+
+/* Error */
+.err{background:rgba(192,80,64,.08);border:1px solid rgba(192,80,64,.22);border-radius:var(--rs);padding:.9rem;font-size:12px;color:var(--coral);margin-bottom:1rem;}
+
+@media(max-width:768px){
+  .main{padding:1rem;}
+  .hdr{padding:1rem;}
+  .kgrid{grid-template-columns:1fr 1fr;}
+  .g2,.g3{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="hdr">
+  <div class="hdr-l">
+    <div class="hdr-icon">💎</div>
+    <div>
+      <div class="hdr-title">Aneka KG — CRM Analytics</div>
+      <div class="hdr-sub" id="sync-txt">Initialising...</div>
+    </div>
+  </div>
+  <div class="hdr-r">
+    <div class="badge"><div class="dot err" id="dot"></div><span id="dot-txt">Loading</span></div>
+    <button class="btn-refresh" onclick="init()">↻ Refresh</button>
+  </div>
+</div>
+
+<!-- Nav -->
+<div class="nav">
+  <div class="tab on" onclick="showPage('seg')">Segments 25-26</div>
+  <div class="tab" onclick="showPage('ss')">Customers: SS</div>
+  <div class="tab" onclick="showPage('ts')">Customers: TS/PS/O</div>
+  <div class="tab" onclick="showPage('ld')">Leads: SF</div>
+</div>
+
+<div class="main">
+<div id="err-area"></div>
+
+<!-- SEGMENTS PAGE -->
+<div class="page on" id="page-seg">
+  <div class="ph"><div class="pt">Segments: 25–26</div><div class="ps">Customer pyramid & lead pipeline overview</div></div>
+  <div class="kgrid">
+    <div class="kcard" style="--ac:var(--gold)"><div class="klbl">Total Customers</div><div class="kval" id="s-tc">—</div><div class="ksub">Active paying clients</div></div>
+    <div class="kcard" style="--ac:var(--coral)"><div class="klbl">Total Leads</div><div class="kval" id="s-tl">—</div><div class="ksub">In pipeline</div></div>
+    <div class="kcard" style="--ac:var(--teal)"><div class="klbl">VIC Customers</div><div class="kval" id="s-vic">—</div><div class="ksub">Top tier ≥ ₹40L</div></div>
+    <div class="kcard" style="--ac:var(--green)"><div class="klbl">Conversion Rate</div><div class="kval" id="s-conv">—</div><div class="ksub">Customers / total contacts</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Customer pyramid</div><div class="cs">Scored by 20% frequency + 80% monetary</div><div id="s-pyr"></div></div>
+    <div class="card"><div class="ct">Lead pipeline</div><div class="cs">Lead temperature distribution</div><div id="s-ld"></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Customers by region</div><div class="cs">Geographic distribution</div><div class="leg" id="s-geo-leg"></div><div style="position:relative;height:190px"><canvas id="s-geo"></canvas></div></div>
+    <div class="card"><div class="ct">Monthly activity</div><div class="cs">Customers and leads per month</div><div class="leg"><div class="li"><div class="ld" style="background:var(--gold)"></div>Customers</div><div class="li"><div class="ld" style="background:var(--coral)"></div>Leads</div></div><div style="position:relative;height:170px"><canvas id="s-trend"></canvas></div></div>
+  </div>
+</div>
+
+<!-- SS PAGE -->
+<div class="page" id="page-ss">
+  <div class="ph"><div class="pt">Customers: SS</div><div class="ps">Single sale customer analytics</div></div>
+  <div class="info-bar" id="ss-info">✦ Loading colour exclusions...</div>
+  <div class="filters">
+    <span class="flbl">Status</span>
+    <button class="fbtn on" id="ss-fall" onclick="setF('ss','all')">All</button>
+    <button class="fbtn" id="ss-fnew" onclick="setF('ss','New')">New</button>
+    <button class="fbtn" id="ss-frep" onclick="setF('ss','Repeat')">Repeat</button>
+    <div class="fsep"></div>
+    <span class="flbl">Year</span>
+    <select class="fsel" id="ss-fy" onchange="renderSS()">
+      <option value="">All Years</option>
+      <option>FY 19-20</option><option>FY 20-21</option><option>FY 21-22</option>
+      <option>FY 22-23</option><option>FY 23-24</option><option>FY 24-25</option><option>FY 25-26</option>
+    </select>
+    <select class="fsel" id="ss-mo" onchange="renderSS()">
+      <option value="">All Months</option>
+      <option>April</option><option>May</option><option>June</option><option>July</option>
+      <option>August</option><option>September</option><option>October</option>
+      <option>November</option><option>December</option>
+      <option>January</option><option>February</option><option>March</option>
+    </select>
+    <div class="fsep"></div>
+    <select class="fsel" id="ss-country" onchange="renderSS()"><option value="">All Countries</option></select>
+    <select class="fsel" id="ss-source" onchange="renderSS()"><option value="">All Sources</option></select>
+    <select class="fsel" id="ss-seg" onchange="renderSS()"><option value="">All Segments</option></select>
+    <button class="fbtn" onclick="clearF('ss')">✕ Clear</button>
+  </div>
+  <div class="kgrid">
+    <div class="kcard" style="--ac:var(--gold)"><div class="klbl">Total Customers</div><div class="kval" id="ss-tc">—</div><div class="ksub">After exclusions applied</div></div>
+    <div class="kcard" style="--ac:var(--teal)"><div class="klbl">Total Revenue</div><div class="kval" id="ss-rev">—</div><div class="ksub">Sum of total spend</div></div>
+    <div class="kcard" style="--ac:var(--green)"><div class="klbl">New Customers</div><div class="kval" id="ss-new">—</div><div class="ksub">First time buyers</div></div>
+    <div class="kcard" style="--ac:var(--coral)"><div class="klbl">Repeat Customers</div><div class="kval" id="ss-rep">—</div><div class="ksub">Returning buyers</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">New vs Repeat — count</div><div class="cs">Customer status split</div><div style="position:relative;height:170px"><canvas id="ss-nr"></canvas></div></div>
+    <div class="card"><div class="ct">New vs Repeat — revenue</div><div class="cs">Revenue by customer status</div><div style="position:relative;height:170px"><canvas id="ss-nr-rev"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Gender split</div><div class="cs">Customer count by gender</div><div style="position:relative;height:170px"><canvas id="ss-gender"></canvas></div></div>
+    <div class="card"><div class="ct">Age group</div><div class="cs">Customer count by age bracket</div><div style="position:relative;height:170px"><canvas id="ss-age"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Region breakdown</div><div class="cs">Top countries by customer count</div><div style="position:relative;height:220px"><canvas id="ss-region"></canvas></div></div>
+    <div class="card"><div class="ct">NRI vs Non-NRI</div><div class="cs">NRI customer identification (col O)</div><div style="position:relative;height:220px"><canvas id="ss-nri"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Source segmentation</div><div class="cs">Acquisition source — External Event excluded</div><div id="ss-src-bars"></div></div>
+    <div class="card"><div class="ct">Customer segmentation</div><div class="cs">Pyramid tier distribution</div><div id="ss-seg-bars"></div></div>
+  </div>
+</div>
+
+<!-- TS PAGE -->
+<div class="page" id="page-ts">
+  <div class="ph"><div class="pt">Customers: TS/PS/O</div><div class="ps">Trunk show / private show / other customer analytics</div></div>
+  <div class="info-bar" id="ts-info">✦ Loading colour exclusions...</div>
+  <div class="filters">
+    <span class="flbl">Status</span>
+    <button class="fbtn on" id="ts-fall" onclick="setF('ts','all')">All</button>
+    <button class="fbtn" id="ts-fnew" onclick="setF('ts','New')">New</button>
+    <button class="fbtn" id="ts-frep" onclick="setF('ts','Repeat')">Repeat</button>
+    <div class="fsep"></div>
+    <span class="flbl">Year</span>
+    <select class="fsel" id="ts-fy" onchange="renderTS()">
+      <option value="">All Years</option>
+      <option>FY 22-23</option><option>FY 23-24</option><option>FY 24-25</option><option>FY 25-26</option>
+    </select>
+    <select class="fsel" id="ts-mo" onchange="renderTS()">
+      <option value="">All Months</option>
+      <option>April</option><option>May</option><option>June</option><option>July</option>
+      <option>August</option><option>September</option><option>October</option>
+      <option>November</option><option>December</option>
+      <option>January</option><option>February</option><option>March</option>
+    </select>
+    <div class="fsep"></div>
+    <select class="fsel" id="ts-country" onchange="renderTS()"><option value="">All Countries</option></select>
+    <select class="fsel" id="ts-source" onchange="renderTS()"><option value="">All Sources</option></select>
+    <select class="fsel" id="ts-seg" onchange="renderTS()"><option value="">All Segments</option></select>
+    <button class="fbtn" onclick="clearF('ts')">✕ Clear</button>
+  </div>
+  <div class="kgrid">
+    <div class="kcard" style="--ac:var(--gold)"><div class="klbl">Total Customers</div><div class="kval" id="ts-tc">—</div><div class="ksub">After exclusions applied</div></div>
+    <div class="kcard" style="--ac:var(--teal)"><div class="klbl">Total Revenue</div><div class="kval" id="ts-rev">—</div><div class="ksub">Sum of total spend</div></div>
+    <div class="kcard" style="--ac:var(--green)"><div class="klbl">New Customers</div><div class="kval" id="ts-new">—</div><div class="ksub">First time buyers</div></div>
+    <div class="kcard" style="--ac:var(--coral)"><div class="klbl">Repeat Customers</div><div class="kval" id="ts-rep">—</div><div class="ksub">Returning buyers</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">New vs Repeat — count</div><div class="cs">Customer status split</div><div style="position:relative;height:170px"><canvas id="ts-nr"></canvas></div></div>
+    <div class="card"><div class="ct">New vs Repeat — revenue</div><div class="cs">Revenue by customer status</div><div style="position:relative;height:170px"><canvas id="ts-nr-rev"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Gender split</div><div class="cs">Customer count by gender</div><div style="position:relative;height:170px"><canvas id="ts-gender"></canvas></div></div>
+    <div class="card"><div class="ct">Age group</div><div class="cs">Customer count by age bracket</div><div style="position:relative;height:170px"><canvas id="ts-age"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Region breakdown</div><div class="cs">Top countries by customer count</div><div style="position:relative;height:200px"><canvas id="ts-region"></canvas></div></div>
+    <div class="card"><div class="ct">Source segmentation</div><div class="cs">Acquisition source — External Event excluded</div><div id="ts-src-bars"></div></div>
+  </div>
+  <div class="card"><div class="ct">Customer segmentation</div><div class="cs">Pyramid tier distribution</div><div id="ts-seg-bars"></div></div>
+</div>
+
+<!-- LEADS PAGE -->
+<div class="page" id="page-ld">
+  <div class="ph"><div class="pt">Leads: SF</div><div class="ps">Lead pipeline analytics</div></div>
+  <div class="info-bar" id="ld-info">✦ Loading colour exclusions...</div>
+  <div class="filters">
+    <span class="flbl">Status</span>
+    <button class="fbtn on" id="ld-fall" onclick="setF('ld','all')">All</button>
+    <button class="fbtn" id="ld-fnew" onclick="setF('ld','New')">New</button>
+    <button class="fbtn" id="ld-frep" onclick="setF('ld','Repeat')">Repeat</button>
+    <div class="fsep"></div>
+    <span class="flbl">Year</span>
+    <select class="fsel" id="ld-fy" onchange="renderLD()">
+      <option value="">All Years</option>
+      <option>FY 22-23</option><option>FY 23-24</option><option>FY 24-25</option><option>FY 25-26</option>
+    </select>
+    <select class="fsel" id="ld-mo" onchange="renderLD()">
+      <option value="">All Months</option>
+      <option>April</option><option>May</option><option>June</option><option>July</option>
+      <option>August</option><option>September</option><option>October</option>
+      <option>November</option><option>December</option>
+      <option>January</option><option>February</option><option>March</option>
+    </select>
+    <div class="fsep"></div>
+    <select class="fsel" id="ld-country" onchange="renderLD()"><option value="">All Countries</option></select>
+    <select class="fsel" id="ld-source" onchange="renderLD()"><option value="">All Sources</option></select>
+    <button class="fbtn" onclick="clearF('ld')">✕ Clear</button>
+  </div>
+  <div class="kgrid">
+    <div class="kcard" style="--ac:var(--gold)"><div class="klbl">Total Leads</div><div class="kval" id="ld-tc">—</div><div class="ksub">After exclusions applied</div></div>
+    <div class="kcard" style="--ac:var(--green)"><div class="klbl">New Leads</div><div class="kval" id="ld-new">—</div><div class="ksub">First contact</div></div>
+    <div class="kcard" style="--ac:var(--teal)"><div class="klbl">Repeat Leads</div><div class="kval" id="ld-rep">—</div><div class="ksub">Returning leads</div></div>
+    <div class="kcard" style="--ac:var(--coral)"><div class="klbl">New Lead %</div><div class="kval" id="ld-pct">—</div><div class="ksub">Of total leads</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">New vs Repeat</div><div class="cs">Lead status split</div><div style="position:relative;height:170px"><canvas id="ld-nr"></canvas></div></div>
+    <div class="card"><div class="ct">Gender split</div><div class="cs">Lead count by gender</div><div style="position:relative;height:170px"><canvas id="ld-gender"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct">Age group</div><div class="cs">Lead count by age bracket</div><div style="position:relative;height:190px"><canvas id="ld-age"></canvas></div></div>
+    <div class="card"><div class="ct">Region breakdown</div><div class="cs">Top countries by lead count</div><div style="position:relative;height:190px"><canvas id="ld-region"></canvas></div></div>
+  </div>
+  <div class="cfu"><div class="ct">Source segmentation</div><div class="cs">How leads were acquired — External Event excluded</div><div id="ld-src-bars"></div></div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const SHEET_ID = '1DuOpK-6kzG_tnNzqtVnDk-PhlSgTgc7vT1NO2EBY2Kk';
+const API_KEY  = 'AIzaSyA8EqjaSCvAyAUWH-9DJND-0vclslf-tog';
+const CSV = {
+  seg: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?output=csv',
+  ss:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=0&single=true&output=csv',
+  ts:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=1828153604&single=true&output=csv',
+  ld:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=1319626729&single=true&output=csv'
+};
+
+// ── COLOUR DATA (extracted from Excel) ───────────────────────────────────────
+// Indices are 0-based CSV row positions (matching parsed row arrays, excl. header)
+const CD = {"ss": {"pink_af": [0, 9, 25, 38, 39, 58, 60, 65, 83, 104, 118, 134, 137, 144, 146, 157, 160, 164, 169, 176, 190, 192, 221, 229, 241, 243, 251, 254, 274, 275, 286, 287, 288, 291, 292, 314, 356, 365, 371, 377, 384, 388, 389, 390, 391, 395, 397, 399, 410, 426, 433, 434, 450, 451, 456, 468, 475, 483, 484, 509, 519, 524, 525, 543, 545, 553, 557, 582, 586, 644, 662, 664, 679, 718, 722, 736, 740, 775, 785, 843, 858, 883, 893, 972, 974, 976, 984, 988, 991, 1002, 1011, 1036, 1043, 1047, 1078, 1085, 1108, 1124, 1125, 1145, 1146, 1147, 1172, 1176, 1177, 1182, 1185, 1187, 1212, 1241, 1242, 1256, 1257, 1260, 1268, 1269, 1270, 1290, 1333, 1335, 1353, 1375, 1379, 1380, 1393, 1394, 1427, 1431, 1437, 1450, 1457, 1486, 1509, 1510, 1515, 1518, 1519, 1581, 1597, 1601, 1610, 1620, 1642, 1679, 1698, 1705, 1738, 1757], "yellow_ab": [7, 14, 17, 27, 31, 53, 62, 71, 74, 77, 88, 96, 99, 105, 109, 115, 135, 147, 151, 153, 155, 156, 167, 200, 215, 226, 244, 306, 311, 312, 357, 358, 385, 402, 427, 445, 459, 461, 466, 473, 474, 480, 491, 498, 535, 536, 549, 574, 601, 608, 615, 624, 625, 638, 672, 704, 705, 726, 727, 736, 745, 749, 758, 770, 784, 792, 808, 815, 827, 848, 861, 866, 878, 907, 908, 930, 949, 958, 1004, 1017, 1020, 1099, 1150, 1154, 1169, 1178, 1197, 1210, 1225, 1230, 1246, 1276, 1290, 1306, 1307, 1313, 1322, 1337, 1342, 1398, 1427, 1478, 1488, 1495, 1516, 1525, 1552, 1562, 1578, 1603, 1637, 1665, 1682, 1748], "green_ab": [20, 30, 49, 106, 196, 204, 220, 293, 366, 369, 378, 386, 418, 450, 453, 481, 529, 551, 556, 650, 680, 683, 695, 711, 738, 754, 766, 824, 865, 882, 917, 975, 978, 1010, 1019, 1042, 1056, 1063, 1109, 1110, 1114, 1148, 1151, 1163, 1171, 1174, 1200, 1202, 1207, 1240, 1279, 1284, 1304, 1305, 1312, 1314, 1321, 1323, 1327, 1338, 1341, 1346, 1351, 1371, 1377, 1383, 1426, 1430, 1458, 1477, 1484, 1520, 1521, 1526, 1527, 1544, 1555, 1558, 1580, 1586, 1592, 1599, 1602, 1605, 1606, 1608, 1617, 1618, 1625, 1650, 1652, 1653, 1675, 1677, 1683, 1684, 1686, 1687, 1688, 1695, 1696, 1699, 1700, 1702, 1715, 1732, 1734, 1751, 1753, 1756, 1758]}, "ts": {"pink_af": [55, 74, 116, 117, 118, 119, 148, 157, 162, 222, 286], "yellow_ab": [180, 192, 199], "green_ab": [135, 177, 191, 216, 250, 255, 256, 273, 285, 288, 289]}, "ld": {"yellow_d": [40, 61, 62, 63, 64, 71, 75, 83, 85, 87, 106, 109, 110, 113, 114, 115, 116, 117, 118, 119, 121, 142, 143, 144, 145, 147, 148, 151, 282, 365, 366, 367, 368, 369, 372, 373, 374, 375, 377, 380, 382, 383, 393, 398, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 431, 441, 462, 463, 464, 469, 476, 492, 493, 494, 495, 496, 497, 498, 500, 501, 502, 503, 504, 505, 507, 508, 511, 512, 513, 514, 515, 516, 518, 519, 520, 522, 523, 524, 525, 526, 527, 528, 530, 532, 535, 536, 590, 602, 603, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 691, 692, 826, 828, 830, 835, 844, 851, 853, 946, 947, 948, 949, 953, 962, 964, 966, 967, 968, 969, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 1037, 1038, 1039, 1040, 1041, 1042, 1043, 1048, 1049, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1060, 1068, 1084, 1100, 1123, 1133, 1322, 1323, 1324, 1325, 1326, 1327, 1328, 1329, 1330, 1331, 1332, 1333, 1334, 1335, 1336, 1337, 1338, 1339, 1340, 1341, 1342, 1344, 1346, 1347, 1348, 1349, 1350, 1351, 1352, 1353, 1354, 1355, 1356, 1357, 1358, 1359, 1360, 1361, 1362, 1363, 1364, 1365, 1366, 1367, 1368, 1369, 1370, 1371, 1372, 1373, 1374, 1375, 1376, 1377, 1378, 1379, 1380, 1381, 1382, 1383, 1384, 1385, 1386, 1387, 1388, 1389, 1390, 1391, 1392, 1393, 1394, 1395, 1396, 1397, 1398, 1399, 1400, 1401, 1402, 1403, 1404, 1405, 1406, 1407, 1409, 1410, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1437, 1438, 1439, 1440, 1441, 1442, 1443, 1444, 1445, 1446, 1447, 1448, 1449, 1450, 1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470, 1471, 1472, 1473, 1474, 1475, 1476, 1477, 1478, 1479, 1480, 1481, 1482, 1483, 1484, 1485, 1486, 1487, 1488, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501, 1502, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512, 1513, 1514, 1515, 1516, 1517, 1518, 1519, 1520, 1521, 1522, 1523, 1524, 1525, 1526, 1527, 1528, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548, 1549, 1550, 1551, 1552, 1553, 1554, 1555, 1556, 1557, 1558, 1559, 1560, 1561, 1562, 1563, 1564, 1565, 1566, 1567, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588, 1589, 1590, 1591, 1592, 1593, 1594, 1595, 1596, 1597, 1598, 1599, 1600, 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631, 1632, 1633, 1634, 1635, 1636, 1637, 1638, 1639, 1640, 1641, 1642, 1643, 1644, 1645, 1646, 1647, 1648, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677, 1678, 1679, 1680, 1681, 1682, 1683, 1684, 1685, 1690, 1691, 1692, 1693, 1694, 1695, 1811, 1947, 1948, 1949, 1950, 1951, 1952, 1953, 1954, 1955, 1956, 1957, 1958, 1959, 1960, 1961, 1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972, 1973, 1974, 1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 2651, 2652]}}>
