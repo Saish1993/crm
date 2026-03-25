@@ -307,24 +307,120 @@ const CSV = {
   ld:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_rAWLWQ5TDQ_62bVDUFEgH_L_x_f_VO-Y5gsoroL1T3dMeDduqofSXLQGnSehA2r8LnXNWBoKIZhM/pub?gid=1319626729&single=true&output=csv'
 };
 
-// ── COLOUR DATA (extracted from Excel) ───────────────────────────────────────
-// Indices are 0-based CSV row positions (matching parsed row arrays, excl. header)
-const CD = {"ss":{"pink_af":[0,9,25,38,39,58,60,65,83,104,118,134,137,144,146,157,160,164,169,176,190,192,221,229,241,243,251,254,274,275,286,287,288,291,292,314,356,365,371,377,384,388,389,390,391,395,397,399,410,426,433,434,450,451,456,468,475,483,484,509,519,524,525,543,545,553,557,582,586,644,662,664,679,718,722,736,740,775,785,843,858,883,893,972,974,976,984,988,991,1002,1011,1036,1043,1047,1078,1085,1108,1124,1125,1145,1146,1147,1172,1176,1177,1182,1185,1187,1212,1241,1242,1256,1257,1260,1268,1269,1270,1290,1333,1335,1353,1375,1379,1380,1393,1394,1427,1431,1437,1450,1457,1486,1509,1510,1515,1518,1519,1581,1597,1601,1610,1620,1642,1679,1698,1705,1738,1757],"yellow_ab":[7,14,17,27,31,53,62,71,74,77,88,96,99,105,109,115,135,147,151,153,155,156,167,200,215,226,244,306,311,312,357,358,385,402,427,445,459,461,466,473,474,480,491,498,535,536,549,574,601,608,615,624,625,638,672,704,705,726,727,736,745,749,758,770,784,792,808,815,827,848,861,866,878,907,908,930,949,958,1004,1017,1020,1099,1150,1154,1169,1178,1197,1210,1225,1230,1246,1276,1290,1306,1307,1313,1322,1337,1342,1398,1427,1478,1488,1495,1516,1525,1552,1562,1578,1603,1637,1665,1682,1748],"green_ab":[20,30,49,106,196,204,220,293,366,369,378,386,418,450,453,481,529,551,556,650,680,683,695,711,738,754,766,824,865,882,917,975,978,1010,1019,1042,1056,1063,1109,1110,1114,1148,1151,1163,1171,1174,1200,1202,1207,1240,1279,1284,1304,1305,1312,1314,1321,1323,1327,1338,1341,1346,1351,1371,1377,1383,1426,1430,1458,1477,1484,1520,1521,1526,1527,1544,1555,1558,1580,1586,1592,1599,1602,1605,1606,1608,1617,1618,1625,1650,1652,1653,1675,1677,1683,1684,1686,1687,1688,1695,1696,1699,1700,1702,1715,1732,1734,1751,1753,1756,1758]},"ts":{"pink_af":[55,74,116,117,118,119,148,157,162,222,286],"yellow_ab":[180,192,199],"green_ab":[135,177,191,216,250,255,256,273,285,288,289]},"ld":{"yellow_d":[40,61,62,63,64,71,75,83,85,87,106,109,110,113,114,115,116,117,118,119,121,142,143,144,145,147,148,151,282,365,366,367,368,369,372,373,374,375,377,380,382,383,393,398,410,411,412,413,414,415,416,417,418,419,420,421,422,423,424,425,426,427,428,429,430,431,441,462,463,464,469,476,492,493,494,495,496,497,498,500,501,502,503,504,505,507,508,511,512,513,514,515,516,518,519,520,522,523,524,525,526,527,528,530,532,535,536,590,602,603,604,605,606,607,608,609,610,611,612,613,614,616,617,618,619,620,621,622,623,624,625,626,627,628,629,630,691,692,826,828,830,835,844,851,853,946,947,948,949,953,962,964,966,967,968,969,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1048,1049,1051,1052,1053,1054,1055,1056,1057,1060,1068,1084,1100,1123,1133,1322,1323,1324,1325,1326,1327,1328,1329,1330,1331,1332,1333,1334,1335,1336,1337,1338,1339,1340,1341,1342,1344,1346,1347,1348,1349,1350,1351,1352,1353,1354,1355,1356,1357,1358,1359,1360,1361,1362,1363,1364,1365,1366,1367,1368,1369,1370,1371,1372,1373,1374,1375,1376,1377,1378,1379,1380,1381,1382,1383,1384,1385,1386,1387,1388,1389,1390,1391,1392,1393,1394,1395,1396,1397,1398,1399,1400,1401,1402,1403,1404,1405,1406,1407,1409,1410,1411,1412,1413,1414,1415,1416,1417,1418,1419,1420,1421,1422,1423,1424,1425,1426,1427,1428,1429,1430,1431,1432,1433,1434,1435,1436,1437,1438,1439,1440,1441,1442,1443,1444,1445,1446,1447,1448,1449,1450,1451,1452,1453,1454,1455,1456,1457,1458,1459,1460,1461,1462,1463,1464,1465,1466,1467,1468,1469,1470,1471,1472,1473,1474,1475,1476,1477,1478,1479,1480,1481,1482,1483,1484,1485,1486,1487,1488,1489,1490,1491,1492,1493,1494,1495,1496,1497,1498,1499,1500,1501,1502,1505,1506,1507,1508,1509,1510,1511,1512,1513,1514,1515,1516,1517,1518,1519,1520,1521,1522,1523,1524,1525,1526,1527,1528,1529,1530,1531,1532,1533,1534,1535,1536,1537,1538,1539,1540,1541,1542,1543,1544,1545,1546,1547,1548,1549,1550,1551,1552,1553,1554,1555,1556,1557,1558,1559,1560,1561,1562,1563,1564,1565,1566,1567,1568,1569,1570,1571,1572,1573,1574,1575,1576,1577,1578,1579,1580,1581,1582,1583,1584,1585,1586,1587,1588,1589,1590,1591,1592,1593,1594,1595,1596,1597,1598,1599,1600,1601,1602,1603,1604,1605,1606,1607,1608,1609,1610,1611,1612,1613,1614,1615,1616,1617,1618,1619,1620,1621,1622,1623,1624,1625,1626,1627,1628,1629,1630,1631,1632,1633,1634,1635,1636,1637,1638,1639,1640,1641,1642,1643,1644,1645,1646,1647,1648,1649,1650,1651,1652,1653,1654,1655,1656,1657,1658,1659,1660,1661,1662,1663,1664,1665,1666,1667,1668,1669,1670,1671,1672,1673,1674,1675,1676,1677,1678,1679,1680,1681,1682,1683,1684,1685,1690,1691,1692,1693,1694,1695,1811,1947,1948,1949,1950,1951,1952,1953,1954,1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,1971,1972,1973,1974,1975,1976,1977,1978,1979,1980,1981,1982,1983,1984,2651,2652]}};
-
 // ── STATE ─────────────────────────────────────────────────────────────────────
 const RAW = {ss:[], ts:[], ld:[]};
-const EXC = {
-  ss: new Set(CD.ss.pink_af),
-  ts: new Set(CD.ts.pink_af),
-  ld: new Set(CD.ld.yellow_d)
-};
-const YAB = {
-  ss: new Set(CD.ss.yellow_ab),
-  ts: new Set(CD.ts.yellow_ab)
-};
+const EXC = {ss: new Set(), ts: new Set(), ld: new Set()};
+const YAB = {ss: new Set(), ts: new Set()};
 const F = {ss:'all', ts:'all', ld:'all'};
 const CH = {};
 
+// ── COLOUR DETECTION ──────────────────────────────────────────────────────────
+function isPink(bg) {
+  if (!bg) return false;
+  const r = (bg.red||0), g = (bg.green||0), b = (bg.blue||0);
+  if (r > 0.98 && g > 0.98 && b > 0.98) return false; // white
+  if (r < 0.01 && g < 0.01 && b < 0.01) return false; // black/default
+  // Pink: #F4CCCC = (0.957, 0.8, 0.8) — high red, medium green+blue
+  return r > 0.85 && g > 0.7 && g < 0.9 && b > 0.7 && b < 0.9 && r > g && r > b;
+}
+
+function isYellow(bg) {
+  if (!bg) return false;
+  const r = (bg.red||0), g = (bg.green||0), b = (bg.blue||0);
+  if (r > 0.98 && g > 0.98 && b > 0.98) return false;
+  if (r < 0.01 && g < 0.01 && b < 0.01) return false;
+  // Yellow #FFFF00 = (1,1,0) or Light Yellow #FFF2CC = (1,0.95,0.8)
+  return r > 0.9 && g > 0.88 && b < 0.5;
+}
+
+function isGreen(bg) {
+  if (!bg) return false;
+  const r = (bg.red||0), g = (bg.green||0), b = (bg.blue||0);
+  if (r > 0.98 && g > 0.98 && b > 0.98) return false;
+  if (r < 0.01 && g < 0.01 && b < 0.01) return false;
+  // Green #D9EAD3 = (0.85, 0.918, 0.827)
+  return g > r && g > b && g > 0.8 && r > 0.7;
+}
+
+function isLightYellow(bg) {
+  if (!bg) return false;
+  const r = (bg.red||0), g = (bg.green||0), b = (bg.blue||0);
+  if (r > 0.98 && g > 0.98 && b > 0.98) return false;
+  if (r < 0.01 && g < 0.01 && b < 0.01) return false;
+  // Light Yellow 3 #FFF2CC = (1, 0.949, 0.8)
+  return r > 0.95 && g > 0.88 && b > 0.7 && b < 0.9 && r >= g && g >= b;
+}
+
+// ── FETCH COLOURS FROM API ────────────────────────────────────────────────────
+async function fetchColours(sheetName) {
+  // Fetch background colours for key columns
+  // SS: AF(col 32)=pink exclude, AB(col 28)=yellow/green new/repeat
+  // TS: AE(col 31)=pink exclude, AA(col 27)=yellow/green
+  // LD: D(col 4)=light yellow exclude
+  const ranges = encodeURIComponent(sheetName);
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?ranges=${ranges}&fields=sheets(data(rowData(values(effectiveFormat/backgroundColor))))&key=${API_KEY}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`API ${res.status}`);
+  const data = await res.json();
+  return data?.sheets?.[0]?.data?.[0]?.rowData || [];
+}
+
+async function buildColourSets() {
+  // Get exact sheet names first
+  const metaUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?fields=sheets.properties&key=${API_KEY}`;
+  const metaRes = await fetch(metaUrl);
+  if (!metaRes.ok) throw new Error('Cannot read sheet metadata');
+  const meta = await metaRes.json();
+  const sheets = meta.sheets.map(s => ({name: s.properties.title, gid: s.properties.sheetId}));
+
+  const ssName = sheets.find(s => s.gid === 0)?.name || 'Customers SS';
+  const tsName = sheets.find(s => s.gid === 1828153604)?.name || 'Customers TSPSO';
+  const ldName = sheets.find(s => s.gid === 1319626729)?.name || 'Leads SF';
+
+  // Fetch colours for all 3 sheets in parallel
+  const [ssRows, tsRows, ldRows] = await Promise.all([
+    fetchColours(ssName),
+    fetchColours(tsName),
+    fetchColours(ldName)
+  ]);
+
+  // SS: col AF=32(idx 31) pink=exclude, col AB=28(idx 27) yellow=excl new, green=repeat
+  ssRows.forEach((row, ri) => {
+    if (ri === 0) return; // skip header
+    const csvIdx = ri - 1; // 0-based CSV index (row 1 in sheet = row 0 in CSV data)
+    const afCell = row?.values?.[31]?.effectiveFormat?.backgroundColor;
+    const abCell = row?.values?.[27]?.effectiveFormat?.backgroundColor;
+    if (isPink(afCell))   EXC.ss.add(csvIdx);
+    if (isYellow(abCell)) YAB.ss.add(csvIdx);
+  });
+
+  // TS: col AE=31(idx 30) pink=exclude, col AA=27(idx 26) yellow/green
+  tsRows.forEach((row, ri) => {
+    if (ri === 0) return;
+    const csvIdx = ri - 1;
+    const aeCell = row?.values?.[30]?.effectiveFormat?.backgroundColor;
+    const aaCell = row?.values?.[26]?.effectiveFormat?.backgroundColor;
+    if (isPink(aeCell))   EXC.ts.add(csvIdx);
+    if (isYellow(aaCell)) YAB.ts.add(csvIdx);
+  });
+
+  // LD: col D=4(idx 3) light yellow=exclude
+  ldRows.forEach((row, ri) => {
+    if (ri === 0) return;
+    const csvIdx = ri - 1;
+    const dCell = row?.values?.[3]?.effectiveFormat?.backgroundColor;
+    if (isLightYellow(dCell)) EXC.ld.add(csvIdx);
+  });
+
+  return {
+    ssExc: EXC.ss.size, ssYab: YAB.ss.size,
+    tsExc: EXC.ts.size, tsYab: YAB.ts.size,
+    ldExc: EXC.ld.size
+  };
+}
+
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
 function parseCSV(txt) {
   const lines = txt.split('\n');
   let hi = 0;
@@ -450,6 +546,7 @@ function barsHTML(cid, entries, color) {
   setTimeout(() => el.querySelectorAll('.bf').forEach(b => b.style.width = b.dataset.p+'%'), 50);
 }
 
+// ── FILTER ENGINE ─────────────────────────────────────────────────────────────
 function applyF(rows, pfx, nrKey, srcKey) {
   const status  = F[pfx];
   const fy      = document.getElementById(`${pfx}-fy`)?.value  || '';
@@ -641,9 +738,26 @@ function clearF(pfx) {
 async function init() {
   const dot=document.getElementById('dot'),txt=document.getElementById('dot-txt');
   dot.className='dot err'; txt.textContent='Loading';
-  document.getElementById('sync-txt').textContent='Fetching all sheets...';
+  document.getElementById('sync-txt').textContent='Fetching colours from Google Sheets API...';
   document.getElementById('err-area').innerHTML='';
+
   try {
+    // Step 1: Fetch colours from API (live, always in sync)
+    let colourResult;
+    try {
+      colourResult = await buildColourSets();
+      document.getElementById('ss-info').textContent = `✦ ${colourResult.ssExc} rows excluded (pink AF) · ${colourResult.ssYab} rows excluded from New filter (yellow AB)`;
+      document.getElementById('ts-info').textContent = `✦ ${colourResult.tsExc} rows excluded (pink AE) · ${colourResult.tsYab} rows excluded from New filter (yellow AB)`;
+      document.getElementById('ld-info').textContent = `✦ ${colourResult.ldExc} lead rows excluded (light yellow col D)`;
+    } catch(apiErr) {
+      console.warn('Colour API failed:', apiErr.message);
+      document.getElementById('ss-info').textContent = '⚠️ Colour exclusions unavailable — showing all rows';
+      document.getElementById('ts-info').textContent = '⚠️ Colour exclusions unavailable — showing all rows';
+      document.getElementById('ld-info').textContent = '⚠️ Colour exclusions unavailable — showing all rows';
+    }
+
+    // Step 2: Fetch CSV data
+    document.getElementById('sync-txt').textContent='Fetching sheet data...';
     const t = Date.now();
     const [sR,ssR,tsR,ldR] = await Promise.all([
       fetch(CSV.seg+'&t='+t), fetch(CSV.ss+'&t='+t),
@@ -651,14 +765,13 @@ async function init() {
     ]);
     if (!sR.ok||!ssR.ok||!tsR.ok||!ldR.ok) throw new Error('One or more sheets failed to load');
     const [sTx,ssTx,tsTx,ldTx] = await Promise.all([sR.text(),ssR.text(),tsR.text(),ldR.text()]);
+
     const segLines = sTx.split('\n').map(l => splitLine(l));
     renderSeg(segLines);
     RAW.ss = parseCSV(ssTx);
     RAW.ts = parseCSV(tsTx);
     RAW.ld = parseCSV(ldTx);
-    document.getElementById('ss-info').textContent = `✦ ${EXC.ss.size} rows excluded (pink AF) · ${YAB.ss.size} rows excluded from New filter (yellow AB)`;
-    document.getElementById('ts-info').textContent = `✦ ${EXC.ts.size} rows excluded (pink AE) · ${YAB.ts.size} rows excluded from New filter (yellow AB)`;
-    document.getElementById('ld-info').textContent = `✦ ${EXC.ld.size} lead rows excluded (light yellow col D)`;
+
     const notExt = v => v && v.trim().length > 0 && v.trim().toLowerCase() !== 'external event' && v.trim().toLowerCase() !== 'external events';
     fillSel('ss-country', RAW.ss.map(r=>r['Country']), 'All Countries');
     fillSel('ss-source',  RAW.ss.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
@@ -668,9 +781,12 @@ async function init() {
     fillSel('ts-seg',     RAW.ts.map(r=>r['Segmentation']).filter(v=>v&&!v.includes('2024')&&!v.includes('2025')), 'All Segments');
     fillSel('ld-country', RAW.ld.map(r=>r['Country']), 'All Countries');
     fillSel('ld-source',  RAW.ld.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
+
     renderSS(); renderTS(); renderLD();
+
     dot.className='dot ok'; txt.textContent='Live';
     document.getElementById('sync-txt').textContent = 'Last synced: '+new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+
   } catch(e) {
     dot.className='dot err'; txt.textContent='Error';
     document.getElementById('sync-txt').textContent='Could not connect';
