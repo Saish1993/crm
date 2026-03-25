@@ -38,8 +38,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .filter-label{font-size:11px;color:var(--text3);}
 select.flt{background:var(--surface);border:1px solid var(--border2);color:var(--text2);padding:6px 10px;border-radius:var(--radius-sm);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;outline:none;}
 select.flt:focus{border-color:var(--gold);}
-input.flt-date{background:var(--surface);border:1px solid var(--border2);color:var(--text2);padding:6px 10px;border-radius:var(--radius-sm);font-size:11px;font-family:'DM Sans',sans-serif;outline:none;}
-input.flt-date:focus{border-color:var(--gold);}
+
 .flt-btn{background:var(--surface);border:1px solid var(--border2);color:var(--text2);padding:6px 12px;border-radius:var(--radius-sm);font-size:11px;cursor:pointer;transition:all 0.15s;}
 .flt-btn.on{background:var(--gold-dim);border-color:rgba(184,134,11,0.35);color:var(--gold2);}
 .flt-sep{width:1px;height:20px;background:var(--border2);margin:0 4px;}
@@ -120,9 +119,24 @@ input.flt-date:focus{border-color:var(--gold);}
       <button class="flt-btn" id="ss-f-New" onclick="setFilter('ss','New')">New</button>
       <button class="flt-btn" id="ss-f-Repeat" onclick="setFilter('ss','Repeat')">Repeat</button>
       <div class="flt-sep"></div>
-      <span class="filter-label">Date:</span>
-      <input type="month" class="flt-date" id="ss-from" onchange="renderCust('ss')" placeholder="From">
-      <input type="month" class="flt-date" id="ss-to" onchange="renderCust('ss')" placeholder="To">
+      <span class="filter-label">Year:</span>
+      <select class="flt" id="ss-fy" onchange="renderCust('ss')">
+        <option value="">All Years</option>
+        <option>FY 19-20</option>
+        <option>FY 20-21</option>
+        <option>FY 21-22</option>
+        <option>FY 22-23</option>
+        <option>FY 23-24</option>
+        <option>FY 24-25</option>
+        <option>FY 25-26</option>
+      </select>
+      <select class="flt" id="ss-month" onchange="renderCust('ss')">
+        <option value="">All Months</option>
+        <option>April</option><option>May</option><option>June</option>
+        <option>July</option><option>August</option><option>September</option>
+        <option>October</option><option>November</option><option>December</option>
+        <option>January</option><option>February</option><option>March</option>
+      </select>
       <div class="flt-sep"></div>
       <select class="flt" id="ss-country" onchange="renderCust('ss')"><option value="">All Countries</option></select>
       <select class="flt" id="ss-source" onchange="renderCust('ss')"><option value="">All Sources</option></select>
@@ -163,9 +177,21 @@ input.flt-date:focus{border-color:var(--gold);}
       <button class="flt-btn" id="ts-f-New" onclick="setFilter('ts','New')">New</button>
       <button class="flt-btn" id="ts-f-Repeat" onclick="setFilter('ts','Repeat')">Repeat</button>
       <div class="flt-sep"></div>
-      <span class="filter-label">Date:</span>
-      <input type="month" class="flt-date" id="ts-from" onchange="renderCust('ts')" placeholder="From">
-      <input type="month" class="flt-date" id="ts-to" onchange="renderCust('ts')" placeholder="To">
+      <span class="filter-label">Year:</span>
+      <select class="flt" id="ts-fy" onchange="renderCust('ts')">
+        <option value="">All Years</option>
+        <option>FY 22-23</option>
+        <option>FY 23-24</option>
+        <option>FY 24-25</option>
+        <option>FY 25-26</option>
+      </select>
+      <select class="flt" id="ts-month" onchange="renderCust('ts')">
+        <option value="">All Months</option>
+        <option>April</option><option>May</option><option>June</option>
+        <option>July</option><option>August</option><option>September</option>
+        <option>October</option><option>November</option><option>December</option>
+        <option>January</option><option>February</option><option>March</option>
+      </select>
       <div class="flt-sep"></div>
       <select class="flt" id="ts-country" onchange="renderCust('ts')"><option value="">All Countries</option></select>
       <select class="flt" id="ts-source" onchange="renderCust('ts')"><option value="">All Sources</option></select>
@@ -206,9 +232,21 @@ input.flt-date:focus{border-color:var(--gold);}
       <button class="flt-btn" id="ld-f-New" onclick="setFilter('ld','New')">New</button>
       <button class="flt-btn" id="ld-f-Repeat" onclick="setFilter('ld','Repeat')">Repeat</button>
       <div class="flt-sep"></div>
-      <span class="filter-label">Date:</span>
-      <input type="month" class="flt-date" id="ld-from" onchange="renderLeads()" placeholder="From">
-      <input type="month" class="flt-date" id="ld-to" onchange="renderLeads()" placeholder="To">
+      <span class="filter-label">Year:</span>
+      <select class="flt" id="ld-fy" onchange="renderLeads()">
+        <option value="">All Years</option>
+        <option>FY 22-23</option>
+        <option>FY 23-24</option>
+        <option>FY 24-25</option>
+        <option>FY 25-26</option>
+      </select>
+      <select class="flt" id="ld-month" onchange="renderLeads()">
+        <option value="">All Months</option>
+        <option>April</option><option>May</option><option>June</option>
+        <option>July</option><option>August</option><option>September</option>
+        <option>October</option><option>November</option><option>December</option>
+        <option>January</option><option>February</option><option>March</option>
+      </select>
       <div class="flt-sep"></div>
       <select class="flt" id="ld-country" onchange="renderLeads()"><option value="">All Countries</option></select>
       <select class="flt" id="ld-source" onchange="renderLeads()"><option value="">All Sources</option></select>
@@ -413,42 +451,12 @@ function clearFilters(pfx) {
   filters[pfx] = 'all';
   ['all','New','Repeat'].forEach(v => document.getElementById(`${pfx}-f-${v}`)?.classList.remove('on'));
   document.getElementById(`${pfx}-f-all`)?.classList.add('on');
-  ['country','source','seg','from','to'].forEach(k => { const el=document.getElementById(`${pfx}-${k}`); if(el) el.value=''; });
+  ['country','source','seg','fy','month'].forEach(k => { const el=document.getElementById(`${pfx}-${k}`); if(el) el.value=''; });
   if (pfx === 'ld') renderLeads(); else renderCust(pfx);
 }
 
 // ─── Month parsing ────────────────────────────────────────────────────────────
-const MONTHS = {january:0,february:1,march:2,april:3,may:4,june:5,july:6,august:7,september:8,october:9,november:10,december:11,jan:0,feb:1,mar:2,apr:3,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
-const FY_START = {'FY 19-20':2019,'FY 20-21':2020,'FY 21-22':2021,'FY 22-23':2022,'FY 23-24':2023,'FY 24-25':2024,'FY 25-26':2025};
-
-function rowToDate(r) {
-  const fy = (r['Financial Year']||'').trim();
-  const mo = (r['Month']||'').trim().toLowerCase();
-  const fyYear = FY_START[fy];
-  if (!fyYear) return null;
-  const moIdx = MONTHS[mo];
-  if (moIdx === undefined) return null;
-  // FY Apr-Mar: Apr-Dec = start year, Jan-Mar = start year+1
-  const year = moIdx >= 3 ? fyYear : fyYear + 1;
-  return new Date(year, moIdx, 1);
-}
-
-function inDateRange(r, fromEl, toEl) {
-  const fromVal = fromEl?.value;
-  const toVal   = toEl?.value;
-  if (!fromVal && !toVal) return true;
-  const d = rowToDate(r);
-  if (!d) return true;
-  if (fromVal) {
-    const [fy, fm] = fromVal.split('-').map(Number);
-    if (d < new Date(fy, fm-1, 1)) return false;
-  }
-  if (toVal) {
-    const [ty, tm] = toVal.split('-').map(Number);
-    if (d > new Date(ty, tm-1, 28)) return false;
-  }
-  return true;
-}
+// Financial year and month filtering handled via dropdowns
 
 // ─── Filter rows ──────────────────────────────────────────────────────────────
 function applyFilters(rows, pfx, nrKey, excSet) {
@@ -456,34 +464,35 @@ function applyFilters(rows, pfx, nrKey, excSet) {
   const country = document.getElementById(`${pfx}-country`)?.value || '';
   const source  = document.getElementById(`${pfx}-source`)?.value  || '';
   const seg     = document.getElementById(`${pfx}-seg`)?.value     || '';
-  const fromEl  = document.getElementById(`${pfx}-from`);
-  const toEl    = document.getElementById(`${pfx}-to`);
+  const fy      = document.getElementById(`${pfx}-fy`)?.value    || '';
+  const month   = document.getElementById(`${pfx}-month`)?.value  || '';
 
   // Yellow AB = exclude from New; Green AB = include only for Repeat
   const yellowAB = pfx === 'ss' ? (window.ssYellowAB || new Set()) : pfx === 'ts' ? (window.tsYellowAB || new Set()) : new Set();
   const greenAB  = pfx === 'ss' ? (window.ssGreenAB  || new Set()) : pfx === 'ts' ? (window.tsGreenAB  || new Set()) : new Set();
 
   return rows.filter((r, idx) => {
-    if (excSet && excSet.has(idx)) return false; // pink AF = exclude always
+    if (excSet && excSet.has(idx)) return false;
 
     if (f === 'New') {
       const nr = (r[nrKey]||'').toLowerCase();
       if (!nr.includes('new') || nr.includes('repeat')) return false;
-      if (yellowAB.has(idx)) return false; // yellow AB = exclude from New
+      if (yellowAB.has(idx)) return false;
     }
     if (f === 'Repeat') {
       const nr = (r[nrKey]||'').toLowerCase();
       if (!nr.includes('repeat')) return false;
     }
-    if (f === 'all') {
-      // For All view: still exclude yellow AB rows from New count
-      // (handled in renderCust separately)
-    }
 
+    if (fy     && (r['Financial Year']||'').trim() !== fy) return false;
+    if (month  && (r['Month']||'').trim().toLowerCase() !== month.toLowerCase()) return false;
     if (country && (r['Country']||'').trim() !== country) return false;
-    if (source  && (r['Primary Source']||'').trim() !== source) return false;
+    // Source key varies by tab - check both possible column names
+    if (source) {
+      const rowSrc = (r['Primary Source']||r['Primary Source']||'').trim();
+      if (rowSrc !== source) return false;
+    }
     if (seg     && (r['Segmentation']||'').trim() !== seg) return false;
-    if (!inDateRange(r, fromEl, toEl)) return false;
     return true;
   });
 }
@@ -535,7 +544,10 @@ function renderCust(pfx) {
   const nriKey  = 'NRI';
 
   let f = applyFilters(rows, pfx, nrKey, excluded[pfx]);
-  f = f.filter(r => (r['Primary Source']||'').trim() !== 'External Event');
+  f = f.filter(r => {
+    const src = (r['Primary Source']||'').trim().toLowerCase();
+    return src !== 'external event' && src !== 'external events';
+  });
   f = f.filter(r => (r[nameKey]||'').trim() && !(r[nameKey]||'').includes('Exclude'));
 
   const tc  = f.length;
@@ -560,16 +572,23 @@ function renderCust(pfx) {
   const ao = ['10-20','20-30','30-40','40-50','50-60','60-70','70+'];
   const al=[],av=[];
   ao.forEach(a=>{if(ad[a]){al.push(a);av.push(ad[a]);}});
-  Object.entries(ad).forEach(([k,v])=>{if(!ao.includes(k)&&k){al.push(k);av.push(v);}});
+  // Also add 70-75 and 75+ if present, skip date values
+  Object.entries(ad).forEach(([k,v])=>{
+    if(!ao.includes(k)&&k&&!k.includes('-')===false&&k.length<=5){al.push(k);av.push(v);}
+  });
   mkBar(`${pfx}-age`, al, av, '#3a5f90');
 
   const rd = topN(countBy(f,'Country'));
   mkBar(`${pfx}-region`, rd.map(e=>e[0]), rd.map(e=>e[1]), ['#b8860b','#2a7d6f','#c05040','#3a5f90','#3a7d3a','#8a70c0','#e8c97a','#b8860b'], true);
 
-  // NRI chart
-  const nriCount = f.filter(r=>(r[nriKey]||'').trim().toLowerCase()==='yes'||(r[nriKey]||'').trim().toLowerCase()==='nri').length;
+  // NRI chart - 'Yes' = NRI, blank = Non-NRI
+  const nriCount = f.filter(r => (r[nriKey]||'').trim().toLowerCase() === 'yes').length;
   const nonNRI = tc - nriCount;
-  mkDonut(`${pfx}-nri`, ['NRI','Non-NRI'], [nriCount, nonNRI], ['#c05040','#b8860b']);
+  if(nriCount > 0) {
+    mkDonut(`${pfx}-nri`, ['NRI','Non-NRI'], [nriCount, nonNRI], ['#c05040','#b8860b']);
+  } else {
+    mkDonut(`${pfx}-nri`, ['Non-NRI'], [nonNRI], ['#b8860b']);
+  }
 
   bars(`${pfx}-src`, topN(countBy(f,'Primary Source')), '#2a7d6f');
 
@@ -592,10 +611,21 @@ function renderCust(pfx) {
 // ─── Leads ────────────────────────────────────────────────────────────────────
 function renderLeads() {
   const rows = raw.ld; if (!rows.length) return;
-  const nrKey = Object.keys(rows[0]||{}).find(k=>k.toLowerCase().includes('lead status')||k.toLowerCase().includes('new/ repeat')) || 'Lead Status';
+  // Leads SF correct columns:
+  // Lead Status = col Y header = 'Lead Status\n(New/ Repeat)'
+  // Source = col AE header = 'Primary Source'
+  const nrKey = Object.keys(rows[0]||{}).find(k => {
+    const kl = k.toLowerCase().replace(/\s+/g,' ').replace(/\n/g,' ');
+    return kl.includes('lead status') || kl.includes('new/ repeat') || kl === 'new/ repeat';
+  }) || 'Lead Status\n(New/ Repeat)';
+  const srcKey = 'Primary Source';
 
   let f = applyFilters(rows, 'ld', nrKey, excluded.ld);
-  f = f.filter(r => (r['Primary Source']||'').trim() !== 'External Event');
+  // Exclude External Event - note case variations
+  f = f.filter(r => {
+    const src = (r[srcKey]||'').trim().toLowerCase();
+    return src !== 'external event' && src !== 'external events';
+  });
   f = f.filter(r => (r['Name']||'').trim() && !(r['Name']||'').includes('Exclude'));
 
   const tc = f.length;
@@ -612,17 +642,20 @@ function renderLeads() {
   const gd = countBy(f,'Gender');
   mkDonut('ld-gender', Object.keys(gd), Object.values(gd), ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0,Object.keys(gd).length));
 
+  const ao = ['10-20','20-30','30-40','40-50','50-60','60-70','70-75','75+'];
   const ad = countBy(f,'Age Group');
-  const ao = ['10-20','20-30','30-40','40-50','50-60','60-70','70+'];
   const al=[],av=[];
   ao.forEach(a=>{if(ad[a]){al.push(a);av.push(ad[a]);}});
-  Object.entries(ad).forEach(([k,v])=>{if(!ao.includes(k)&&k){al.push(k);av.push(v);}});
   mkBar('ld-age', al, av, '#3a5f90');
 
   const rd = topN(countBy(f,'Country'));
   mkBar('ld-region', rd.map(e=>e[0]), rd.map(e=>e[1]), ['#b8860b','#2a7d6f','#c05040','#3a5f90','#3a7d3a','#8a70c0','#e8c97a','#b8860b'], true);
 
-  bars('ld-src', topN(countBy(f,'Primary Source')), '#2a7d6f');
+  bars('ld-src', topN(countBy(f, srcKey)), '#2a7d6f');
+
+  // Populate dropdowns with correct source key
+  fillSelect('ld-country', raw.ld.map(r=>r['Country']).filter(v=>v&&v.length>1), 'All Countries');
+  fillSelect('ld-source', raw.ld.filter(r=>{const s=(r[srcKey]||'').toLowerCase();return s&&s!=='external event';}).map(r=>r[srcKey]).filter(v=>v&&v.length>1), 'All Sources');
 }
 
 // ─── Hardcoded colour data extracted from Excel file ─────────────────────────
