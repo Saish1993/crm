@@ -314,120 +314,20 @@ const YAB = {ss: new Set(), ts: new Set()};
 const F = {ss:'all', ts:'all', ld:'all'};
 const CH = {};
 
-// ── COLOUR DETECTION ──────────────────────────────────────────────────────────
-function isPink(bg) {
-  if (!bg) return false;
-  const r = (bg.red||0), g = (bg.green||0), b = (bg.blue||0);
-  if (r > 0.98 && g > 0.98 && b > 0.98) return false; // white
-  if (r < 0.01 && g < 0.01 && b < 0.01) return false; // black/default
-  // Pink: #F4CCCC = (0.957, 0.8, 0.8) — high red, medium green+blue
-  return r > 0.85 && g > 0.7 && g < 0.9 && b > 0.7 && b < 0.9 && r > g && r > b;
-}
-
-function isYellow(bg) {
-  if (!bg) return false;
-  const r = (bg.red||0), g = (bg.green||0), b = (bg.blue||0);
-  if (r > 0.98 && g > 0.98 && b > 0.98) return false;
-  if (r < 0.01 && g < 0.01 && b < 0.01) return false;
-  // Yellow #FFFF00 = (1,1,0) or Light Yellow #FFF2CC = (1,0.95,0.8)
-  return r > 0.9 && g > 0.88 && b < 0.5;
-}
-
-function isGreen(bg) {
-  if (!bg) return false;
-  const r = (bg.red||0), g = (bg.green||0), b = (bg.blue||0);
-  if (r > 0.98 && g > 0.98 && b > 0.98) return false;
-  if (r < 0.01 && g < 0.01 && b < 0.01) return false;
-  // Green #D9EAD3 = (0.85, 0.918, 0.827)
-  return g > r && g > b && g > 0.8 && r > 0.7;
-}
-
-function isLightYellow(bg) {
-  if (!bg) return false;
-  const r = (bg.red||0), g = (bg.green||0), b = (bg.blue||0);
-  if (r > 0.98 && g > 0.98 && b > 0.98) return false;
-  if (r < 0.01 && g < 0.01 && b < 0.01) return false;
-  // Light Yellow 3 #FFF2CC = (1, 0.949, 0.8)
-  return r > 0.95 && g > 0.88 && b > 0.7 && b < 0.9 && r >= g && g >= b;
-}
-
-// ── FETCH COLOURS FROM API ────────────────────────────────────────────────────
-async function fetchColours(sheetName) {
-  // Fetch background colours for key columns
-  // SS: AF(col 32)=pink exclude, AB(col 28)=yellow/green new/repeat
-  // TS: AE(col 31)=pink exclude, AA(col 27)=yellow/green
-  // LD: D(col 4)=light yellow exclude
-  const ranges = encodeURIComponent(sheetName);
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?ranges=${ranges}&fields=sheets(data(rowData(values(effectiveFormat/backgroundColor))))&key=${API_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`API ${res.status}`);
-  const data = await res.json();
-  return data?.sheets?.[0]?.data?.[0]?.rowData || [];
-}
-
+// ── TEXT-BASED EXCLUSION ──────────────────────────────────────────────────────
+// SS: exclude if Additional Comment (AF col) contains 'No CRM'
+// TS: exclude if Additional Comments (AE col) contains 'No CRM'
+// LD: no text exclusion — yellow col D has no text marker
 function buildExclusionSets() {
-  // SS: exclude if Additional Comment (AF) contains 'No CRM'
+  EXC.ss.clear(); EXC.ts.clear(); EXC.ld.clear();
   RAW.ss.forEach((r, idx) => {
     if ((r['Additional Comment']||'').toLowerCase().includes('no crm')) EXC.ss.add(idx);
   });
-  // TS: exclude if Additional Comments (AE) contains 'No CRM'
   RAW.ts.forEach((r, idx) => {
     if ((r['Additional Comments']||'').toLowerCase().includes('no crm')) EXC.ts.add(idx);
   });
-  return { ssExc: EXC
-  // Get exact sheet names first
-  const metaUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?fields=sheets.properties&key=${API_KEY}`;
-  const metaRes = await fetch(metaUrl);
-  if (!metaRes.ok) throw new Error('Cannot read sheet metadata');
-  const meta = await metaRes.json();
-  const sheets = meta.sheets.map(s => ({name: s.properties.title, gid: s.properties.sheetId}));
-
-  const ssName = sheets.find(s => s.gid === 0)?.name || 'Customers SS';
-  const tsName = sheets.find(s => s.gid === 1828153604)?.name || 'Customers TSPSO';
-  const ldName = sheets.find(s => s.gid === 1319626729)?.name || 'Leads SF';
-
-  // Fetch colours for all 3 sheets in parallel
-  const [ssRows, tsRows, ldRows] = await Promise.all([
-    fetchColours(ssName),
-    fetchColours(tsName),
-    fetchColours(ldName)
-  ]);
-
-  // SS: AF(32) Additional Comment pink=exclude idx31, AB(28) New/Repeat yellow idx27
-  ssRows.forEach((row, ri) => {
-    if (ri === 0) return;
-    const csvIdx = ri - 1;
-    const afCell = row?.values?.[31]?.effectiveFormat?.backgroundColor; // AF=32 idx31
-    const abCell = row?.values?.[27]?.effectiveFormat?.backgroundColor; // AB=28 idx27
-    if (isPink(afCell))   EXC.ss.add(csvIdx);
-    if (isYellow(abCell)) YAB.ss.add(csvIdx);
-  });
-
-  // TS: AE(31) Additional Comments pink=exclude idx30, AA(27) New/Repeat yellow idx26
-  tsRows.forEach((row, ri) => {
-    if (ri === 0) return;
-    const csvIdx = ri - 1;
-    const aeCell = row?.values?.[30]?.effectiveFormat?.backgroundColor; // AE=31 idx30
-    const aaCell = row?.values?.[26]?.effectiveFormat?.backgroundColor; // AA=27 idx26
-    if (isPink(aeCell))   EXC.ts.add(csvIdx);
-    if (isYellow(aaCell)) YAB.ts.add(csvIdx);
-  });
-
-  // LD: col D=4(idx 3) light yellow=exclude
-  ldRows.forEach((row, ri) => {
-    if (ri === 0) return;
-    const csvIdx = ri - 1;
-    const dCell = row?.values?.[3]?.effectiveFormat?.backgroundColor;
-    if (isLightYellow(dCell)) EXC.ld.add(csvIdx);
-  });
-
-  return {
-    ssExc: EXC.ss.size, ssYab: YAB.ss.size,
-    tsExc: EXC.ts.size, tsYab: YAB.ts.size,
-    ldExc: EXC.ld.size
-  };
+  return { ssExc: EXC.ss.size, tsExc: EXC.ts.size, ldExc: EXC.ld.size };
 }
-
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function parseCSV(txt) {
@@ -445,7 +345,6 @@ function parseCSV(txt) {
     const vals = splitLine(line);
     if (!vals[0] && !vals[1] && !vals[2] && !vals[3]) continue;
     const obj = {};
-    // Strip newlines/tabs from all values (Google Sheets CSV can embed them)
     hdrs.forEach((h,j) => obj[h] = (vals[j]||'').replace(/[\n\r\t]/g,' ').trim());
     rows.push(obj);
   }
@@ -481,7 +380,7 @@ function parseRev(val) {
 
 function cntBy(rows, key) {
   const m = {};
-  rows.forEach(r => { const v = (r[key]||'').trim(); if (v) m[v] = (m[v]||0)+1; });
+  rows.forEach(r => { const v=(r[key]||'').trim(); if(v) m[v]=(m[v]||0)+1; });
   return m;
 }
 
@@ -503,11 +402,9 @@ function mkDonut(id, labels, data, colors) {
   CH[id] = new Chart(el, {
     type: 'doughnut',
     data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false, cutout: '58%',
-      plugins: { legend: { display: true, position: 'right',
-        labels: { color: '#5a5848', font: { size: 10 }, boxWidth: 8, padding: 6 } } }
-    }
+    options: { responsive:true, maintainAspectRatio:false, cutout:'58%',
+      plugins:{ legend:{ display:true, position:'right',
+        labels:{ color:'#5a5848', font:{size:10}, boxWidth:8, padding:6 } } } }
   });
 }
 
@@ -516,15 +413,11 @@ function mkHBar(id, labels, data, colors) {
   if (CH[id]) CH[id].destroy();
   CH[id] = new Chart(el, {
     type: 'bar',
-    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 3 }] },
-    options: {
-      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { color: '#9a9680', font: { size: 10 } } },
-        y: { grid: { display: false }, ticks: { color: '#5a5848', font: { size: 10 } } }
-      }
-    }
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius:3 }] },
+    options: { indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#9a9680',font:{size:10}} },
+               y:{ grid:{display:false}, ticks:{color:'#5a5848',font:{size:10}} } } }
   });
 }
 
@@ -533,15 +426,11 @@ function mkVBar(id, labels, data, color) {
   if (CH[id]) CH[id].destroy();
   CH[id] = new Chart(el, {
     type: 'bar',
-    data: { labels, datasets: [{ data, backgroundColor: color, borderRadius: 3 }] },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { color: '#9a9680', font: { size: 10 } } },
-        y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { color: '#9a9680', font: { size: 10 } } }
-      }
-    }
+    data: { labels, datasets: [{ data, backgroundColor: color, borderRadius:3 }] },
+    options: { responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{ display:false } },
+      scales:{ x:{ grid:{display:false}, ticks:{color:'#9a9680',font:{size:10}} },
+               y:{ grid:{color:'rgba(0,0,0,0.04)'}, ticks:{color:'#9a9680',font:{size:10}} } } }
   });
 }
 
@@ -549,11 +438,11 @@ function barsHTML(cid, entries, color) {
   const el = document.getElementById(cid); if (!el) return;
   el.innerHTML = '';
   const mx = Math.max(...entries.map(e=>e[1]), 1);
-  entries.forEach(([lbl, val]) => {
-    const pct = Math.max(2, (val/mx)*93);
+  entries.forEach(([lbl,val]) => {
+    const pct = Math.max(2,(val/mx)*93);
     el.innerHTML += `<div class="br"><div class="bl" title="${lbl}">${lbl}</div><div class="bt"><div class="bf" style="width:0%;background:${color};color:rgba(255,255,255,.85);" data-p="${pct}">${val>4?val:''}</div></div><div class="bn">${val}</div></div>`;
   });
-  setTimeout(() => el.querySelectorAll('.bf').forEach(b => b.style.width = b.dataset.p+'%'), 50);
+  setTimeout(() => el.querySelectorAll('.bf').forEach(b => b.style.width=b.dataset.p+'%'), 50);
 }
 
 // ── FILTER ENGINE ─────────────────────────────────────────────────────────────
@@ -596,10 +485,12 @@ const AGE_ORDER = ['10-20','20-30','30-40','40-50','50-60','60-70','70-75','75+'
 const SEG_COLORS = {VIC:'#b8860b',Family:'#3a5f90',Adventurer:'#3a7d3a',Core:'#c05040',Novice:'#8a70c0'};
 const REG_COLORS = ['#b8860b','#2a7d6f','#c05040','#3a5f90','#3a7d3a','#8a70c0','#c9a84c','#6a50a0'];
 
+// ── RENDER CUSTOMERS ──────────────────────────────────────────────────────────
+// COLUMN MAPPING (verified from actual sheet):
+// SS:  Name=E(CustomerName), NRI=O, Gender=P, AgeGroup=R, NR=AB, Src=AC, PinkExcl=AF, Rev=AV, Seg=BC
+// TS:  Name=E(Name), NoNRI, Gender=O, AgeGroup=Q, NR=AA, Src=AB, PinkExcl=AE, Rev=AU, Seg=BB
 function renderCust(pfx) {
   const rows = RAW[pfx]; if (!rows.length) return;
-  // SS cols: Name=E, NRI=O, Gender=P, AgeGroup=R, NR=AB, Src=AC, PinkExcl=AF, Rev=AV, Seg=BC
-  // TS cols: Name=E, Gender=O, AgeGroup=Q, NR=AA, Src=AB, PinkExcl=AE, Rev=AU, Seg=BB
   const nrKey  = 'New/ Repeat';
   const srcKey = 'Primary Source';
   const revKey = 'Total Spend';
@@ -607,9 +498,10 @@ function renderCust(pfx) {
   const genderKey = 'Gender';
   const ageKey = 'Age Group';
   const segKey = 'Segmentation';
-  const nriKey = pfx === 'ss' ? 'NRI' : null; // TS has no NRI col
+
   const f = applyF(rows, pfx, nrKey, srcKey);
   const tc = f.length;
+
   const newC = f.filter(r => {
     const origIdx = rows.indexOf(r);
     const nr = (r[nrKey]||'').toLowerCase();
@@ -624,76 +516,91 @@ function renderCust(pfx) {
   }).reduce((s,r) => s + parseRev(r[revKey]), 0);
   const repRev = f.filter(r => (r[nrKey]||'').toLowerCase().includes('repeat'))
                   .reduce((s,r) => s + parseRev(r[revKey]), 0);
+
   document.getElementById(`${pfx}-tc`).textContent  = tc.toLocaleString();
   document.getElementById(`${pfx}-rev`).textContent = fmtRev(rev);
   document.getElementById(`${pfx}-new`).textContent = newC.toLocaleString();
   document.getElementById(`${pfx}-rep`).textContent = repC.toLocaleString();
-  mkDonut(`${pfx}-nr`, ['New','Repeat'], [newC, repC], ['#3a7d3a','#b8860b']);
-  mkDonut(`${pfx}-nr-rev`, ['New','Repeat'], [Math.round(newRev), Math.round(repRev)], ['#3a7d3a','#b8860b']);
+
+  mkDonut(`${pfx}-nr`,     ['New','Repeat'], [newC, repC],                       ['#3a7d3a','#b8860b']);
+  mkDonut(`${pfx}-nr-rev`, ['New','Repeat'], [Math.round(newRev),Math.round(repRev)], ['#3a7d3a','#b8860b']);
+
   const gd = cntBy(f, genderKey);
-  mkDonut(`${pfx}-gender`, Object.keys(gd), Object.values(gd), ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0,Object.keys(gd).length));
+  mkDonut(`${pfx}-gender`, Object.keys(gd), Object.values(gd),
+    ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0,Object.keys(gd).length));
+
   const ad = cntBy(f, ageKey);
-  const al = [], av = [];
-  AGE_ORDER.forEach(a => { if (ad[a]) { al.push(a); av.push(ad[a]); } });
+  const al=[], av=[];
+  AGE_ORDER.forEach(a => { if(ad[a]){al.push(a);av.push(ad[a]);} });
   mkVBar(`${pfx}-age`, al, av, '#3a5f90');
-  const rd = topN(cntBy(f, 'Country'), 8);
+
+  const rd = topN(cntBy(f,'Country'), 8);
   mkHBar(`${pfx}-region`, rd.map(e=>e[0]), rd.map(e=>e[1]), REG_COLORS.slice(0,rd.length));
+
   barsHTML(`${pfx}-src-bars`, topN(cntBy(f, srcKey)), '#2a7d6f');
+
   const sd = cntBy(f, segKey);
   const se = ['VIC','Family','Adventurer','Core','Novice'].map(s=>[s,sd[s]||0]).filter(e=>e[1]>0);
   const segEl = document.getElementById(`${pfx}-seg-bars`);
   if (segEl) {
-    segEl.innerHTML = '';
-    const mx = Math.max(...se.map(e=>e[1]), 1);
+    segEl.innerHTML='';
+    const mx = Math.max(...se.map(e=>e[1]),1);
     se.forEach(([lbl,val]) => {
       const pct = Math.max(2,(val/mx)*93);
       segEl.innerHTML += `<div class="br"><div class="bl">${lbl}</div><div class="bt"><div class="bf" style="width:0%;background:${SEG_COLORS[lbl]||'#b8860b'};color:rgba(255,255,255,.9);" data-p="${pct}">${val>3?val:''}</div></div><div class="bn">${val}</div></div>`;
     });
-    setTimeout(() => segEl.querySelectorAll('.bf').forEach(b => b.style.width = b.dataset.p+'%'), 50);
+    setTimeout(()=>segEl.querySelectorAll('.bf').forEach(b=>b.style.width=b.dataset.p+'%'),50);
   }
-  // NRI: SS has NRI at col O(15). TS has NO NRI column.
-  if (pfx === 'ss' && nriKey) {
+
+  // NRI: SS has NRI at col O. TS has no NRI column.
+  if (pfx === 'ss') {
     const nriC = f.filter(r => (r['NRI']||'').trim().toLowerCase() === 'yes').length;
     mkDonut('ss-nri', ['NRI','Non-NRI'], [nriC, tc-nriC], ['#c05040','#b8860b']);
-  } else if (pfx === 'ss') {
-    const el = document.getElementById('ss-nri');
-    if (el && el.closest) { const card = el.closest('.card'); if(card) card.style.display='none'; }
   }
 }
 
 function renderSS() { renderCust('ss'); }
 function renderTS() { renderCust('ts'); }
 
+// ── RENDER LEADS ──────────────────────────────────────────────────────────────
+// LD cols: Name=D, NRI=N, Gender=O, AgeGroup=Q, LeadStatus=Y, Src=AE(PrimarySource)
 function renderLD() {
   const rows = RAW.ld; if (!rows.length) return;
-  const nrKey = Object.keys(rows[0]||{}).find(k => {
-    const kn = k.replace(/\s+/g,' ').toLowerCase();
-    return kn.includes('lead status') || kn === 'new/ repeat';
-  }) || 'Lead Status (New/ Repeat)';
+  // Lead Status header after newline cleanup = 'Lead Status (New/ Repeat)'
+  const nrKey = Object.keys(rows[0]||{}).find(k => k.toLowerCase().includes('lead status')) || 'Lead Status (New/ Repeat)';
   const srcKey = 'Primary Source';
+
   const f = applyF(rows, 'ld', nrKey, srcKey);
   const tc  = f.length;
   const nwC = f.filter(r => { const v=(r[nrKey]||'').toLowerCase(); return v.includes('new')&&!v.includes('repeat'); }).length;
   const rpC = f.filter(r => (r[nrKey]||'').toLowerCase().includes('repeat')).length;
+
   document.getElementById('ld-tc').textContent  = tc.toLocaleString();
   document.getElementById('ld-new').textContent = nwC.toLocaleString();
   document.getElementById('ld-rep').textContent = rpC.toLocaleString();
-  document.getElementById('ld-pct').textContent = tc > 0 ? ((nwC/tc)*100).toFixed(1)+'%' : '—';
-  mkDonut('ld-nr', ['New','Repeat'], [nwC, rpC], ['#3a7d3a','#b8860b']);
-  const gd = cntBy(f, 'Gender');
-  mkDonut('ld-gender', Object.keys(gd), Object.values(gd), ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0,Object.keys(gd).length));
-  const ad = cntBy(f, 'Age Group');
-  const al = [], av = [];
-  AGE_ORDER.forEach(a => { if (ad[a]) { al.push(a); av.push(ad[a]); } });
+  document.getElementById('ld-pct').textContent = tc>0 ? ((nwC/tc)*100).toFixed(1)+'%' : '—';
+
+  mkDonut('ld-nr', ['New','Repeat'], [nwC,rpC], ['#3a7d3a','#b8860b']);
+
+  const gd = cntBy(f,'Gender');
+  mkDonut('ld-gender', Object.keys(gd), Object.values(gd),
+    ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0,Object.keys(gd).length));
+
+  const ad = cntBy(f,'Age Group');
+  const al=[],av=[];
+  AGE_ORDER.forEach(a=>{if(ad[a]){al.push(a);av.push(ad[a]);}});
   mkVBar('ld-age', al, av, '#3a5f90');
-  const rd = topN(cntBy(f, 'Country'), 8);
+
+  const rd = topN(cntBy(f,'Country'),8);
   mkHBar('ld-region', rd.map(e=>e[0]), rd.map(e=>e[1]), REG_COLORS.slice(0,rd.length));
-  barsHTML('ld-src-bars', topN(cntBy(f, srcKey)), '#2a7d6f');
+
+  barsHTML('ld-src-bars', topN(cntBy(f,srcKey)), '#2a7d6f');
 }
 
+// ── RENDER SEGMENTS ───────────────────────────────────────────────────────────
 function renderSeg(lines) {
-  function sv(l) { for(const r of lines){if(r[0]&&r[0].trim()===l){const v=parseInt(r[1]);if(!isNaN(v))return v;}}return 0; }
-  function lv(l) { for(const r of lines){if(r[3]&&r[3].trim()===l){const v=parseInt(r[4]);if(!isNaN(v))return v;}}return 0; }
+  function sv(l){for(const r of lines){if(r[0]&&r[0].trim()===l){const v=parseInt(r[1]);if(!isNaN(v))return v;}}return 0;}
+  function lv(l){for(const r of lines){if(r[3]&&r[3].trim()===l){const v=parseInt(r[4]);if(!isNaN(v))return v;}}return 0;}
   const vic=sv('VIC'),fam=sv('Family'),adv=sv('Adventurer'),core=sv('Core'),nov=sv('Novice');
   const tc=vic+fam+adv+core+nov;
   const hot=lv('Hot Leads'),warm=lv('Warm Leads'),cold=lv('Cold Leads'),tl=hot+warm+cold;
@@ -727,6 +634,7 @@ function renderSeg(lines) {
   CH['s-trend']=new Chart(document.getElementById('s-trend'),{type:'bar',data:{labels:ml,datasets:[{label:'Customers',data:cm,backgroundColor:'#b8860b',borderRadius:3},{label:'Leads',data:lm,backgroundColor:'#c05040',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#9a9680',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9a9680',font:{size:10}}}}}});
 }
 
+// ── NAV ───────────────────────────────────────────────────────────────────────
 function showPage(name) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
@@ -736,85 +644,66 @@ function showPage(name) {
 }
 
 function setF(pfx, val) {
-  F[pfx] = val;
-  ['all','new','rep'].forEach(v => document.getElementById(`${pfx}-f${v}`)?.classList.remove('on'));
+  F[pfx]=val;
+  ['all','new','rep'].forEach(v=>document.getElementById(`${pfx}-f${v}`)?.classList.remove('on'));
   document.getElementById(`${pfx}-f${val==='all'?'all':val==='New'?'new':'rep'}`)?.classList.add('on');
-  if (pfx==='ss') renderSS();
-  else if (pfx==='ts') renderTS();
-  else renderLD();
+  if(pfx==='ss')renderSS(); else if(pfx==='ts')renderTS(); else renderLD();
 }
 
 function clearF(pfx) {
-  F[pfx] = 'all';
+  F[pfx]='all';
   ['all','new','rep'].forEach(v=>document.getElementById(`${pfx}-f${v}`)?.classList.remove('on'));
   document.getElementById(`${pfx}-fall`)?.classList.add('on');
-  ['fy','mo','country','source','seg'].forEach(k=>{
-    const el=document.getElementById(`${pfx}-${k}`);if(el)el.value='';
-  });
-  if (pfx==='ss') renderSS();
-  else if (pfx==='ts') renderTS();
-  else renderLD();
+  ['fy','mo','country','source','seg'].forEach(k=>{const el=document.getElementById(`${pfx}-${k}`);if(el)el.value='';});
+  if(pfx==='ss')renderSS(); else if(pfx==='ts')renderTS(); else renderLD();
 }
 
+// ── INIT ──────────────────────────────────────────────────────────────────────
 async function init() {
-  const dot=document.getElementById('dot'),txt=document.getElementById('dot-txt');
+  const dot=document.getElementById('dot'), txt=document.getElementById('dot-txt');
   dot.className='dot err'; txt.textContent='Loading';
-  document.getElementById('sync-txt').textContent='Fetching colours from Google Sheets API...';
+  document.getElementById('sync-txt').textContent='Fetching data...';
   document.getElementById('err-area').innerHTML='';
-
   try {
-    // Step 1: Fetch colours from API (live, always in sync)
-    let colourResult;
-    try {
-      colourResult = await buildColourSets();
-      document.getElementById('ss-info').textContent = `✦ ${colourResult.ssExc} rows excluded (pink AF) · ${colourResult.ssYab} rows excluded from New filter (yellow AB)`;
-      document.getElementById('ts-info').textContent = `✦ ${colourResult.tsExc} rows excluded (pink AE) · ${colourResult.tsYab} rows excluded from New filter (yellow AB)`;
-      document.getElementById('ld-info').textContent = `✦ ${colourResult.ldExc} lead rows excluded (light yellow col D)`;
-    } catch(apiErr) {
-      console.warn('Colour API failed:', apiErr.message);
-      document.getElementById('ss-info').textContent = '⚠️ Colour exclusions unavailable — showing all rows';
-      document.getElementById('ts-info').textContent = '⚠️ Colour exclusions unavailable — showing all rows';
-      document.getElementById('ld-info').textContent = '⚠️ Colour exclusions unavailable — showing all rows';
-    }
-
-    // Step 2: Fetch CSV data
-    document.getElementById('sync-txt').textContent='Fetching sheet data...';
-    const t = Date.now();
+    const t=Date.now();
     const [sR,ssR,tsR,ldR] = await Promise.all([
       fetch(CSV.seg+'&t='+t), fetch(CSV.ss+'&t='+t),
       fetch(CSV.ts+'&t='+t),  fetch(CSV.ld+'&t='+t)
     ]);
-    if (!sR.ok||!ssR.ok||!tsR.ok||!ldR.ok) throw new Error('One or more sheets failed to load');
+    if(!sR.ok||!ssR.ok||!tsR.ok||!ldR.ok) throw new Error('One or more sheets failed to load');
     const [sTx,ssTx,tsTx,ldTx] = await Promise.all([sR.text(),ssR.text(),tsR.text(),ldR.text()]);
 
-    const segLines = sTx.split('\n').map(l => splitLine(l));
-    renderSeg(segLines);
+    // Parse CSVs
     RAW.ss = parseCSV(ssTx);
     RAW.ts = parseCSV(tsTx);
     RAW.ld = parseCSV(ldTx);
 
-    const notExt = v => v && v.trim().length > 0 && v.trim().toLowerCase() !== 'external event' && v.trim().toLowerCase() !== 'external events';
-    // SS: Customer Name, Primary Source, Segmentation
-    // TS: Name, Primary Source, Segmentation
+    // Text-based exclusions (No CRM in Additional Comment)
+    const excResult = buildExclusionSets();
+
+    // Update info badges
+    document.getElementById('ss-info').textContent = `✦ ${excResult.ssExc} rows excluded (No CRM) from ${RAW.ss.length} total`;
+    document.getElementById('ts-info').textContent = `✦ ${excResult.tsExc} rows excluded (No CRM) from ${RAW.ts.length} total`;
+    document.getElementById('ld-info').textContent = `✦ ${RAW.ld.length} total leads loaded`;
+
+    // Populate dropdowns
+    const notExt = v => v && v.trim().length>0 && !['external event','external events'].includes(v.trim().toLowerCase());
     fillSel('ss-country', RAW.ss.map(r=>r['Country']), 'All Countries');
     fillSel('ss-source',  RAW.ss.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
     fillSel('ss-seg',     RAW.ss.map(r=>r['Segmentation']).filter(v=>v&&v.length>1), 'All Segments');
     fillSel('ts-country', RAW.ts.map(r=>r['Country']), 'All Countries');
     fillSel('ts-source',  RAW.ts.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
     fillSel('ts-seg',     RAW.ts.map(r=>r['Segmentation']).filter(v=>v&&v.length>1), 'All Segments');
-    // Debug: log first LD row keys to console
-    if (RAW.ld.length > 0) {
-      console.log('LD first row keys:', Object.keys(RAW.ld[0]));
-      console.log('LD Primary Source sample:', RAW.ld[0]['Primary Source']);
-      console.log('LD sources found:', [...new Set(RAW.ld.map(r=>r['Primary Source']).filter(v=>v))].slice(0,5));
-    }
     fillSel('ld-country', RAW.ld.map(r=>r['Country']), 'All Countries');
     fillSel('ld-source',  RAW.ld.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
 
+    // Render all tabs
+    const segLines = sTx.split('\n').map(l=>splitLine(l));
+    renderSeg(segLines);
     renderSS(); renderTS(); renderLD();
 
     dot.className='dot ok'; txt.textContent='Live';
-    document.getElementById('sync-txt').textContent = 'Last synced: '+new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    document.getElementById('sync-txt').textContent='Last synced: '+new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
   } catch(e) {
     dot.className='dot err'; txt.textContent='Error';
