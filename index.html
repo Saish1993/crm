@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -308,4 +309,376 @@ const CSV = {
 
 // ── COLOUR DATA (extracted from Excel) ───────────────────────────────────────
 // Indices are 0-based CSV row positions (matching parsed row arrays, excl. header)
-const CD = {"ss": {"pink_af": [0, 9, 25, 38, 39, 58, 60, 65, 83, 104, 118, 134, 137, 144, 146, 157, 160, 164, 169, 176, 190, 192, 221, 229, 241, 243, 251, 254, 274, 275, 286, 287, 288, 291, 292, 314, 356, 365, 371, 377, 384, 388, 389, 390, 391, 395, 397, 399, 410, 426, 433, 434, 450, 451, 456, 468, 475, 483, 484, 509, 519, 524, 525, 543, 545, 553, 557, 582, 586, 644, 662, 664, 679, 718, 722, 736, 740, 775, 785, 843, 858, 883, 893, 972, 974, 976, 984, 988, 991, 1002, 1011, 1036, 1043, 1047, 1078, 1085, 1108, 1124, 1125, 1145, 1146, 1147, 1172, 1176, 1177, 1182, 1185, 1187, 1212, 1241, 1242, 1256, 1257, 1260, 1268, 1269, 1270, 1290, 1333, 1335, 1353, 1375, 1379, 1380, 1393, 1394, 1427, 1431, 1437, 1450, 1457, 1486, 1509, 1510, 1515, 1518, 1519, 1581, 1597, 1601, 1610, 1620, 1642, 1679, 1698, 1705, 1738, 1757], "yellow_ab": [7, 14, 17, 27, 31, 53, 62, 71, 74, 77, 88, 96, 99, 105, 109, 115, 135, 147, 151, 153, 155, 156, 167, 200, 215, 226, 244, 306, 311, 312, 357, 358, 385, 402, 427, 445, 459, 461, 466, 473, 474, 480, 491, 498, 535, 536, 549, 574, 601, 608, 615, 624, 625, 638, 672, 704, 705, 726, 727, 736, 745, 749, 758, 770, 784, 792, 808, 815, 827, 848, 861, 866, 878, 907, 908, 930, 949, 958, 1004, 1017, 1020, 1099, 1150, 1154, 1169, 1178, 1197, 1210, 1225, 1230, 1246, 1276, 1290, 1306, 1307, 1313, 1322, 1337, 1342, 1398, 1427, 1478, 1488, 1495, 1516, 1525, 1552, 1562, 1578, 1603, 1637, 1665, 1682, 1748], "green_ab": [20, 30, 49, 106, 196, 204, 220, 293, 366, 369, 378, 386, 418, 450, 453, 481, 529, 551, 556, 650, 680, 683, 695, 711, 738, 754, 766, 824, 865, 882, 917, 975, 978, 1010, 1019, 1042, 1056, 1063, 1109, 1110, 1114, 1148, 1151, 1163, 1171, 1174, 1200, 1202, 1207, 1240, 1279, 1284, 1304, 1305, 1312, 1314, 1321, 1323, 1327, 1338, 1341, 1346, 1351, 1371, 1377, 1383, 1426, 1430, 1458, 1477, 1484, 1520, 1521, 1526, 1527, 1544, 1555, 1558, 1580, 1586, 1592, 1599, 1602, 1605, 1606, 1608, 1617, 1618, 1625, 1650, 1652, 1653, 1675, 1677, 1683, 1684, 1686, 1687, 1688, 1695, 1696, 1699, 1700, 1702, 1715, 1732, 1734, 1751, 1753, 1756, 1758]}, "ts": {"pink_af": [55, 74, 116, 117, 118, 119, 148, 157, 162, 222, 286], "yellow_ab": [180, 192, 199], "green_ab": [135, 177, 191, 216, 250, 255, 256, 273, 285, 288, 289]}, "ld": {"yellow_d": [40, 61, 62, 63, 64, 71, 75, 83, 85, 87, 106, 109, 110, 113, 114, 115, 116, 117, 118, 119, 121, 142, 143, 144, 145, 147, 148, 151, 282, 365, 366, 367, 368, 369, 372, 373, 374, 375, 377, 380, 382, 383, 393, 398, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 431, 441, 462, 463, 464, 469, 476, 492, 493, 494, 495, 496, 497, 498, 500, 501, 502, 503, 504, 505, 507, 508, 511, 512, 513, 514, 515, 516, 518, 519, 520, 522, 523, 524, 525, 526, 527, 528, 530, 532, 535, 536, 590, 602, 603, 604, 605, 606, 607, 608, 609, 610, 611, 612, 613, 614, 616, 617, 618, 619, 620, 621, 622, 623, 624, 625, 626, 627, 628, 629, 630, 691, 692, 826, 828, 830, 835, 844, 851, 853, 946, 947, 948, 949, 953, 962, 964, 966, 967, 968, 969, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1029, 1030, 1031, 1032, 1033, 1034, 1035, 1036, 1037, 1038, 1039, 1040, 1041, 1042, 1043, 1048, 1049, 1051, 1052, 1053, 1054, 1055, 1056, 1057, 1060, 1068, 1084, 1100, 1123, 1133, 1322, 1323, 1324, 1325, 1326, 1327, 1328, 1329, 1330, 1331, 1332, 1333, 1334, 1335, 1336, 1337, 1338, 1339, 1340, 1341, 1342, 1344, 1346, 1347, 1348, 1349, 1350, 1351, 1352, 1353, 1354, 1355, 1356, 1357, 1358, 1359, 1360, 1361, 1362, 1363, 1364, 1365, 1366, 1367, 1368, 1369, 1370, 1371, 1372, 1373, 1374, 1375, 1376, 1377, 1378, 1379, 1380, 1381, 1382, 1383, 1384, 1385, 1386, 1387, 1388, 1389, 1390, 1391, 1392, 1393, 1394, 1395, 1396, 1397, 1398, 1399, 1400, 1401, 1402, 1403, 1404, 1405, 1406, 1407, 1409, 1410, 1411, 1412, 1413, 1414, 1415, 1416, 1417, 1418, 1419, 1420, 1421, 1422, 1423, 1424, 1425, 1426, 1427, 1428, 1429, 1430, 1431, 1432, 1433, 1434, 1435, 1436, 1437, 1438, 1439, 1440, 1441, 1442, 1443, 1444, 1445, 1446, 1447, 1448, 1449, 1450, 1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470, 1471, 1472, 1473, 1474, 1475, 1476, 1477, 1478, 1479, 1480, 1481, 1482, 1483, 1484, 1485, 1486, 1487, 1488, 1489, 1490, 1491, 1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501, 1502, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512, 1513, 1514, 1515, 1516, 1517, 1518, 1519, 1520, 1521, 1522, 1523, 1524, 1525, 1526, 1527, 1528, 1529, 1530, 1531, 1532, 1533, 1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548, 1549, 1550, 1551, 1552, 1553, 1554, 1555, 1556, 1557, 1558, 1559, 1560, 1561, 1562, 1563, 1564, 1565, 1566, 1567, 1568, 1569, 1570, 1571, 1572, 1573, 1574, 1575, 1576, 1577, 1578, 1579, 1580, 1581, 1582, 1583, 1584, 1585, 1586, 1587, 1588, 1589, 1590, 1591, 1592, 1593, 1594, 1595, 1596, 1597, 1598, 1599, 1600, 1601, 1602, 1603, 1604, 1605, 1606, 1607, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617, 1618, 1619, 1620, 1621, 1622, 1623, 1624, 1625, 1626, 1627, 1628, 1629, 1630, 1631, 1632, 1633, 1634, 1635, 1636, 1637, 1638, 1639, 1640, 1641, 1642, 1643, 1644, 1645, 1646, 1647, 1648, 1649, 1650, 1651, 1652, 1653, 1654, 1655, 1656, 1657, 1658, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1666, 1667, 1668, 1669, 1670, 1671, 1672, 1673, 1674, 1675, 1676, 1677, 1678, 1679, 1680, 1681, 1682, 1683, 1684, 1685, 1690, 1691, 1692, 1693, 1694, 1695, 1811, 1947, 1948, 1949, 1950, 1951, 1952, 1953, 1954, 1955, 1956, 1957, 1958, 1959, 1960, 1961, 1962, 1963, 1964, 1965, 1966, 1967, 1968, 1969, 1970, 1971, 1972, 1973, 1974, 1975, 1976, 1977, 1978, 1979, 1980, 1981, 1982, 1983, 1984, 2651, 2652]}}>
+const CD = {"ss":{"pink_af":[0,9,25,38,39,58,60,65,83,104,118,134,137,144,146,157,160,164,169,176,190,192,221,229,241,243,251,254,274,275,286,287,288,291,292,314,356,365,371,377,384,388,389,390,391,395,397,399,410,426,433,434,450,451,456,468,475,483,484,509,519,524,525,543,545,553,557,582,586,644,662,664,679,718,722,736,740,775,785,843,858,883,893,972,974,976,984,988,991,1002,1011,1036,1043,1047,1078,1085,1108,1124,1125,1145,1146,1147,1172,1176,1177,1182,1185,1187,1212,1241,1242,1256,1257,1260,1268,1269,1270,1290,1333,1335,1353,1375,1379,1380,1393,1394,1427,1431,1437,1450,1457,1486,1509,1510,1515,1518,1519,1581,1597,1601,1610,1620,1642,1679,1698,1705,1738,1757],"yellow_ab":[7,14,17,27,31,53,62,71,74,77,88,96,99,105,109,115,135,147,151,153,155,156,167,200,215,226,244,306,311,312,357,358,385,402,427,445,459,461,466,473,474,480,491,498,535,536,549,574,601,608,615,624,625,638,672,704,705,726,727,736,745,749,758,770,784,792,808,815,827,848,861,866,878,907,908,930,949,958,1004,1017,1020,1099,1150,1154,1169,1178,1197,1210,1225,1230,1246,1276,1290,1306,1307,1313,1322,1337,1342,1398,1427,1478,1488,1495,1516,1525,1552,1562,1578,1603,1637,1665,1682,1748],"green_ab":[20,30,49,106,196,204,220,293,366,369,378,386,418,450,453,481,529,551,556,650,680,683,695,711,738,754,766,824,865,882,917,975,978,1010,1019,1042,1056,1063,1109,1110,1114,1148,1151,1163,1171,1174,1200,1202,1207,1240,1279,1284,1304,1305,1312,1314,1321,1323,1327,1338,1341,1346,1351,1371,1377,1383,1426,1430,1458,1477,1484,1520,1521,1526,1527,1544,1555,1558,1580,1586,1592,1599,1602,1605,1606,1608,1617,1618,1625,1650,1652,1653,1675,1677,1683,1684,1686,1687,1688,1695,1696,1699,1700,1702,1715,1732,1734,1751,1753,1756,1758]},"ts":{"pink_af":[55,74,116,117,118,119,148,157,162,222,286],"yellow_ab":[180,192,199],"green_ab":[135,177,191,216,250,255,256,273,285,288,289]},"ld":{"yellow_d":[40,61,62,63,64,71,75,83,85,87,106,109,110,113,114,115,116,117,118,119,121,142,143,144,145,147,148,151,282,365,366,367,368,369,372,373,374,375,377,380,382,383,393,398,410,411,412,413,414,415,416,417,418,419,420,421,422,423,424,425,426,427,428,429,430,431,441,462,463,464,469,476,492,493,494,495,496,497,498,500,501,502,503,504,505,507,508,511,512,513,514,515,516,518,519,520,522,523,524,525,526,527,528,530,532,535,536,590,602,603,604,605,606,607,608,609,610,611,612,613,614,616,617,618,619,620,621,622,623,624,625,626,627,628,629,630,691,692,826,828,830,835,844,851,853,946,947,948,949,953,962,964,966,967,968,969,1002,1003,1004,1005,1006,1007,1008,1009,1010,1011,1012,1013,1014,1029,1030,1031,1032,1033,1034,1035,1036,1037,1038,1039,1040,1041,1042,1043,1048,1049,1051,1052,1053,1054,1055,1056,1057,1060,1068,1084,1100,1123,1133,1322,1323,1324,1325,1326,1327,1328,1329,1330,1331,1332,1333,1334,1335,1336,1337,1338,1339,1340,1341,1342,1344,1346,1347,1348,1349,1350,1351,1352,1353,1354,1355,1356,1357,1358,1359,1360,1361,1362,1363,1364,1365,1366,1367,1368,1369,1370,1371,1372,1373,1374,1375,1376,1377,1378,1379,1380,1381,1382,1383,1384,1385,1386,1387,1388,1389,1390,1391,1392,1393,1394,1395,1396,1397,1398,1399,1400,1401,1402,1403,1404,1405,1406,1407,1409,1410,1411,1412,1413,1414,1415,1416,1417,1418,1419,1420,1421,1422,1423,1424,1425,1426,1427,1428,1429,1430,1431,1432,1433,1434,1435,1436,1437,1438,1439,1440,1441,1442,1443,1444,1445,1446,1447,1448,1449,1450,1451,1452,1453,1454,1455,1456,1457,1458,1459,1460,1461,1462,1463,1464,1465,1466,1467,1468,1469,1470,1471,1472,1473,1474,1475,1476,1477,1478,1479,1480,1481,1482,1483,1484,1485,1486,1487,1488,1489,1490,1491,1492,1493,1494,1495,1496,1497,1498,1499,1500,1501,1502,1505,1506,1507,1508,1509,1510,1511,1512,1513,1514,1515,1516,1517,1518,1519,1520,1521,1522,1523,1524,1525,1526,1527,1528,1529,1530,1531,1532,1533,1534,1535,1536,1537,1538,1539,1540,1541,1542,1543,1544,1545,1546,1547,1548,1549,1550,1551,1552,1553,1554,1555,1556,1557,1558,1559,1560,1561,1562,1563,1564,1565,1566,1567,1568,1569,1570,1571,1572,1573,1574,1575,1576,1577,1578,1579,1580,1581,1582,1583,1584,1585,1586,1587,1588,1589,1590,1591,1592,1593,1594,1595,1596,1597,1598,1599,1600,1601,1602,1603,1604,1605,1606,1607,1608,1609,1610,1611,1612,1613,1614,1615,1616,1617,1618,1619,1620,1621,1622,1623,1624,1625,1626,1627,1628,1629,1630,1631,1632,1633,1634,1635,1636,1637,1638,1639,1640,1641,1642,1643,1644,1645,1646,1647,1648,1649,1650,1651,1652,1653,1654,1655,1656,1657,1658,1659,1660,1661,1662,1663,1664,1665,1666,1667,1668,1669,1670,1671,1672,1673,1674,1675,1676,1677,1678,1679,1680,1681,1682,1683,1684,1685,1690,1691,1692,1693,1694,1695,1811,1947,1948,1949,1950,1951,1952,1953,1954,1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,1971,1972,1973,1974,1975,1976,1977,1978,1979,1980,1981,1982,1983,1984,2651,2652]}};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const RAW = {ss:[], ts:[], ld:[]};
+const EXC = {
+  ss: new Set(CD.ss.pink_af),
+  ts: new Set(CD.ts.pink_af),
+  ld: new Set(CD.ld.yellow_d)
+};
+const YAB = {
+  ss: new Set(CD.ss.yellow_ab),
+  ts: new Set(CD.ts.yellow_ab)
+};
+const F = {ss:'all', ts:'all', ld:'all'};
+const CH = {};
+
+function parseCSV(txt) {
+  const lines = txt.split('\n');
+  let hi = 0;
+  for (let i = 0; i < Math.min(5, lines.length); i++) {
+    const l = lines[i].toLowerCase();
+    if (l.includes('financial year') || l.includes('salutation') || l.includes('sr. no')) { hi = i; break; }
+  }
+  const hdrs = splitLine(lines[hi]).map(h => h.replace(/\n/g,' ').replace(/\r/g,'').trim());
+  const rows = [];
+  for (let i = hi+1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const vals = splitLine(line);
+    if (!vals[0] && !vals[1] && !vals[2] && !vals[3]) continue;
+    const obj = {};
+    hdrs.forEach((h,j) => obj[h] = (vals[j]||'').trim());
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function splitLine(line) {
+  const vals = []; let cur = '', inQ = false;
+  for (const c of (line||'')) {
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { vals.push(cur.trim()); cur = ''; }
+    else cur += c;
+  }
+  vals.push(cur.trim());
+  return vals;
+}
+
+function fmtRev(n) {
+  if (!n || isNaN(n)) return '₹0';
+  if (n >= 10000000) return '₹' + (n/10000000).toFixed(2) + 'Cr';
+  if (n >= 100000)   return '₹' + (n/100000).toFixed(1) + 'L';
+  if (n >= 1000)     return '₹' + (n/1000).toFixed(0) + 'K';
+  return '₹' + Math.round(n);
+}
+
+function parseRev(val) {
+  if (!val) return 0;
+  const s = String(val).replace(/[,₹\s]/g,'').trim();
+  if (!s || s.startsWith('=')) return 0;
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+
+function cntBy(rows, key) {
+  const m = {};
+  rows.forEach(r => { const v = (r[key]||'').trim(); if (v) m[v] = (m[v]||0)+1; });
+  return m;
+}
+
+function topN(obj, n=10) {
+  return Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n);
+}
+
+function fillSel(id, vals, ph) {
+  const el = document.getElementById(id); if (!el) return;
+  const cur = el.value;
+  el.innerHTML = `<option value="">${ph}</option>`;
+  [...new Set(vals.filter(v => v && v.trim().length > 0))].sort()
+    .forEach(v => el.innerHTML += `<option value="${v}"${v===cur?' selected':''}>${v}</option>`);
+}
+
+function mkDonut(id, labels, data, colors) {
+  const el = document.getElementById(id); if (!el) return;
+  if (CH[id]) CH[id].destroy();
+  CH[id] = new Chart(el, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '58%',
+      plugins: { legend: { display: true, position: 'right',
+        labels: { color: '#5a5848', font: { size: 10 }, boxWidth: 8, padding: 6 } } }
+    }
+  });
+}
+
+function mkHBar(id, labels, data, colors) {
+  const el = document.getElementById(id); if (!el) return;
+  if (CH[id]) CH[id].destroy();
+  CH[id] = new Chart(el, {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 3 }] },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { color: '#9a9680', font: { size: 10 } } },
+        y: { grid: { display: false }, ticks: { color: '#5a5848', font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function mkVBar(id, labels, data, color) {
+  const el = document.getElementById(id); if (!el) return;
+  if (CH[id]) CH[id].destroy();
+  CH[id] = new Chart(el, {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: color, borderRadius: 3 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#9a9680', font: { size: 10 } } },
+        y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { color: '#9a9680', font: { size: 10 } } }
+      }
+    }
+  });
+}
+
+function barsHTML(cid, entries, color) {
+  const el = document.getElementById(cid); if (!el) return;
+  el.innerHTML = '';
+  const mx = Math.max(...entries.map(e=>e[1]), 1);
+  entries.forEach(([lbl, val]) => {
+    const pct = Math.max(2, (val/mx)*93);
+    el.innerHTML += `<div class="br"><div class="bl" title="${lbl}">${lbl}</div><div class="bt"><div class="bf" style="width:0%;background:${color};color:rgba(255,255,255,.85);" data-p="${pct}">${val>4?val:''}</div></div><div class="bn">${val}</div></div>`;
+  });
+  setTimeout(() => el.querySelectorAll('.bf').forEach(b => b.style.width = b.dataset.p+'%'), 50);
+}
+
+function applyF(rows, pfx, nrKey, srcKey) {
+  const status  = F[pfx];
+  const fy      = document.getElementById(`${pfx}-fy`)?.value  || '';
+  const mo      = document.getElementById(`${pfx}-mo`)?.value  || '';
+  const country = document.getElementById(`${pfx}-country`)?.value || '';
+  const source  = document.getElementById(`${pfx}-source`)?.value  || '';
+  const seg     = document.getElementById(`${pfx}-seg`)?.value     || '';
+  const exc     = EXC[pfx];
+  const yab     = YAB[pfx] || new Set();
+
+  return rows.filter((r, idx) => {
+    if (exc.has(idx)) return false;
+    const nameKey = pfx === 'ss' ? 'Customer Name' : 'Name';
+    if (!(r[nameKey]||'').trim()) return false;
+    const src = (r[srcKey]||'').trim().toLowerCase();
+    if (src === 'external event' || src === 'external events') return false;
+    if (status !== 'all') {
+      const nr = (r[nrKey]||'').toLowerCase();
+      if (status === 'New') {
+        if (!nr.includes('new') || nr.includes('repeat')) return false;
+        if (yab.has(idx)) return false;
+      }
+      if (status === 'Repeat') {
+        if (!nr.includes('repeat')) return false;
+      }
+    }
+    if (fy && (r['Financial Year']||'').trim() !== fy) return false;
+    if (mo && (r['Month']||'').trim().toLowerCase() !== mo.toLowerCase()) return false;
+    if (country && (r['Country']||'').trim() !== country) return false;
+    if (source && (r[srcKey]||'').trim() !== source) return false;
+    if (seg && (r['Segmentation']||'').trim() !== seg) return false;
+    return true;
+  });
+}
+
+const AGE_ORDER = ['10-20','20-30','30-40','40-50','50-60','60-70','70-75','75+'];
+const SEG_COLORS = {VIC:'#b8860b',Family:'#3a5f90',Adventurer:'#3a7d3a',Core:'#c05040',Novice:'#8a70c0'};
+const REG_COLORS = ['#b8860b','#2a7d6f','#c05040','#3a5f90','#3a7d3a','#8a70c0','#c9a84c','#6a50a0'];
+
+function renderCust(pfx) {
+  const rows = RAW[pfx]; if (!rows.length) return;
+  const nrKey  = 'New/ Repeat';
+  const srcKey = 'Primary Source';
+  const revKey = 'Total Spend';
+  const f = applyF(rows, pfx, nrKey, srcKey);
+  const tc = f.length;
+  const newC = f.filter(r => {
+    const origIdx = rows.indexOf(r);
+    const nr = (r[nrKey]||'').toLowerCase();
+    return nr.includes('new') && !nr.includes('repeat') && !(YAB[pfx]||new Set()).has(origIdx);
+  }).length;
+  const repC = f.filter(r => (r[nrKey]||'').toLowerCase().includes('repeat')).length;
+  const rev    = f.reduce((s,r) => s + parseRev(r[revKey]), 0);
+  const newRev = f.filter(r => {
+    const origIdx = rows.indexOf(r);
+    const nr = (r[nrKey]||'').toLowerCase();
+    return nr.includes('new') && !nr.includes('repeat') && !(YAB[pfx]||new Set()).has(origIdx);
+  }).reduce((s,r) => s + parseRev(r[revKey]), 0);
+  const repRev = f.filter(r => (r[nrKey]||'').toLowerCase().includes('repeat'))
+                  .reduce((s,r) => s + parseRev(r[revKey]), 0);
+  document.getElementById(`${pfx}-tc`).textContent  = tc.toLocaleString();
+  document.getElementById(`${pfx}-rev`).textContent = fmtRev(rev);
+  document.getElementById(`${pfx}-new`).textContent = newC.toLocaleString();
+  document.getElementById(`${pfx}-rep`).textContent = repC.toLocaleString();
+  mkDonut(`${pfx}-nr`, ['New','Repeat'], [newC, repC], ['#3a7d3a','#b8860b']);
+  mkDonut(`${pfx}-nr-rev`, ['New','Repeat'], [Math.round(newRev), Math.round(repRev)], ['#3a7d3a','#b8860b']);
+  const gd = cntBy(f, 'Gender');
+  mkDonut(`${pfx}-gender`, Object.keys(gd), Object.values(gd), ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0,Object.keys(gd).length));
+  const ad = cntBy(f, 'Age Group');
+  const al = [], av = [];
+  AGE_ORDER.forEach(a => { if (ad[a]) { al.push(a); av.push(ad[a]); } });
+  mkVBar(`${pfx}-age`, al, av, '#3a5f90');
+  const rd = topN(cntBy(f, 'Country'), 8);
+  mkHBar(`${pfx}-region`, rd.map(e=>e[0]), rd.map(e=>e[1]), REG_COLORS.slice(0,rd.length));
+  barsHTML(`${pfx}-src-bars`, topN(cntBy(f, srcKey)), '#2a7d6f');
+  const sd = cntBy(f, 'Segmentation');
+  const se = ['VIC','Family','Adventurer','Core','Novice'].map(s=>[s,sd[s]||0]).filter(e=>e[1]>0);
+  const segEl = document.getElementById(`${pfx}-seg-bars`);
+  if (segEl) {
+    segEl.innerHTML = '';
+    const mx = Math.max(...se.map(e=>e[1]), 1);
+    se.forEach(([lbl,val]) => {
+      const pct = Math.max(2,(val/mx)*93);
+      segEl.innerHTML += `<div class="br"><div class="bl">${lbl}</div><div class="bt"><div class="bf" style="width:0%;background:${SEG_COLORS[lbl]||'#b8860b'};color:rgba(255,255,255,.9);" data-p="${pct}">${val>3?val:''}</div></div><div class="bn">${val}</div></div>`;
+    });
+    setTimeout(() => segEl.querySelectorAll('.bf').forEach(b => b.style.width = b.dataset.p+'%'), 50);
+  }
+  if (pfx === 'ss') {
+    const nriC = f.filter(r => (r['NRI']||'').trim().toLowerCase() === 'yes').length;
+    mkDonut('ss-nri', ['NRI','Non-NRI'], [nriC, tc-nriC], ['#c05040','#b8860b']);
+  }
+}
+
+function renderSS() { renderCust('ss'); }
+function renderTS() { renderCust('ts'); }
+
+function renderLD() {
+  const rows = RAW.ld; if (!rows.length) return;
+  const nrKey = Object.keys(rows[0]||{}).find(k => {
+    const kn = k.replace(/\s+/g,' ').toLowerCase();
+    return kn.includes('lead status') || kn === 'new/ repeat';
+  }) || 'Lead Status (New/ Repeat)';
+  const srcKey = 'Primary Source';
+  const f = applyF(rows, 'ld', nrKey, srcKey);
+  const tc  = f.length;
+  const nwC = f.filter(r => { const v=(r[nrKey]||'').toLowerCase(); return v.includes('new')&&!v.includes('repeat'); }).length;
+  const rpC = f.filter(r => (r[nrKey]||'').toLowerCase().includes('repeat')).length;
+  document.getElementById('ld-tc').textContent  = tc.toLocaleString();
+  document.getElementById('ld-new').textContent = nwC.toLocaleString();
+  document.getElementById('ld-rep').textContent = rpC.toLocaleString();
+  document.getElementById('ld-pct').textContent = tc > 0 ? ((nwC/tc)*100).toFixed(1)+'%' : '—';
+  mkDonut('ld-nr', ['New','Repeat'], [nwC, rpC], ['#3a7d3a','#b8860b']);
+  const gd = cntBy(f, 'Gender');
+  mkDonut('ld-gender', Object.keys(gd), Object.values(gd), ['#b8860b','#2a7d6f','#8a70c0','#c05040'].slice(0,Object.keys(gd).length));
+  const ad = cntBy(f, 'Age Group');
+  const al = [], av = [];
+  AGE_ORDER.forEach(a => { if (ad[a]) { al.push(a); av.push(ad[a]); } });
+  mkVBar('ld-age', al, av, '#3a5f90');
+  const rd = topN(cntBy(f, 'Country'), 8);
+  mkHBar('ld-region', rd.map(e=>e[0]), rd.map(e=>e[1]), REG_COLORS.slice(0,rd.length));
+  barsHTML('ld-src-bars', topN(cntBy(f, srcKey)), '#2a7d6f');
+}
+
+function renderSeg(lines) {
+  function sv(l) { for(const r of lines){if(r[0]&&r[0].trim()===l){const v=parseInt(r[1]);if(!isNaN(v))return v;}}return 0; }
+  function lv(l) { for(const r of lines){if(r[3]&&r[3].trim()===l){const v=parseInt(r[4]);if(!isNaN(v))return v;}}return 0; }
+  const vic=sv('VIC'),fam=sv('Family'),adv=sv('Adventurer'),core=sv('Core'),nov=sv('Novice');
+  const tc=vic+fam+adv+core+nov;
+  const hot=lv('Hot Leads'),warm=lv('Warm Leads'),cold=lv('Cold Leads'),tl=hot+warm+cold;
+  document.getElementById('s-tc').textContent=tc;
+  document.getElementById('s-tl').textContent=tl;
+  document.getElementById('s-vic').textContent=vic;
+  document.getElementById('s-conv').textContent=tc+tl>0?((tc/(tc+tl))*100).toFixed(1)+'%':'—';
+  barsHTML('s-pyr',[['VIC',vic],['Family',fam],['Adventurer',adv],['Core',core],['Novice',nov]],'#b8860b');
+  barsHTML('s-ld',[['Hot Leads',hot],['Warm Leads',warm],['Cold Leads',cold]],'#c05040');
+  const ghi=lines.findIndex(r=>r[0]&&r[0].trim()==='Categories'&&r[1]&&r[1].trim()==='Africa');
+  const gtr=ghi>=0?lines.slice(ghi+1,ghi+8).find(r=>r[0]&&r[0].trim()==='Total'):null;
+  const regs=['Africa','America','Asia','Australia','Europe','MEA','Oceania','SEA'];
+  const gcols=['#7c6fb0','#6a9d6a','#b8860b','#c05040','#3a5f90','#c9a84c','#2a7d6f','#8a70c0'];
+  const gd=gtr?regs.map((_,i)=>parseInt(gtr[i+1])||0):regs.map(()=>0);
+  const gf=regs.map((r,i)=>({r,v:gd[i],c:gcols[i]})).filter(x=>x.v>0);
+  document.getElementById('s-geo-leg').innerHTML=gf.map(x=>`<div class="li"><div class="ld" style="background:${x.c}"></div>${x.r} ${x.v}</div>`).join('');
+  if(CH['s-geo'])CH['s-geo'].destroy();
+  CH['s-geo']=new Chart(document.getElementById('s-geo'),{type:'doughnut',data:{labels:gf.map(x=>x.r),datasets:[{data:gf.map(x=>x.v),backgroundColor:gf.map(x=>x.c),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{display:true,position:'right',labels:{color:'#5a5848',font:{size:10},boxWidth:8,padding:6}}}}});
+  const ms=['Apr - 1','May - 1','Jun - 1','Jul - 1','Aug - 1','Sep - 1','Oct - 1'];
+  const ml=['Apr','May','Jun','Jul','Aug','Sep','Oct'];
+  const cm=[],lm=[];
+  ms.forEach(sec=>{
+    const idx=lines.findIndex(r=>r[0]&&r[0].trim()===sec);
+    if(idx<0){cm.push(0);lm.push(0);return;}
+    const blk=lines.slice(idx+1,idx+14);
+    function rt(row){for(let i=row.length-1;i>=1;i--){const v=parseInt(row[i]);if(!isNaN(v)&&row[i]!=='')return v;}return 0;}
+    cm.push(['VIC','Family','Adventurer','Core','Novice'].reduce((s,seg)=>{const r=blk.find(r=>r[0]&&r[0].trim()===seg);return s+(r?rt(r):0);},0));
+    lm.push(['Hot Leads','Warm Leads','Cold Leads'].reduce((s,seg)=>{const r=blk.find(r=>r[0]&&r[0].trim()===seg);return s+(r?rt(r):0);},0));
+  });
+  if(CH['s-trend'])CH['s-trend'].destroy();
+  CH['s-trend']=new Chart(document.getElementById('s-trend'),{type:'bar',data:{labels:ml,datasets:[{label:'Customers',data:cm,backgroundColor:'#b8860b',borderRadius:3},{label:'Leads',data:lm,backgroundColor:'#c05040',borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{color:'#9a9680',font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#9a9680',font:{size:10}}}}}});
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('page-'+name).classList.add('on');
+  const tabs=['seg','ss','ts','ld'];
+  document.querySelectorAll('.tab').forEach((t,i)=>{if(tabs[i]===name)t.classList.add('on');});
+}
+
+function setF(pfx, val) {
+  F[pfx] = val;
+  ['all','new','rep'].forEach(v => document.getElementById(`${pfx}-f${v}`)?.classList.remove('on'));
+  document.getElementById(`${pfx}-f${val==='all'?'all':val==='New'?'new':'rep'}`)?.classList.add('on');
+  if (pfx==='ss') renderSS();
+  else if (pfx==='ts') renderTS();
+  else renderLD();
+}
+
+function clearF(pfx) {
+  F[pfx] = 'all';
+  ['all','new','rep'].forEach(v=>document.getElementById(`${pfx}-f${v}`)?.classList.remove('on'));
+  document.getElementById(`${pfx}-fall`)?.classList.add('on');
+  ['fy','mo','country','source','seg'].forEach(k=>{
+    const el=document.getElementById(`${pfx}-${k}`);if(el)el.value='';
+  });
+  if (pfx==='ss') renderSS();
+  else if (pfx==='ts') renderTS();
+  else renderLD();
+}
+
+async function init() {
+  const dot=document.getElementById('dot'),txt=document.getElementById('dot-txt');
+  dot.className='dot err'; txt.textContent='Loading';
+  document.getElementById('sync-txt').textContent='Fetching all sheets...';
+  document.getElementById('err-area').innerHTML='';
+  try {
+    const t = Date.now();
+    const [sR,ssR,tsR,ldR] = await Promise.all([
+      fetch(CSV.seg+'&t='+t), fetch(CSV.ss+'&t='+t),
+      fetch(CSV.ts+'&t='+t),  fetch(CSV.ld+'&t='+t)
+    ]);
+    if (!sR.ok||!ssR.ok||!tsR.ok||!ldR.ok) throw new Error('One or more sheets failed to load');
+    const [sTx,ssTx,tsTx,ldTx] = await Promise.all([sR.text(),ssR.text(),tsR.text(),ldR.text()]);
+    const segLines = sTx.split('\n').map(l => splitLine(l));
+    renderSeg(segLines);
+    RAW.ss = parseCSV(ssTx);
+    RAW.ts = parseCSV(tsTx);
+    RAW.ld = parseCSV(ldTx);
+    document.getElementById('ss-info').textContent = `✦ ${EXC.ss.size} rows excluded (pink AF) · ${YAB.ss.size} rows excluded from New filter (yellow AB)`;
+    document.getElementById('ts-info').textContent = `✦ ${EXC.ts.size} rows excluded (pink AE) · ${YAB.ts.size} rows excluded from New filter (yellow AB)`;
+    document.getElementById('ld-info').textContent = `✦ ${EXC.ld.size} lead rows excluded (light yellow col D)`;
+    const notExt = v => v && v.trim().length > 0 && v.trim().toLowerCase() !== 'external event' && v.trim().toLowerCase() !== 'external events';
+    fillSel('ss-country', RAW.ss.map(r=>r['Country']), 'All Countries');
+    fillSel('ss-source',  RAW.ss.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
+    fillSel('ss-seg',     RAW.ss.map(r=>r['Segmentation']).filter(v=>v&&!v.includes('2024')&&!v.includes('2025')), 'All Segments');
+    fillSel('ts-country', RAW.ts.map(r=>r['Country']), 'All Countries');
+    fillSel('ts-source',  RAW.ts.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
+    fillSel('ts-seg',     RAW.ts.map(r=>r['Segmentation']).filter(v=>v&&!v.includes('2024')&&!v.includes('2025')), 'All Segments');
+    fillSel('ld-country', RAW.ld.map(r=>r['Country']), 'All Countries');
+    fillSel('ld-source',  RAW.ld.map(r=>r['Primary Source']).filter(notExt), 'All Sources');
+    renderSS(); renderTS(); renderLD();
+    dot.className='dot ok'; txt.textContent='Live';
+    document.getElementById('sync-txt').textContent = 'Last synced: '+new Date().toLocaleString('en-IN',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  } catch(e) {
+    dot.className='dot err'; txt.textContent='Error';
+    document.getElementById('sync-txt').textContent='Could not connect';
+    document.getElementById('err-area').innerHTML=`<div class="err">⚠️ ${e.message}</div>`;
+  }
+}
+
+init();
+</script>
+</body>
+</html>
