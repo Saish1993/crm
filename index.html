@@ -428,7 +428,7 @@ function parseCSV(txt) {
     const l = lines[i].toLowerCase();
     if (l.includes('financial year') || l.includes('salutation') || l.includes('sr. no')) { hi = i; break; }
   }
-  const hdrs = splitLine(lines[hi]).map(h => h.replace(/\n/g,' ').replace(/\r/g,'').trim());
+  const hdrs = splitLine(lines[hi]).map(h => h.replace(/[\n\r\t]/g,' ').trim());
   const rows = [];
   for (let i = hi+1; i < lines.length; i++) {
     const line = lines[i].trim();
@@ -436,7 +436,8 @@ function parseCSV(txt) {
     const vals = splitLine(line);
     if (!vals[0] && !vals[1] && !vals[2] && !vals[3]) continue;
     const obj = {};
-    hdrs.forEach((h,j) => obj[h] = (vals[j]||'').trim());
+    // Strip newlines/tabs from all values (Google Sheets CSV can embed them)
+    hdrs.forEach((h,j) => obj[h] = (vals[j]||'').replace(/[\n\r\t]/g,' ').trim());
     rows.push(obj);
   }
   return rows;
